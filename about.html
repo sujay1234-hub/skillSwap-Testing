@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - SkillSwap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #a855f7;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 30%);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            border-bottom: 1px solid var(--border);
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo i {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav { display: flex; gap: 30px; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        nav a:hover, nav a.active { color: white; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .section { margin-bottom: 80px; }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i { color: var(--accent); }
+
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .problem-grid, .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .problem-card, .solution-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.1);
+        }
+
+        .solution-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+        }
+
+        .problem-icon, .solution-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+        }
+
+        .problem-icon { background: rgba(239, 68, 68, 0.1); }
+        .solution-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+        .problem-card h3, .solution-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .problem-card p, .solution-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .vision-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .vision-card h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .vision-card p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .founder-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+            transition: 0.3s ease;
+        }
+
+        .founder-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .founder-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .founder-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .founder-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+        .founder-role { color: var(--primary); font-weight: 500; margin-bottom: 8px; }
+        .founder-college { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+        .founder-bio { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        .cta-section {
+            text-align: center;
+            padding: 60px 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+        }
+
+        .cta-section h2 { font-size: 2rem; font-weight: 700; margin-bottom: 16px; }
+        .cta-section p { color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem; }
+
+        .cta-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+
+        .btn-primary {
+            padding: 16px 32px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            padding: 16px 32px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .hero h1 { font-size: 2.2rem; }
+            .vision-card, .founder-card { padding: 30px 20px; }
+            .cta-buttons { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-bolt"></i> SkillSwap
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="explore.html">Explore</a>
+            <a href="about.html" class="active">About</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>About <span>SkillSwap</span></h1>
+            <p>Trade Skills. Not Money. Building the future of peer-to-peer learning.</p>
+        </div>
+
+        <!-- Problem Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-triangle-exclamation"></i> The Problem</h2>
+                <p>Millions of students want to learn but face significant barriers.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">💸</div>
+                    <h3>Expensive Education</h3>
+                    <p>Quality courses cost thousands, making learning inaccessible for many students.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🎓</div>
+                    <h3>Underutilized Knowledge</h3>
+                    <p>Students have valuable skills but lack a platform to share and monetize them.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🤝</div>
+                    <h3>Trust Issues</h3>
+                    <p>Finding reliable peers for skill exchange is difficult and time-consuming.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🌍</div>
+                    <h3>Unequal Access</h3>
+                    <p>Opportunities are not equally distributed across regions and backgrounds.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solution Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-lightbulb"></i> Our Solution</h2>
+                <p>A student-powered marketplace where knowledge becomes currency.</p>
+            </div>
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <div class="solution-icon">🔄</div>
+                    <h3>Skill Exchange</h3>
+                    <p>Trade your expertise for what you want to learn. No money required.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">👥</div>
+                    <h3>Peer Learning</h3>
+                    <p>Learn from fellow students who understand your context and goals.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">⭐</div>
+                    <h3>Reputation System</h3>
+                    <p>Build trust through ratings, reviews, and verified exchanges.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">📚</div>
+                    <h3>Practical Skills</h3>
+                    <p>Focus on real-world skills that matter in the job market.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vision Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-eye"></i> Our Vision</h2>
+            </div>
+            <div class="vision-card">
+                <h3>Democratize Education</h3>
+                <p>We aim to build the world's largest knowledge-sharing network where education is free, collaborative, and powered by community — not money.</p>
+            </div>
+        </div>
+
+        <!-- Founder Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-user"></i> Built By</h2>
+            </div>
+            <div class="founder-card">
+                <div class="founder-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h3>Sujay Banarjee</h3>
+                <div class="founder-role">Founder & Developer</div>
+                <div class="founder-college">B.Tech CSE — LPU</div>
+                <p class="founder-bio">Passionate about building products that solve real problems for students and revolutionize education.</p>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>Join the Movement</h2>
+            <p>Start learning, teaching, and growing — without spending money.</p>
+            <div class="cta-buttons">
+                <a href="explore.html" class="btn-primary">
+                    <i class="fa-solid fa-compass"></i> Explore Skills
+                </a>
+                <a href="index.html" class="btn-secondary">
+                    <i class="fa-solid fa-house"></i> Go Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2026 SkillSwap — Trade Skills. Not Money.
+    </footer>
+
+</body>
+</html>

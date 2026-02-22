@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Session — SkillSwap</title>
+
+  <style>
+    body{
+      margin:0;
+      background:#09090b;
+      color:white;
+      font-family:Arial;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    header{
+      background:#18181b;
+      padding:14px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid #222;
+    }
+
+    .title{
+      font-weight:600;
+      font-size:18px;
+    }
+
+    .btn{
+      padding:8px 16px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .exit{ background:#111; color:white; }
+    .end{ background:#ef4444; color:white; }
+
+    #jitsi-container{
+      flex:1;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="title">🎥 Live Session</div>
+
+  <div>
+    <button class="btn exit"
+      onclick="window.location.href='trades.html'">
+      Exit
+    </button>
+
+    <button class="btn end" onclick="leaveCall()">
+      End
+    </button>
+  </div>
+</header>
+
+<div id="jitsi-container"></div>
+
+
+<!-- 🔥 JITSI API -->
+<script src="https://meet.jit.si/external_api.js"></script>
+
+<script>
+
+// ✅ SAME ROOM FOR BOTH USERS
+const params = new URLSearchParams(window.location.search);
+const roomName = params.get("room") || "SkillSwap_Public";
+
+const domain = "meet.jit.si";
+
+const options = {
+  roomName: roomName,
+  parentNode: document.querySelector("#jitsi-container"),
+
+  configOverwrite: {
+    prejoinPageEnabled: false,
+    disableDeepLinking: true
+  },
+
+  interfaceConfigOverwrite: {
+    SHOW_JITSI_WATERMARK: false,
+    SHOW_POWERED_BY: false,
+    DISPLAY_WELCOME_PAGE_CONTENT: false
+  }
+};
+const api = new JitsiMeetExternalAPI(domain, options);
+
+
+// 🔴 END CALL
+function leaveCall(){
+  if(confirm("Leave session?")){
+    api.dispose();
+    window.location.href = "trades.html";
+  }
+}
+
+</script>
+
+</body>
+</html>

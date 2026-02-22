@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel - SkillSwap</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  background:#0f172a;
+  color:white;
+  font-family:Inter;
+  padding:40px;
+}
+
+h1{margin-bottom:30px;}
+
+.section{margin-bottom:60px;}
+
+.analytics{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-bottom:40px;
+}
+
+.stat{
+  background:#1e293b;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+th,td{
+  padding:12px;
+  text-align:left;
+}
+
+th{
+  background:#1e293b;
+}
+
+tr{
+  background:#111827;
+  border-bottom:1px solid #1e293b;
+}
+
+button{
+  padding:6px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-right:5px;
+  font-weight:600;
+}
+
+.add{background:#10b981;color:white;}
+.deduct{background:#ef4444;color:white;}
+.set{background:#6366f1;color:white;}
+.approve{background:#10b981;color:white;}
+.reject{background:#ef4444;color:white;}
+
+input{
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:15px;
+  width:300px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<!-- ================= ANALYTICS ================= -->
+
+<div class="analytics">
+  <div class="stat">
+    <h3>Total Platform Revenue</h3>
+    <p id="totalRevenue">₹0</p>
+  </div>
+  <div class="stat">
+    <h3>Total Paid to Tutors</h3>
+    <p id="totalPaid">₹0</p>
+  </div>
+  <div class="stat">
+    <h3>Total Users</h3>
+    <p id="totalUsers">0</p>
+  </div>
+  <div class="stat">
+    <h3>Pending Withdrawals</h3>
+    <p id="pendingWithdraw">₹0</p>
+  </div>
+</div>
+
+<!-- ================= WALLET ================= -->
+
+<div class="section">
+<h2>💰 User Wallet Management</h2>
+
+<input type="text" id="searchUser" placeholder="Search by email..." oninput="filterUsers()">
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Balance</th>
+      <th>Total Earned</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="walletTable"></tbody>
+</table>
+</div>
+
+<!-- ================= WITHDRAW ================= -->
+
+<div class="section">
+<h2>🏦 Withdrawal Requests</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tutor</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="withdrawTable"></tbody>
+</table>
+</div>
+
+<script type="module">
+
+import { initializeApp } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import { 
+  getFirestore,
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+ authDomain: "skillswapp-35e86.firebaseapp.com",
+ projectId: "skillswapp-35e86"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let allUsers = [];
+
+/* ================= ANALYTICS ================= */
+
+let totalRevenue = 0;
+let totalPaid = 0;
+
+onSnapshot(collection(db,"earnings"), snapshot => {
+
+  totalPaid = 0;
+  totalRevenue = 0;
+
+  snapshot.forEach(docSnap=>{
+    const data = docSnap.data();
+    totalPaid += data.totalEarned || 0;
+  });
+
+  totalRevenue = totalPaid * 0.10;
+
+  document.getElementById("totalPaid").innerText = "₹" + totalPaid;
+  document.getElementById("totalRevenue").innerText = "₹" + totalRevenue;
+});
+
+onSnapshot(collection(db,"users"), snapshot=>{
+  document.getElementById("totalUsers").innerText = snapshot.size;
+});
+
+onSnapshot(collection(db,"withdrawRequests"), snapshot=>{
+  let pending = 0;
+  snapshot.forEach(docSnap=>{
+    const data = docSnap.data();
+    if(data.status==="pending"){
+      pending += data.amount;
+    }
+  });
+  document.getElementById("pendingWithdraw").innerText = "₹" + pending;
+});
+
+/* ================= WALLET ================= */
+
+const walletTable = document.getElementById("walletTable");
+
+onSnapshot(collection(db,"earnings"), async snapshot => {
+
+  walletTable.innerHTML="";
+  allUsers = [];
+
+  for(const docSnap of snapshot.docs){
+
+    const data = docSnap.data();
+    const uid = docSnap.id;
+
+    const userSnap = await getDoc(doc(db,"users",uid));
+
+    let name="Unknown";
+    let email="Not Found";
+
+    if(userSnap.exists()){
+      name = userSnap.data().name || "No Name";
+      email = userSnap.data().email || "No Email";
+    }
+
+    allUsers.push({
+      uid,
+      name,
+      email,
+      balance:data.balance||0,
+      totalEarned:data.totalEarned||0
+    });
+  }
+
+  renderUsers(allUsers);
+});
+
+function renderUsers(users){
+
+  walletTable.innerHTML="";
+
+  users.forEach(user=>{
+
+    walletTable.innerHTML += `
+      <tr>
+        <td>
+          <strong>${user.name}</strong><br>
+          <small>${user.email}</small><br>
+          <small style="color:#94a3b8;">${user.uid}</small>
+        </td>
+        <td>₹${user.balance}</td>
+        <td>₹${user.totalEarned}</td>
+        <td>
+          <button class="add" onclick="addMoney('${user.uid}')">+ Add</button>
+          <button class="deduct" onclick="deductMoney('${user.uid}')">- Deduct</button>
+          <button class="set" onclick="setBalance('${user.uid}')">Set</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+window.filterUsers = function(){
+
+  const search = document.getElementById("searchUser").value.toLowerCase();
+
+  const filtered = allUsers.filter(user =>
+    user.email.toLowerCase().includes(search)
+  );
+
+  renderUsers(filtered);
+};
+
+/* ================= ADMIN ACTIONS ================= */
+
+window.addMoney = async function(uid){
+  const amount = Number(prompt("Add amount:"));
+  if(!amount) return;
+
+  await updateDoc(doc(db,"earnings",uid),{
+    balance: increment(amount),
+    totalEarned: increment(amount)
+  });
+};
+
+window.deductMoney = async function(uid){
+  const amount = Number(prompt("Deduct amount:"));
+  if(!amount) return;
+
+  await updateDoc(doc(db,"earnings",uid),{
+    balance: increment(-amount)
+  });
+};
+
+window.setBalance = async function(uid){
+  const amount = Number(prompt("Set new balance:"));
+  if(amount<0) return;
+
+  await setDoc(doc(db,"earnings",uid),{
+    balance:amount
+  },{merge:true});
+};
+
+/* ================= WITHDRAW ================= */
+
+const withdrawTable = document.getElementById("withdrawTable");
+
+onSnapshot(collection(db,"withdrawRequests"), async snapshot => {
+
+  withdrawTable.innerHTML="";
+
+  for(const docSnap of snapshot.docs){
+
+    const data = docSnap.data();
+    const userSnap = await getDoc(doc(db,"users",data.tutorId));
+
+    let name="Unknown";
+    if(userSnap.exists()){
+      name=userSnap.data().name;
+    }
+
+    withdrawTable.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>₹${data.amount}</td>
+        <td>${data.status}</td>
+        <td>
+          ${data.status==="pending" ? `
+            <button class="approve"
+              onclick="approveWithdraw('${docSnap.id}','${data.tutorId}',${data.amount})">
+              Approve
+            </button>
+            <button class="reject"
+              onclick="rejectWithdraw('${docSnap.id}')">
+              Reject
+            </button>
+          ` : ""}
+        </td>
+      </tr>
+    `;
+  }
+});
+
+window.approveWithdraw = async function(id,tutorId,amount){
+
+  await updateDoc(doc(db,"withdrawRequests",id),{
+    status:"approved"
+  });
+
+  await updateDoc(doc(db,"earnings",tutorId),{
+    balance: increment(-amount)
+  });
+
+  alert("Approved. Pay tutor manually.");
+};
+
+window.rejectWithdraw = async function(id){
+
+  await updateDoc(doc(db,"withdrawRequests",id),{
+    status:"rejected"
+  });
+};
+
+</script>
+
+</body>
+</html>

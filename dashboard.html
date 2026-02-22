@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkillSwap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --accent: #a855f7;
+            --success: #10b981;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            /* Subtle Mesh Gradient */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .user-greeting h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .user-greeting p {
+            color: var(--text-muted);
+        }
+
+        .profile-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 8px 16px;
+            border-radius: 50px;
+        }
+
+        .avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover::before { opacity: 1; }
+
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Wallet Specific */
+        .wallet-card .stat-value {
+            background: linear-gradient(to right, #fff, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-action {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Reputation Progress */
+        .progress-container {
+            margin-top: 15px;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%; /* JS will update this */
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        .level-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Recent Activity Section */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .activity-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .activity-text h4 {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .activity-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: #18181b;
+            border: 1px solid var(--card-border);
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: 0.3s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .modal-header h2 { font-size: 1.5rem; margin-bottom: 10px; }
+        .modal-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .input-group { margin-bottom: 20px; }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--primary-glow); }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-cancel:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .profile-pill { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="user-greeting">
+                <h1>Welcome back! 👋</h1>
+                <p>Here is your daily overview.</p>
+            </div>
+            <div class="profile-pill">
+                <div class="avatar" id="userAvatar">U</div>
+                <div>
+                    <div style="font-weight:600; font-size:0.9rem;" id="userName">User</div>
+                    <div style="font-size:0.8rem; color:#fbbf24;">⭐ <span id="userXP">0</span> XP</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <!-- Wallet Card -->
+            <div class="stat-card wallet-card">
+                <div class="stat-icon" style="color: #fbbf24;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="stat-value" id="walletBalance">₹0</div>
+                <div class="stat-label">Wallet Balance</div>
+                <button class="btn-action" onclick="openWithdrawModal()">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdraw Funds
+                </button>
+            </div>
+
+            <!-- Reputation Card -->
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #a855f7;">
+                    <i class="fa-solid fa-medal"></i>
+                </div>
+                <div class="stat-value" id="repLevel">Beginner</div>
+                <div class="stat-label">Reputation Level</div>
+                <div class="progress-container">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="repProgress" style="width: 10%"></div>
+                    </div>
+                    <div class="level-text">
+                        <span>Novice</span>
+                        <span>Expert</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trades Card -->
+            <!-- 🤝 ACTIVE TRADES CARD -->
+<div class="stat-card">
+
+  <div class="stat-icon" style="color:#6366f1;">
+    <i class="fa-solid fa-handshake"></i>
+  </div>
+
+  <div class="stat-value" id="tradeCount">0</div>
+  <div class="stat-label">Active Trades</div>
+
+  <!-- 👀 VIEW MY TRADES BUTTON -->
+  <button onclick="location.href='trades.html'"
+  style="
+    margin-top:14px;
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    background:linear-gradient(135deg,#6366f1,#a855f7);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+  ">
+    📋 View My Trades
+  </button>
+
+  <!-- ➕ FIND NEW TRADES BUTTON -->
+  <button onclick="location.href='skill-exchange.html'"
+  style="
+    margin-top:8px;
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #333;
+    background:#18181b;
+    color:#fff;
+    cursor:pointer;
+  ">
+    ➕ Find New Trades
+  </button>
+
+</div>
+
+        <!-- Recent Activity -->
+        <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h2>
+        <div class="activity-list" id="activityList">
+            <!-- Placeholder / Empty State -->
+            <div class="activity-item">
+                <div class="activity-info">
+                    <div class="activity-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <div class="activity-text">
+                        <h4>No Recent Activity</h4>
+                        <p>Start trading skills to see updates here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal-overlay">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <i class="fa-solid fa-wallet"></i>
+      <h2>Withdraw Funds</h2>
+      <p>Enter the amount you wish to withdraw.</p>
+    </div>
+
+    <!-- Amount -->
+    <div class="input-group">
+      <label>Amount (₹)</label>
+      <input type="number" id="withdrawAmount" placeholder="Enter amount">
+    </div>
+
+    <!-- UPI ID -->
+    <div class="input-group">
+      <label>UPI ID</label>
+      <input type="text" id="upiId" placeholder="example@upi">
+    </div>
+
+    <!-- Buttons -->
+    <button class="btn-primary" onclick="submitWithdraw()">
+      Withdraw Now
+    </button>
+
+    <button class="btn-cancel" onclick="closeWithdrawModal()">
+      Cancel
+    </button>
+
+  </div>
+</div>

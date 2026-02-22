@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Profile - SkillSwap</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Inter;
+    text-align:center;
+    padding:50px;
+}
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:40px;
+    border-radius:20px;
+    width:400px;
+    margin:auto;
+}
+img{
+    width:100px;
+    border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <img id="photo">
+    <h2 id="name"></h2>
+    <p id="email"></p>
+    <h3 style="margin-top:20px;">Bank / UPI Details</h3>
+
+<input id="upiId" placeholder="Enter UPI ID">
+<button onclick="saveBank()">Save</button>
+
+    <p><strong>Reputation:</strong> Beginner</p>
+    <p><strong>Skills:</strong> Java, C++, Web Dev</p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user)=>{
+    if(!user){
+        window.location.href="login.html";
+    }else{
+        document.getElementById("name").innerText=user.displayName;
+        document.getElementById("email").innerText=user.email;
+        document.getElementById("photo").src=user.photoURL;
+    }
+    const db = getFirestore(app);
+
+});
+window.saveBank = async function(){
+
+  const user = auth.currentUser;
+  const upi = document.getElementById("upiId").value.trim();
+
+  if(!upi){
+    alert("Please enter UPI ID");
+    return;
+  }
+
+  await setDoc(doc(db,"bankDetails",user.uid),{
+    upiId:upi
+  });
+
+  alert("Bank details saved successfully!");
+};
+
+</script>
+
+</body>
+</html>

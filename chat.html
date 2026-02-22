@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - SkillSwap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #a855f7;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --sent-msg: linear-gradient(135deg, var(--primary), var(--accent));
+            --received-msg: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            /* Subtle Background */
+            background-image: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.05), transparent 20%);
+        }
+
+        /* --- Layout --- */
+        .chat-wrapper {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 360px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            background: rgba(9, 9, 11, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .sidebar-header i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background: var(--bg-card);
+        }
+
+        .chat-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid #09090b;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-meta {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .unread-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-left: auto;
+        }
+
+        /* --- Main Chat Area --- */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chat-header .status {
+            font-size: 0.8rem;
+            color: #10b981;
+        }
+
+        .messages-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 14px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: var(--received-msg);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--sent-msg);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+        }
+
+        /* --- Input Area --- */
+        .input-area {
+            padding: 20px 30px;
+            background: rgba(9, 9, 11, 0.9);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 16px 20px;
+            padding-right: 50px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .btn-send {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--sent-msg);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-send:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Empty State --- */
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+        .empty-chat i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.2;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h2, .chat-info, .chat-meta { display: none; }
+            .chat-item { justify-content: center; padding: 15px 0; }
+            .avatar { width: 40px; height: 40px; border-radius: 12px; }
+            .message { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-wrapper">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-paper-plane"></i> Messages</h2>
+        </div>
+        <div class="chat-list" id="chatList">
+            <!-- Chat items will be injected here -->
+            <div style="padding:20px; text-align:center; color:var(--text-muted);">
+                Loading chats...
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat -->
+    <div class="chat-main">
+        <div class="chat-header" id="chatHeader">
+            <div class="avatar-container">
+                <img src="" id="headerAvatar" class="avatar" style="display:none;">
+            </div>
+            <div>
+                <h3 id="headerName">Select a conversation</h3>
+                <span class="status" id="headerStatus" style="display:none;">Online</span>
+            </div>
+        </div>
+
+        <div class="messages-area" id="messagesArea">
+            <div class="empty-chat">
+                <i class="fa-regular fa-comments"></i>
+                <h3>Select a chat to start messaging</h3>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+            </div>
+            <button class="btn-send" onclick="sendMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Firebase Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, where, getDocs,
+  addDoc, orderBy, onSnapshot, doc, getDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let activeChatId = null;
+let unsubscribe = null;
+
+
+// ENTER KEY SEND
+document.getElementById("messageInput")
+.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+
+// AUTH CHECK
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    currentUser = user;
+    loadChats();
+  }
+});
+
+
+// =======================
+// LOAD CHATS
+// =======================
+
+async function loadChats() {
+  const chatList = document.getElementById("chatList");
+
+  try {
+
+    // Try participants field
+    let q = query(
+      collection(db, "chats"),
+      where("participants", "array-contains", currentUser.uid)
+    );
+
+    let snapshot = await getDocs(q);
+
+    // If none, try users field
+    if (snapshot.empty) {
+      q = query(
+        collection(db, "chats"),
+        where("users", "array-contains", currentUser.uid)
+      );
+      snapshot = await getDocs(q);
+    }
+
+    if (snapshot.empty) {
+      chatList.innerHTML = `
+        <div style="padding:30px;text-align:center;color:#aaa">
+          <i class="fa-solid fa-inbox" style="font-size:2rem"></i>
+          <p>No conversations yet</p>
+        </div>`;
+      return;
+    }
+
+    renderChatList(snapshot.docs);
+
+  } catch (err) {
+    chatList.innerHTML = `
+      <div style="padding:30px;text-align:center;color:#ef4444">
+        Error loading chats<br>${err.message}
+      </div>`;
+  }
+}
+
+
+// =======================
+// RENDER CHAT LIST
+// =======================
+
+async function renderChatList(docs) {
+  const chatList = document.getElementById("chatList");
+  chatList.innerHTML = "";
+
+  for (const docSnap of docs) {
+
+    const data = docSnap.data();
+    const chatId = docSnap.id;
+
+    const users = data.participants || data.users || [];
+    const otherUserId = users.find(u => u !== currentUser.uid);
+    if (!otherUserId) continue;
+
+    // Fetch other user
+    let name = "User";
+let photo = "";
+
+try {
+  const userSnap = await getDoc(doc(db, "users", otherUserId));
+  if (userSnap.exists()) {
+    const u = userSnap.data();
+    name = u.name || u.displayName || "User";
+    photo = u.photo || u.photoURL || "";
+  }
+} catch {}
+
+// 🔥 If no Firestore photo, try Auth users collection (optional)
+if (!photo && otherUserId === currentUser.uid) {
+  photo = currentUser.photoURL || "";
+}
+
+    // Last message
+    let lastMsg = "No messages yet";
+
+    try {
+      const msgQuery = query(
+        collection(db, "chats", chatId, "messages"),
+        orderBy("createdAt", "desc")
+      );
+      const msgSnap = await getDocs(msgQuery);
+
+      if (!msgSnap.empty) {
+        lastMsg = msgSnap.docs[0].data().text || "";
+      }
+    } catch {}
+
+    // CREATE CHAT ITEM
+    let avatarHTML;
+
+if (photo) {
+  avatarHTML = `<img src="${photo}" class="avatar">`;
+} else {
+  avatarHTML = `<div class="avatar">${name.charAt(0)}</div>`;
+}
+
+const div = document.createElement("div");
+div.className = "chat-item";
+div.onclick = () => openChat(chatId, name);
+
+div.innerHTML = `
+  <div class="avatar-container">
+    ${avatarHTML}
+  </div>
+  <div class="chat-info">
+    <h4>${name}</h4>
+    <p>${lastMsg}</p>
+  </div>
+`;
+
+    chatList.appendChild(div);
+  }
+}
+
+
+// =======================
+// OPEN CHAT
+// =======================
+
+function openChat(chatId, name) {
+
+  activeChatId = chatId;
+
+  document.getElementById("headerName").textContent = name;
+  document.getElementById("messagesArea").innerHTML = "";
+
+  if (unsubscribe) unsubscribe();
+
+  const q = query(
+    collection(db, "chats", chatId, "messages"),
+    orderBy("createdAt")
+  );
+
+  unsubscribe = onSnapshot(q, (snapshot) => {
+
+    const area = document.getElementById("messagesArea");
+    area.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const msg = doc.data();
+
+      const div = document.createElement("div");
+      div.className = "message " +
+        (msg.senderId === currentUser.uid ? "sent" : "received");
+
+      div.textContent = msg.text;
+
+      area.appendChild(div);
+    });
+
+    area.scrollTop = area.scrollHeight;
+  });
+}
+
+
+// =======================
+// SEND MESSAGE
+// =======================
+
+window.sendMessage = async function () {
+
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+
+  if (!text || !activeChatId) return;
+
+  await addDoc(
+    collection(db, "chats", activeChatId, "messages"),
+    {
+      text,
+      senderId: currentUser.uid,
+      createdAt: serverTimestamp()
+    }
+  );
+
+  input.value = "";
+};
+</script>
