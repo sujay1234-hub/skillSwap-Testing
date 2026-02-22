@@ -21,6 +21,7 @@
             --card-bg: rgba(255, 255, 255, 0.03);
             --success: #10b981;
             --danger: #ef4444;
+            --warning: #fbbf24;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,6 +60,8 @@
             padding: 20px 0 40px;
             border-bottom: 1px solid var(--border);
             margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .logo {
@@ -75,6 +78,12 @@
             background: linear-gradient(135deg, var(--accent), #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .user-profile {
@@ -98,7 +107,83 @@
         .xp-pill {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #fbbf24;
+            color: var(--warning);
+        }
+
+        /* --- Trade Requests Badge Card --- */
+        .requests-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+            min-width: 220px;
+        }
+
+        .requests-card:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .requests-card:active {
+            transform: translateY(0);
+        }
+
+        .requests-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .requests-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 146, 60, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--warning);
+        }
+
+        .requests-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .requests-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .requests-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .requests-badge {
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            color: #000;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            min-width: 28px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .requests-badge.empty {
+            display: none;
         }
 
         /* --- Form Section --- */
@@ -187,6 +272,44 @@
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -5px var(--accent-glow);
+        }
+
+        /* --- Search Bar --- */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        #searchBar:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            background: rgba(0,0,0,0.3);
+            outline: none;
+        }
+
+        #searchBar::placeholder {
+            color: #52525b;
         }
 
         /* --- Grid Layout --- */
@@ -330,13 +453,47 @@
             100% { background-position: -200% 0; }
         }
 
+        /* --- No Results --- */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
         /* --- Responsive --- */
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 15px; }
             .card { padding: 20px; }
-            header { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .user-profile { width: 100%; justify-content: space-between; }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-profile { 
+                width: 100%; 
+                justify-content: space-between; 
+            }
+            
+            .requests-card {
+                width: 100%;
+                min-width: unset;
+            }
+            
             .toast { left: 20px; right: 20px; bottom: 20px; }
         }
     </style>
@@ -350,11 +507,28 @@
             <a href="#" class="logo">
                 <i class="fa-solid fa-bolt"></i> SkillSwap
             </a>
-            <div class="user-profile">
-                <div class="avatar" id="userAvatar">U</div>
-                <div>
-                    <div style="font-size: 0.9rem; font-weight: 600;" id="userName">User</div>
-                    <div class="xp-pill">⭐ <span id="xpDisplay">0</span> XP</div>
+            
+            <div class="header-actions">
+                <!-- Trade Requests Badge Card -->
+                <a href="trade-requests.html" class="requests-card" id="requestsCard">
+                    <div class="requests-info">
+                        <div class="requests-icon">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div class="requests-text">
+                            <span class="requests-title">Manage Trade Requests</span>
+                            <span class="requests-subtitle">View incoming requests</span>
+                        </div>
+                    </div>
+                    <div class="requests-badge empty" id="requestsBadge">0</div>
+                </a>
+
+                <div class="user-profile">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: 600;" id="userName">User</div>
+                        <div class="xp-pill">⭐ <span id="xpDisplay">0</span> XP</div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -396,17 +570,23 @@
             </form>
         </div>
 
+        <!-- Smart Search Bar -->
+        <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+                   <input 
+            type="text" 
+            id="searchBar" 
+            placeholder="Search skills, names, or keywords..."
+            onkeyup="filterExchanges()"
+        >
+        </div>
+
         <h2 class="section-title" style="margin-bottom: 20px;">Available Exchanges</h2>
         <div id="exchangeList" class="grid">
             <!-- Skeletons -->
             <div class="skeleton"></div>
             <div class="skeleton"></div>
             <div class="skeleton"></div>
-        </div>
-
-        <h2 class="section-title" style="margin: 50px 0 20px;">Trade Requests</h2>
-        <div id="tradeRequests" class="grid">
-            <p style="color: var(--text-secondary);">No requests yet.</p>
         </div>
     </div>
 
@@ -418,7 +598,7 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ⚠️ REPLACE WITH YOUR FIREBASE CONFIG
@@ -436,6 +616,8 @@
         const db = getFirestore(app);
 
         let currentUser;
+        let allExchanges = [];
+        let pendingRequestsCount = 0;
 
         // --- Toast Logic ---
         function showToast(msg) {
@@ -443,6 +625,19 @@
             document.getElementById("toastMessage").innerText = msg;
             toast.classList.add("show");
             setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        // --- Update Badge Count ---
+        function updateRequestsBadge(count) {
+            const badge = document.getElementById("requestsBadge");
+            pendingRequestsCount = count;
+            
+            if (count > 0) {
+                badge.textContent = count > 99 ? "99+" : count;
+                badge.classList.remove("empty");
+            } else {
+                badge.classList.add("empty");
+            }
         }
 
         // --- Auth State ---
@@ -465,7 +660,7 @@
                 });
 
                 loadExchanges();
-                loadRequests();
+                loadRequestsCount();
             }
         });
 
@@ -519,78 +714,110 @@
             }
         };
 
+        // --- Smart Search Filter ---
+        window.filterExchanges = () => {
+            const searchTerm = document.getElementById("searchBar").value.toLowerCase().trim();
+            const container = document.getElementById("exchangeList");
+            
+            if (!searchTerm) {
+                renderExchanges(allExchanges);
+                return;
+            }
+
+            const filtered = allExchanges.filter(exchange => {
+                const searchableText = [
+                    exchange.teachSkill,
+                    exchange.learnSkill,
+                    exchange.userName,
+                    exchange.description || ""
+                ].join(" ").toLowerCase();
+
+                return searchableText.includes(searchTerm);
+            });
+
+            renderExchanges(filtered);
+        };
+
+        // --- Render Exchanges ---
+        function renderExchanges(exchanges) {
+            const container = document.getElementById("exchangeList");
+            container.innerHTML = "";
+            
+            if(exchanges.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fa-solid fa-search"></i>
+                        <p>No exchanges found matching your search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            exchanges.forEach(data => {
+                const isOwner = currentUser.uid === data.userId;
+                
+                container.innerHTML += `
+                    <div class="exchange-card">
+                        <div class="card-top">
+                            <div class="user-name">${data.userName}</div>
+                            <div class="level-badge">${data.level}</div>
+                        </div>
+                        
+                        <div class="skill-item">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            <div><strong>Teaches:</strong> ${data.teachSkill}</div>
+                        </div>
+                        <div class="skill-item">
+                            <i class="fa-solid fa-chevron-left"></i>
+                            <div><strong>Wants:</strong> ${data.learnSkill}</div>
+                        </div>
+                        
+                        <div class="card-desc">${data.description || "No description provided."}</div>
+                        
+                        <div class="card-actions">
+                            ${!isOwner 
+                                ? `<button class="btn-request" onclick="requestTrade('${data.id}', '${data.userId}')">Request Trade</button>`
+                                : `<button class="btn-request" style="cursor:default; opacity:0.7">Your Post</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
         // --- Load Exchanges ---
         function loadExchanges() {
             const q = query(collection(db, "skillExchanges"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
-                const container = document.getElementById("exchangeList");
-                container.innerHTML = "";
+                allExchanges = [];
                 
-                if(snapshot.empty) {
-                    container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 20px;">No exchanges found. Be the first to post!</p>`;
-                    return;
-                }
-
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const isOwner = currentUser.uid === data.userId;
-                    
-                    container.innerHTML += `
-                        <div class="exchange-card">
-                            <div class="card-top">
-                                <div class="user-name">${data.userName}</div>
-                                <div class="level-badge">${data.level}</div>
-                            </div>
-                            
-                            <div class="skill-item">
-                                <i class="fa-solid fa-chevron-right"></i>
-                                <div><strong>Teaches:</strong> ${data.teachSkill}</div>
-                            </div>
-                            <div class="skill-item">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                <div><strong>Wants:</strong> ${data.learnSkill}</div>
-                            </div>
-                            
-                            <div class="card-desc">${data.description || "No description provided."}</div>
-                            
-                            <div class="card-actions">
-                                ${!isOwner 
-                                    ? `<button class="btn-request" onclick="requestTrade('${doc.id}', '${data.userId}')">Request Trade</button>`
-                                    : `<button class="btn-request" style="cursor:default; opacity:0.7">Your Post</button>`
-                                }
-                            </div>
-                        </div>
-                    `;
+                    allExchanges.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
                 });
+
+                const currentSearch = document.getElementById("searchBar").value.trim();
+                
+                if (currentSearch) {
+                    filterExchanges();
+                } else {
+                    renderExchanges(allExchanges);
+                }
             });
         }
 
-        // --- Load Requests ---
-        function loadRequests() {
-            const q = query(collection(db, "tradeRequests"), where("ownerId", "==", currentUser.uid));
+        // --- Load Requests Count Only ---
+        function loadRequestsCount() {
+            const q = query(
+                collection(db, "tradeRequests"), 
+                where("ownerId", "==", currentUser.uid),
+                where("status", "==", "pending")
+            );
+            
             onSnapshot(q, (snapshot) => {
-                const container = document.getElementById("tradeRequests");
-                container.innerHTML = "";
-                
-                if(snapshot.empty) {
-                    container.innerHTML = `<p style="color: var(--text-secondary);">No pending requests.</p>`;
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    container.innerHTML += `
-                        <div class="exchange-card">
-                            <div class="card-top">
-                                <div class="user-name">${data.requesterName}</div>
-                                <div class="level-badge" style="color: #fbbf24">${data.status}</div>
-                            </div>
-                            <div class="card-actions">
-                                <button class="btn-request" onclick="window.location.href='trade-requests.html'">Manage</button>
-                            </div>
-                        </div>
-                    `;
-                });
+                updateRequestsBadge(snapshot.size);
             });
         }
     </script>

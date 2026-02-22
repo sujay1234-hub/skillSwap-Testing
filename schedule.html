@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule Session — SkillSwap</title>
+
+<style>
+body{
+  margin:0;
+  background:#09090b;
+  color:white;
+  font-family:Arial;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+.card{
+  background:#111;
+  padding:30px;
+  border-radius:18px;
+}
+
+h2{margin-top:0}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  background:#000;
+  border:1px solid #333;
+  border-radius:8px;
+  color:white;
+}
+
+textarea{resize:vertical}
+
+button{
+  margin-top:10px;
+  padding:12px 18px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.primary{background:#6366f1;color:white;}
+.accept{background:#10b981;color:white;}
+.reject{background:#ef4444;color:white;}
+.disabled{background:#444;cursor:not-allowed}
+
+.status{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:13px;
+  display:inline-block;
+  margin-bottom:10px;
+}
+
+.pending{background:#f59e0b}
+.confirmed{background:#10b981}
+.rejected{background:#ef4444}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📅 Schedule Session</h2>
+
+<div id="proposalForm"></div>
+<div id="scheduleView"></div>
+
+</div>
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import { getAuth, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+  serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+/* 🔥 YOUR FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+/* 🔹 GET TRADE ID */
+const params = new URLSearchParams(window.location.search);
+const tradeId = params.get("trade");
+
+if(!tradeId){
+  alert("Invalid trade");
+}
+
+
+/* 🔹 FIRESTORE DOC */
+const scheduleRef =
+  doc(db,"sessionSchedules","schedule_"+tradeId);
+
+
+let currentUser;
+
+
+/* ============================= */
+/* 🔥 AUTH + REALTIME LISTENER  */
+/* ============================= */
+
+onAuthStateChanged(auth,(user)=>{
+  if(!user){
+    window.location.href="login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  onSnapshot(scheduleRef,(snap)=>{
+    if(!snap.exists()){
+      showProposalForm();
+    }else{
+      showSchedule(snap.data());
+    }
+  });
+
+});
+
+
+/* ============================= */
+/* 📌 SHOW PROPOSAL FORM        */
+/* ============================= */
+
+function showProposalForm(){
+
+  document.getElementById("proposalForm").innerHTML = `
+    <h3>Propose a Session</h3>
+
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <input type="number" id="duration" placeholder="Duration (minutes)">
+    <textarea id="note" placeholder="Optional message"></textarea>
+
+    <button class="primary" onclick="propose()">
+      Propose Session
+    </button>
+  `;
+
+  document.getElementById("scheduleView").innerHTML = "";
+}
+
+
+/* ============================= */
+/* 📌 PROPOSE SESSION           */
+/* ============================= */
+
+window.propose = async function(){
+
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value;
+  const duration = document.getElementById("duration").value;
+  const note = document.getElementById("note").value;
+
+  if(!date || !time || !duration){
+    alert("Fill all required fields");
+    return;
+  }
+
+  await setDoc(scheduleRef,{
+    tradeId,
+    date,
+    time,
+    duration: Number(duration),
+    note,
+    proposedBy: currentUser.uid,
+    proposerName: currentUser.displayName || "User",
+    status: "pending",
+    responseMessage: "",
+    createdAt: serverTimestamp()
+  });
+};
+
+
+/* ============================= */
+/* 📌 SHOW SCHEDULE             */
+/* ============================= */
+
+function showSchedule(data){
+
+  document.getElementById("proposalForm").innerHTML = "";
+
+  let statusClass = data.status;
+
+  let html = `
+    <div class="status ${statusClass}">
+      ${data.status.toUpperCase()}
+    </div>
+
+    <p><b>Proposed by:</b> ${data.proposerName}</p>
+    <p><b>Date:</b> ${data.date}</p>
+    <p><b>Time:</b> ${data.time}</p>
+    <p><b>Duration:</b> ${data.duration} minutes</p>
+    <p><b>Note:</b> ${data.note || "None"}</p>
+  `;
+
+
+  /* 🔹 RESPONSE MESSAGE */
+  if(data.responseMessage){
+    html += `
+      <p><b>Response:</b> ${data.responseMessage}</p>
+    `;
+  }
+
+
+  /* 🔹 ACTIONS */
+  if(data.status === "pending" &&
+     data.proposedBy !== currentUser.uid){
+
+    html += `
+      <button class="accept" onclick="accept()">
+        Accept
+      </button>
+
+      <button class="reject" onclick="reject()">
+        Reject
+      </button>
+    `;
+  }
+
+
+  /* 🔹 ALLOW NEW PROPOSAL AFTER REJECTION */
+  if(data.status === "rejected"){
+    html += `
+      <br><br>
+      <button class="primary" onclick="resetSchedule()">
+        Propose New Session
+      </button>
+    `;
+  }
+
+
+  document.getElementById("scheduleView").innerHTML = html;
+}
+
+
+/* ============================= */
+/* 📌 ACCEPT SESSION            */
+/* ============================= */
+
+window.accept = async function(){
+
+  await updateDoc(scheduleRef,{
+    status:"confirmed",
+    responseMessage:"Accepted"
+  });
+
+};
+
+
+/* ============================= */
+/* 📌 REJECT SESSION            */
+/* ============================= */
+
+window.reject = async function(){
+
+  const msg = prompt("Explain the problem:");
+
+  if(msg === null) return;
+
+  await updateDoc(scheduleRef,{
+    status:"rejected",
+    responseMessage: msg || "Rejected"
+  });
+
+};
+
+
+/* ============================= */
+/* 📌 RESET (NEW PROPOSAL)      */
+/* ============================= */
+
+window.resetSchedule = async function(){
+
+  await updateDoc(scheduleRef,{
+    status:"pending",
+    responseMessage:"",
+    proposedBy: currentUser.uid,
+    proposerName: currentUser.displayName || "User"
+  });
+
+};
+
+</script>
+
+</body>
+</html>

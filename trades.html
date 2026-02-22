@@ -187,6 +187,14 @@
             color: var(--text-main);
         }
 
+        .detail-box.teach h4 i {
+            color: var(--primary);
+        }
+
+        .detail-box.learn h4 i {
+            color: var(--accent);
+        }
+
         /* --- Action Buttons --- */
         .action-buttons {
             display: flex;
@@ -232,6 +240,16 @@
 
         .btn-icon {
             padding: 12px;
+        }
+
+        .btn-live {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-live:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
         }
 
         /* --- Empty State --- */
@@ -331,7 +349,7 @@
         </div>
     </div>
 
-    <!-- 🔥 FIREBASE REAL-TIME SCRIPT -->
+    <!-- FIREBASE SCRIPT -->
     <script type="module">
         import { initializeApp } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -340,14 +358,18 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         import {
-            getFirestore,
-            collection,
-            query,
-            where,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    getFirestore,
+    collection,
+    query,
+    where,
+    onSnapshot,
+    doc,
+    getDoc,
+    setDoc,              // ✅ ADD
+    serverTimestamp      // ✅ ADD
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ⭐ YOUR FIREBASE CONFIG
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
             authDomain: "skillswapp-35e86.firebaseapp.com",
@@ -363,8 +385,8 @@
 
         const container = document.getElementById("tradesContainer");
 
-        // 🟢 LOAD USER TRADES IN REAL TIME
-        onAuthStateChanged(auth, user => {
+        // Load user trades in real time
+        onAuthStateChanged(auth, async (user) => {
             if(!user){
                 window.location.href = "login.html";
                 return;
@@ -376,7 +398,7 @@
                 where("status","==","active")
             );
 
-            onSnapshot(q, snapshot => {
+            onSnapshot(q, async (snapshot) => {
                 container.innerHTML = "";
 
                 if(snapshot.empty){
@@ -393,25 +415,43 @@
                     return;
                 }
 
+                // Get all trades
+                const trades = [];
                 snapshot.forEach(docSnap => {
-                    const trade = docSnap.data();
-                    
-                    // 👉 Find partner name
-                    const partner = Object.entries(trade.partnerNames)
-                        .find(([uid]) => uid !== user.uid)?.[1] || "Partner";
-                    
-                    const partnerInitial = partner.charAt(0).toUpperCase();
+                    trades.push({
+                        id: docSnap.id,
+                        data: docSnap.data()
+                    });
+                });
 
+                // Process each trade
+                for (const trade of trades) {
+                    const tradeDoc = trade.data;
+                    
+                    // Find partner info
+                    const partnerEntry = Object.entries(tradeDoc.partnerNames || {})
+                        .find(([uid]) => uid !== user.uid);
+                    
+                    const partnerName = partnerEntry ? partnerEntry[1] : "Partner";
+                    const partnerUid = partnerEntry ? partnerEntry[0] : null;
+                    const partnerInitial = partnerName.charAt(0).toUpperCase();
+
+                    // Get partner avatar color based on UID
+                    const avatarColor = getAvatarColor(partnerUid || "");
+
+                    // Create trade card
                     const card = document.createElement("div");
                     card.className = "trade-card";
 
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="partner-info">
-                                <div class="partner-avatar">${partnerInitial}</div>
+                                <div class="partner-avatar" style="background: ${avatarColor};">
+                                    ${partnerInitial}
+                                </div>
                                 <div class="partner-details">
-                                    <h3>${partner}</h3>
-                                    <span>Trade ID: ${docSnap.id.substring(0,8)}</span>
+                                    <h3>${partnerName}</h3>
+                                    <span>Trade ID: ${trade.id.substring(0,8)}</span>
                                 </div>
                             </div>
                             <div class="status-badge">
@@ -420,50 +460,119 @@
                         </div>
 
                         <div class="trade-details">
-                            <div class="detail-box">
-                                <h4><i class="fa-solid fa-chalkboard-user" style="color: var(--primary);"></i> You Teach</h4>
-                                <p>${trade.teach || "—"}</p>
+                            <div class="detail-box teach">
+                                <h4><i class="fa-solid fa-chalkboard-user"></i> You Teach</h4>
+                                <p>${tradeDoc.teach || "—"}</p>
                             </div>
-                            <div class="detail-box">
-                                <h4><i class="fa-solid fa-graduation-cap" style="color: var(--accent);"></i> You Learn</h4>
-                                <p>${trade.learn || "—"}</p>
+                            <div class="detail-box learn">
+                                <h4><i class="fa-solid fa-graduation-cap"></i> You Learn</h4>
+                                <p>${tradeDoc.learn || "—"}</p>
                             </div>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-primary" onclick="startSession('${docSnap.id}')">
-                                <i class="fa-solid fa-video"></i> Start Session
+                            <button class="btn btn-live" onclick="startLiveCoding('${trade.id}')">
+                                <i class="fa-solid fa-code"></i> Live Code
                             </button>
-                            <button class="btn btn-secondary" onclick="enterRoom('${docSnap.id}')">
+                            <button class="btn btn-primary" onclick="startSession('${trade.id}')">
+                                <i class="fa-solid fa-video"></i> Video Call
+                            </button>
+                            <button class="btn btn-secondary" onclick="enterRoom('${trade.id}')">
                                 <i class="fa-solid fa-layer-group"></i> Tools
                             </button>
-                            <button class="btn btn-secondary btn-icon" onclick="openChat('${docSnap.id}')" title="Chat">
+                            <button class="btn btn-secondary btn-icon" onclick="openChat('${trade.id}')" title="Chat">
                                 <i class="fa-solid fa-comment-dots"></i>
                             </button>
                         </div>
                     `;
 
                     container.appendChild(card);
-                });
+                }
             });
         });
 
-        // 💬 OPEN CHAT
+        // Generate consistent avatar color from UID
+        function getAvatarColor(uid) {
+            const colors = [
+                'linear-gradient(135deg, #6366f1, #a855f7)',
+                'linear-gradient(135deg, #10b981, #059669)',
+                'linear-gradient(135deg, #f59e0b, #d97706)',
+                'linear-gradient(135deg, #ef4444, #dc2626)',
+                'linear-gradient(135deg, #3b82f6, #2563eb)',
+                'linear-gradient(135deg, #ec4899, #db2777)',
+                'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                'linear-gradient(135deg, #14b8a6, #0d9488)'
+            ];
+            
+            if (!uid) return colors[0];
+            
+            let hash = 0;
+            for (let i = 0; i < uid.length; i++) {
+                hash = uid.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        // Open chat
         window.openChat = function(tradeId){
             window.location.href = "chat.html?trade=" + tradeId;
         };
 
-        // 🏫 ENTER SKILL ROOM
+        // Enter skill room
         window.enterRoom = function(tradeId){
             window.location.href = "skill-room.html?trade=" + tradeId;
         };
 
-        // 🎥 START VIDEO SESSION
+        // Start video session
         window.startSession = function(tradeId){
             const room = "SkillSwap_" + tradeId;
             window.location.href = "video-room.html?room=" + room;
         };
-    </script>
 
+        // Start live coding session
+        window.startLiveCoding = async function(tradeId){
+            try {
+                // Check if code room exists, if not create one
+                const codeRoomId = "code_" + tradeId;
+                const codeRoomRef = doc(db, "codeRooms", codeRoomId);
+                const codeRoomSnap = await getDoc(codeRoomRef);
+
+                if (!codeRoomSnap.exists()) {
+                    // Get current user info
+                    const user = auth.currentUser;
+                    const userName = user ? (user.displayName || "You") : "You";
+                    
+                    // Get trade data to find partner name
+                    const tradeRef = doc(db, "trades", tradeId);
+                    const tradeSnap = await getDoc(tradeRef);
+                    const tradeData = tradeSnap.exists() ? tradeSnap.data() : {};
+                    
+                    const partnerName = Object.entries(tradeData.partnerNames || {})
+                        .find(([uid]) => uid !== user.uid)?.[1] || "Partner";
+
+                    // Create code room
+                    await setDoc(codeRoomRef, {
+                        tradeId: tradeId,
+                        users: [user.uid],
+                        userNames: {
+                            [user.uid]: userName
+                        },
+                        code: `// 👨‍💻 Welcome to SkillSwap Live Coding!\n// Coding with ${partnerName}\n\nconsole.log("Hello, ${partnerName}! Let's code together!");\n`,
+                        language: "javascript",
+                        status: "active",
+                        createdAt: serverTimestamp(),
+                        lastUpdated: serverTimestamp()
+                    });
+                }
+
+                // Navigate to live coding page
+                window.location.href = "live.html?room=code_" + tradeId;
+            } catch (error) {
+                console.error("Error starting live coding:", error);
+                alert("Failed to start live coding session. Please try again.");
+            }
+        };
+    </script>
 </body>
 </html>

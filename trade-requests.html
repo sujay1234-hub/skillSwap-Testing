@@ -1,314 +1,697 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Trade Requests - SkillSwap</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Requests - SkillSwap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.4);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.4);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.4);
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:'Inter',sans-serif;
-    background:linear-gradient(135deg,#0f172a,#0b1220);
-    color:white;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-.container{
-    max-width:1000px;
-    margin:auto;
-    padding:60px 20px;
-}
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
-h1{
-    margin-bottom:40px;
-    font-size:28px;
-}
+        /* --- Background Effects --- */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
+        }
 
-.card{
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(20px);
-    padding:25px;
-    border-radius:18px;
-    margin-bottom:20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    transition:0.3s;
-    box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
 
-.card:hover{
-    transform:translateY(-4px);
-}
+        /* --- Header --- */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
 
-.badge{
-    padding:6px 14px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:600;
-}
-.toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-  padding: 16px 22px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
-  box-shadow: 0 10px 30px rgba(16,185,129,0.5);
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all 0.4s ease;
-  z-index: 9999;
-}
+        .back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
 
-.toast.show {
-  transform: translateY(0);
-  opacity: 1;
-}
+        .back-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateX(-3px);
+        }
 
-.toast-icon {
-  background: rgba(255,255,255,0.2);
-  padding: 6px 10px;
-  border-radius: 50%;
-  font-size: 14px;
-}
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
 
-.hidden {
-  display: none;
-}
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
 
-.pending{ background:#f59e0b; }
-.accepted{ background:#10b981; }
-.rejected{ background:#ef4444; }
+        /* --- Request Card --- */
+        .request-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-.actions button{
-    padding:10px 18px;
-    border:none;
-    border-radius:30px;
-    cursor:pointer;
-    font-weight:600;
-    margin-left:10px;
-    transition:0.2s;
-}
+        .request-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.12);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
 
-.accept{
-    background:linear-gradient(to right,#10b981,#059669);
-    color:white;
-}
+        .request-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px;
+            height: 100%;
+            background: var(--warning);
+            opacity: 0;
+            transition: 0.3s;
+        }
 
-.reject{
-    background:linear-gradient(to right,#ef4444,#dc2626);
-    color:white;
-}
+        .request-card:hover::before {
+            opacity: 1;
+        }
 
-.actions button:hover{
-    transform:scale(1.05);
-}
+        .request-card.accepted::before {
+            background: var(--success);
+            opacity: 1;
+        }
 
-</style>
+        .request-card.rejected::before {
+            background: var(--danger);
+            opacity: 1;
+        }
+
+        .request-info {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .request-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-details h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .user-details span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .request-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-item i {
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        /* --- Status Badge --- */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-badge.accepted {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* --- Action Buttons --- */
+        .request-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-action {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 15px var(--success-glow);
+        }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--success-glow);
+        }
+
+        .btn-reject {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-reject:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            box-shadow: 0 4px 15px var(--danger-glow);
+        }
+
+        .btn-view {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-view:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #18181b;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* --- Skeleton Loader --- */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 20px;
+            height: 120px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .request-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .request-info {
+                padding-right: 0;
+                margin-bottom: 16px;
+                width: 100%;
+            }
+
+            .request-user {
+                margin-bottom: 8px;
+            }
+
+            .request-meta {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .request-actions {
+                width: 100%;
+                flex-direction: row;
+            }
+
+            .btn-action {
+                flex: 1;
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+
+            .btn-action i {
+                font-size: 0.9rem;
+            }
+
+            .toast {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .request-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Your Trade Requests</h1>
-    <div id="requestsContainer"></div>
-</div>
+    <div class="bg-gradient"></div>
 
-<script type="module">
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import { getAuth, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-  increment,
-  query,
-  where,
-  onSnapshot,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-  authDomain: "skillswapp-35e86.firebaseapp.com",
-  projectId: "skillswapp-35e86",
-  storageBucket: "skillswapp-35e86.appspot.com",
-  messagingSenderId: "668466292157",
-  appId: "1:668466292157:web:9be85414fc752b67779ed4"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const container = document.getElementById("requestsContainer");
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  const toastMessage = document.getElementById("toastMessage");
-
-  toastMessage.innerText = message;
-
-  toast.classList.remove("hidden");
-  setTimeout(() => toast.classList.add("show"), 50);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.classList.add("hidden"), 400);
-  }, 3000);
-}
-
-onAuthStateChanged(auth, user => {
-
-  if(!user){
-      window.location.href = "login.html";
-      return;
-  }
-
-  const q = query(
-      collection(db, "tradeRequests"),
-      where("ownerId", "==", user.uid)
-  );
-
-  onSnapshot(q, snapshot => {
-
-      container.innerHTML = "";
-
-      snapshot.forEach(docSnap => {
-
-          const data = docSnap.data();
-
-          const card = document.createElement("div");
-          card.className = "card";
-
-          card.innerHTML = `
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <a href="index.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
             <div>
-              <strong style="font-size:16px;">
-                ${data.requesterName}
-              </strong>
-              <div style="font-size:13px;color:#94a3b8;margin-top:5px;">
-                  Requested your skill exchange
-              </div>
-              <div style="margin-top:10px;">
-                  <span class="badge ${data.status}">
-                      ${data.status.toUpperCase()}
-                  </span>
-              </div>
+                <h1 class="page-title">Trade Requests</h1>
+                <p class="page-subtitle">Manage incoming skill exchange requests</p>
             </div>
+        </div>
 
-            <div class="actions">
-              ${data.status === "pending" ? `
-                  <button class="accept" onclick="acceptTrade('${docSnap.id}')">
-                      Accept
-                  </button>
-                  <button class="reject" onclick="rejectTrade('${docSnap.id}')">
-                      Reject
-                  </button>
-              ` : ""}
-            </div>
-          `;
+        <!-- Requests Container -->
+        <div id="requestsContainer">
+            <!-- Skeletons -->
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
+    </div>
 
-          container.appendChild(card);
-      });
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+        <div id="toastMessage">Success</div>
+    </div>
 
-  });
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, query, where, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-});
+        // ⚠️ REPLACE WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+            authDomain: "skillswapp-35e86.firebaseapp.com",
+            projectId: "skillswapp-35e86",
+            storageBucket: "skillswapp-35e86.appspot.com",
+            messagingSenderId: "668466292157",
+            appId: "1:668466292157:web:9be85414fc752b67779ed4"
+        };
 
-window.acceptTrade = async function(id){
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-  try {
+        const container = document.getElementById("requestsContainer");
 
-    const tradeRef = doc(db,"tradeRequests",id);
-    const tradeSnap = await getDoc(tradeRef);
+        // --- Toast Logic ---
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMessage").innerText = message;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
 
-    if(!tradeSnap.exists()){
-        console.error("Trade not found");
-        return;
-    }
+        // --- Format Date ---
+        function formatDate(timestamp) {
+            if (!timestamp) return "Just now";
+            const date = new Date(timestamp.seconds * 1000);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
 
-    const tradeData = tradeSnap.data();
+            if (diffMins < 1) return "Just now";
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
 
-    const ownerId = tradeData.ownerId;
-    const requesterId = tradeData.requesterId;
+        // --- Render Request Card ---
+        function renderRequestCard(docSnap, data) {
+            const card = document.createElement("div");
+            card.className = `request-card ${data.status}`;
+            
+            const initials = (data.requesterName || "U").charAt(0).toUpperCase();
+            const timeAgo = formatDate(data.createdAt);
 
-    if(!ownerId || !requesterId){
-        console.error("Missing user IDs");
-        return;
-    }
+            card.innerHTML = `
+                <div class="request-info">
+                    <div class="request-user">
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-details">
+                            <h3>${data.requesterName || "User"}</h3>
+                            <span>wants to trade skills with you</span>
+                        </div>
+                    </div>
+                    
+                    <div class="request-meta">
+                        <span class="status-badge ${data.status}">
+                            <i class="fa-solid fa-circle-${data.status === 'pending' ? 'clock' : data.status === 'accepted' ? 'check' : 'xmark'}"></i>
+                            ${data.status}
+                        </span>
+                        <div class="meta-item">
+                            <i class="fa-regular fa-clock"></i>
+                            ${timeAgo}
+                        </div>
+                    </div>
+                </div>
 
-    // ✅ Update request status
-    await updateDoc(tradeRef,{
-        status:"accepted"
-    });
+                <div class="request-actions">
+                    ${data.status === "pending" ? `
+                        <button class="btn-action btn-accept" onclick="acceptTrade('${docSnap.id}')">
+                            <i class="fa-solid fa-check"></i>
+                            Accept
+                        </button>
+                        <button class="btn-action btn-reject" onclick="rejectTrade('${docSnap.id}')">
+                            <i class="fa-solid fa-xmark"></i>
+                            Reject
+                        </button>
+                    ` : `
+                        <button class="btn-action btn-view" onclick="window.location.href='index.html'">
+                            <i class="fa-solid fa-arrow-right"></i>
+                            View All
+                        </button>                    `}
+                </div>
+            `;
 
-    // ✅ Get user data
-    const ownerSnap = await getDoc(doc(db,"users",ownerId));
-    const requesterSnap = await getDoc(doc(db,"users",requesterId));
+            return card;
+        }
 
-    const ownerName = ownerSnap.exists()
-      ? ownerSnap.data().name
-      : "User";
+        // --- Auth State ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
 
-    const requesterName = requesterSnap.exists()
-      ? requesterSnap.data().name
-      : "User";
+            const q = query(
+                collection(db, "tradeRequests"),
+                where("ownerId", "==", user.uid),
+                where("status", "in", ["pending", "accepted", "rejected"])
+            );
 
-    // ✅ CREATE ACTIVE TRADE (THIS WAS MISSING)
-    await addDoc(collection(db,"trades"),{
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = "";
 
-        users:[ownerId, requesterId],
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-regular fa-bell-slash"></i>
+                            <h3>No Requests Yet</h3>
+                            <p>When someone requests to trade skills with you, they'll appear here.</p>
+                        </div>
+                    `;
+                    return;
+                }
 
-        partnerNames:{
-          [ownerId]: ownerName,
-          [requesterId]: requesterName
-        },
+                // Sort by date (newest first)
+                const sortedDocs = Array.from(snapshot.docs).sort((a, b) => {
+                    const dateA = a.data().createdAt?.seconds || 0;
+                    const dateB = b.data().createdAt?.seconds || 0;
+                    return dateB - dateA;
+                });
 
-        teach: tradeData.skillOffered || "",
-        learn: tradeData.skillWanted || "",
+                sortedDocs.forEach(docSnap => {
+                    const card = renderRequestCard(docSnap, docSnap.data());
+                    container.appendChild(card);
+                });
+            });
+        });
 
-        status:"active",
-        createdAt: serverTimestamp()
-    });
+        // --- Accept Trade ---
+        window.acceptTrade = async function(id) {
+            try {
+                const tradeRef = doc(db, "tradeRequests", id);
+                const tradeSnap = await getDoc(tradeRef);
 
-    // ✅ Create chat (already working)
-    const chatDoc = await addDoc(collection(db,"chats"),{
-        users:[ownerId, requesterId],
-        userNames:{
-          [ownerId]: ownerName,
-          [requesterId]: requesterName
-        },
-        createdAt: serverTimestamp()
-    });
+                if (!tradeSnap.exists()) {
+                    showToast("Trade not found");
+                    return;
+                }
 
-    showToast("Trade accepted! Visit My Trades 🤝");
+                const tradeData = tradeSnap.data();
+                const { ownerId, requesterId } = tradeData;
 
-    console.log("Trade + Chat created:", chatDoc.id);
+                if (!ownerId || !requesterId) {
+                    showToast("Invalid trade data");
+                    return;
+                }
 
-  } catch(error){
-      console.error("Accept trade error:", error);
-  }
-};
+                // Update request status
+                await updateDoc(tradeRef, {
+                    status: "accepted"
+                });
 
-window.rejectTrade = async function(id){
-    await updateDoc(doc(db,"tradeRequests",id),{
-        status:"rejected"
-    });
-};
-</script>
-<div id="toast" class="toast hidden">
-  <div class="toast-icon">✓</div>
-  <div id="toastMessage">Success</div>
-</div>
+                // Get user data
+                const ownerSnap = await getDoc(doc(db, "users", ownerId));
+                const requesterSnap = await getDoc(doc(db, "users", requesterId));
+
+                const ownerName = ownerSnap.exists() ? ownerSnap.data().name : "User";
+                const requesterName = requesterSnap.exists() ? requesterSnap.data().name : "User";
+
+                // Create active trade
+                const tradeDoc = await addDoc(collection(db, "trades"), {
+                    users: [ownerId, requesterId],
+                    partnerNames: {
+                        [ownerId]: ownerName,
+                        [requesterId]: requesterName
+                    },
+                    teach: tradeData.skillOffered || "",
+                    learn: tradeData.skillWanted || "",
+                    status: "active",
+                    createdAt: serverTimestamp()
+                });
+
+                // Create code room for live coding
+                const codeRoomId = "code_" + tradeDoc.id;
+                
+                await setDoc(doc(db, "codeRooms", codeRoomId), {
+                    tradeId: tradeDoc.id,
+                    users: [ownerId, requesterId],
+                    userNames: {
+                        [ownerId]: ownerName,
+                        [requesterId]: requesterName
+                    },
+                    code: "// 👨‍💻 Welcome to your collaborative coding room!\n// Start coding together...\n\nconsole.log('Hello, ' + partnerNames[Object.keys(partnerNames).find(uid => uid !== currentUserUid)] + '!');\n",
+                    language: "javascript",
+                    status: "active",
+                    createdAt: serverTimestamp(),
+                    lastUpdated: serverTimestamp()
+                });
+
+                // Create chat
+                const chatDoc = await addDoc(collection(db, "chats"), {
+                    users: [ownerId, requesterId],
+                    userNames: {
+                        [ownerId]: ownerName,
+                        [requesterId]: requesterName
+                    },
+                    createdAt: serverTimestamp()
+                });
+
+                showToast("Trade accepted! Start coding together 🤝");
+
+                console.log("Trade + Code Room + Chat created:", { 
+                    tradeId: tradeDoc.id, 
+                    codeRoomId, 
+                    chatId: chatDoc.id 
+                });
+
+            } catch (error) {
+                console.error("Accept trade error:", error);
+                showToast("Failed to accept trade. Please try again.");
+            }
+        };
+
+        // --- Reject Trade ---
+        window.rejectTrade = async function(id) {
+            try {
+                await updateDoc(doc(db, "tradeRequests", id), {
+                    status: "rejected"
+                });
+                showToast("Trade request rejected");
+            } catch (error) {
+                console.error("Reject trade error:", error);
+                showToast("Failed to reject trade. Please try again.");
+            }
+        };
+    </script>
 </body>
 </html>

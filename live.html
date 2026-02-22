@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Live Coding — SkillSwap</title>
+
+<!-- MONACO EDITOR -->
+<script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0a0a0f;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: 12px 20px;
+  background: #111;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 55px;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand i {
+  color: #6366f1;
+  font-size: 1.2rem;
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.room-info .status {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.partner-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.partner-info i {
+  color: #10b981;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+#editor {
+  flex: 1;
+  min-height: calc(100vh - 55px);
+}
+
+/* PROBLEMS PANEL */
+.problems-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a1f;
+  border-top: 1px solid #333;
+  max-height: 200px;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.problems-panel.show {
+  transform: translateY(0);
+}
+
+.problems-header {
+  padding: 10px 20px;
+  background: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #333;
+}
+
+.problems-header h3 {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.problems-header h3 .error-count {
+  background: #ef4444;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.problems-header h3 .warning-count {
+  background: #f59e0b;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.close-problems {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.close-problems:hover {
+  color: white;
+}
+
+.problem-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.problem-item:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.problem-item.error {
+  border-left: 3px solid #ef4444;
+}
+
+.problem-item.warning {
+  border-left: 3px solid #f59e0b;
+}
+
+.problem-icon {
+  font-size: 0.9rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.problem-item.error .problem-icon {
+  color: #ef4444;
+}
+
+.problem-item.warning .problem-icon {
+  color: #f59e0b;
+}
+
+.problem-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.problem-message {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.problem-location {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* TOOLBAR */
+.toolbar {
+  position: fixed;
+  right: 20px;
+  top: 75px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+
+.toolbar-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateX(-2px);
+}
+
+.toolbar-btn.active {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: #6366f1;
+}
+
+.toolbar-btn .badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* LANGUAGE SELECTOR */
+.language-selector {
+  position: fixed;
+  left: 20px;
+  top: 75px;
+  z-index: 50;
+}
+
+.language-selector select {
+  padding: 10px 35px 10px 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all 0.2s;
+}
+
+.language-selector select:hover {
+  background-color: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.language-selector select option {
+  background: #1a1a1f;
+  color: white;
+}
+
+/* OUTPUT PANEL */
+.output-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a1f;
+  border-top: 1px solid #333;
+  max-height: 200px;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.output-panel.show {
+  transform: translateY(0);
+}
+
+.output-header {
+  padding: 10px 20px;
+  background: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #333;
+}
+
+.output-header h3 {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.output-header h3 i {
+  color: #10b981;
+}
+
+.output-content {
+  padding: 15px 20px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output-content .output-line {
+  padding: 3px 0;
+}
+
+.output-content .output-error {
+  color: #ef4444;
+}
+
+.output-content .output-success {
+  color: #10b981;
+}
+
+.output-content .output-info {
+  color: #3b82f6;
+}
+
+/* CURSOR COLORS FOR COLLABORATION */
+.cursor-owner {
+  background: rgba(99, 102, 241, 0.3);
+  border-left: 3px solid #6366f1;
+}
+
+.cursor-partner {
+  background: rgba(16, 185, 129, 0.3);
+  border-left: 3px solid #10b981;
+}
+
+/* LOADING OVERLAY */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 15, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #a1a1aa;
+  font-size: 1rem;
+}
+
+/* SYNC INDICATOR */
+.sync-indicator {
+  position: fixed;
+  top: 65px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(99, 102, 241, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 50;
+}
+
+.sync-indicator.show {
+  opacity: 1;
+}
+
+.sync-indicator i {
+  animation: sync-spin 1s linear infinite;
+}
+
+@keyframes sync-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 15px;
+    height: 50px;
+  }
+  
+  .brand span {
+    display: none;
+  }
+  
+  .room-info {
+    display: none;
+  }
+  
+  .toolbar {
+    right: 10px;
+    top: 60px;
+  }
+  
+  .toolbar-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+  
+  .language-selector {
+    left: 10px;
+    top: 60px;
+  }
+  
+  .language-selector select {
+    padding: 8px 30px 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .btn span {
+    display: none;
+  }
+  
+  .btn {
+    padding: 8px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading code room...</div>
+</div>
+
+<!-- SYNC INDICATOR -->
+<div id="syncIndicator" class="sync-indicator">
+  <i class="fa-solid fa-sync"></i> Syncing...
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="brand">
+      <i class="fa-solid fa-code"></i>
+      <span>SkillSwap</span>
+    </div>
+    <div class="room-info">
+      <div class="status"></div>
+      <span>Live</span>
+    </div>
+    <div class="partner-info" id="partnerInfo" style="display: none;">
+      <i class="fa-solid fa-user"></i>
+      <span id="partnerName">Partner</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-secondary" onclick="runCode()">
+      <i class="fa-solid fa-play"></i>
+      <span>Run</span>
+    </button>
+    <button class="btn btn-secondary" onclick="toggleOutput()">
+      <i class="fa-solid fa-terminal"></i>
+      <span>Output</span>
+    </button>
+    <button class="btn btn-secondary" onclick="toggleProblems()">
+      <i class="fa-solid fa-exclamation-triangle"></i>
+      <span>Issues</span>
+    </button>
+    <button class="btn btn-primary" onclick="copyCode()">
+      <i class="fa-solid fa-copy"></i>
+      <span>Copy</span>
+    </button>
+    <button class="btn btn-success" onclick="goToTrades()">
+      <i class="fa-solid fa-handshake"></i>
+      <span>Trades</span>
+    </button>
+  </div>
+</div>
+
+<!-- LANGUAGE SELECTOR -->
+<div class="language-selector">
+  <select id="languageSelect" onchange="changeLanguage()">
+    <option value="javascript">JavaScript</option>
+    <option value="typescript">TypeScript</option>
+    <option value="python">Python</option>
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="json">JSON</option>
+    <option value="java">Java</option>
+    <option value="cpp">C++</option>
+    <option value="csharp">C#</option>
+    <option value="go">Go</option>
+    <option value="rust">Rust</option>
+    <option value="php">PHP</option>
+    <option value="ruby">Ruby</option>
+    <option value="sql">SQL</option>
+    <option value="markdown">Markdown</option>
+    <option value="xml">XML</option>
+    <option value="yaml">YAML</option>
+  </select>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="toolbar-btn" onclick="formatCode()" title="Format Code">
+    <i class="fa-solid fa-align-left"></i>
+  </button>
+  <button class="toolbar-btn" onclick="undoCode()" title="Undo">
+    <i class="fa-solid fa-undo"></i>
+  </button>
+    <button class="toolbar-btn" onclick="redoCode()" title="Redo">
+    <i class="fa-solid fa-redo"></i>
+  </button>
+  <button class="toolbar-btn" onclick="clearCode()" title="Clear All">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+  <button class="toolbar-btn" onclick="downloadCode()" title="Download">
+    <i class="fa-solid fa-download"></i>
+  </button>
+  <button class="toolbar-btn" id="problemsBtn" onclick="toggleProblems()" title="Problems">
+    <i class="fa-solid fa-bug"></i>
+    <span class="badge hidden" id="problemsBadge">0</span>
+  </button>
+</div>
+
+<!-- MONACO EDITOR CONTAINER -->
+<div id="editor"></div>
+
+<!-- PROBLEMS PANEL -->
+<div id="problemsPanel" class="problems-panel">
+  <div class="problems-header">
+    <h3>
+      <i class="fa-solid fa-list-check"></i>
+      Problems
+      <span class="error-count hidden" id="errorCount">0</span>
+      <span class="warning-count hidden" id="warningCount">0</span>
+    </h3>
+    <button class="close-problems" onclick="toggleProblems()">
+      <i class="fa-solid fa-times"></i>
+    </button>
+  </div>
+  <div id="problemsList"></div>
+</div>
+
+<!-- OUTPUT PANEL -->
+<div id="outputPanel" class="output-panel">
+  <div class="output-header">
+    <h3>
+      <i class="fa-solid fa-terminal"></i>
+      Output
+    </h3>
+    <button class="close-problems" onclick="toggleOutput()">
+      <i class="fa-solid fa-times"></i>
+    </button>
+  </div>
+  <div id="outputContent" class="output-content"></div>
+</div>
+
+<!-- FIREBASE AND MONACO SCRIPT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Global variables
+let editor;
+let currentUserUid = null;
+let currentUserName = "You";
+let roomId = null;
+let roomRef = null;
+let unsubscribe = null;
+let isUpdatingFromRemote = false;
+let typingTimeout;
+let currentLanguage = "javascript";
+let problems = [];
+
+// Get room ID from URL
+const params = new URLSearchParams(window.location.search);
+roomId = params.get("room") || params.get("trade");
+
+if (!roomId) {
+  showError("No room ID provided. Please access this page from your trades.");
+}
+
+// Initialize Monaco Editor
+require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.45.0/min/vs" } });
+
+require(["vs/editor/editor.main"], function () {
+  // Define custom theme
+  monaco.editor.defineTheme('skillswap-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+      { token: 'keyword', foreground: 'C586C0' },
+      { token: 'string', foreground: 'CE9178' },
+      { token: 'number', foreground: 'B5CEA8' },
+      { token: 'function', foreground: 'DCDCAA' },
+      { token: 'variable', foreground: '9CDCFE' },
+      { token: 'type', foreground: '4EC9B0' },
+    ],
+    colors: {
+      'editor.background': '#0a0a0f',
+      'editor.foreground': '#D4D4D4',
+      'editor.lineHighlightBackground': '#1a1a1f',
+      'editor.selectionBackground': '#264F78',
+      'editorCursor.foreground': '#AEAFAD',
+      'editorLineNumber.foreground': '#858585',
+      'editorLineNumber.activeForeground': '#C6C6C6',
+    }
+  });
+
+  // Create editor
+  editor = monaco.editor.create(document.getElementById("editor"), {
+    value: '// 👨‍💻 Welcome to SkillSwap Live Coding!\n// Start coding with your partner...\n\nconsole.log("Hello, partner! Let\'s code together!");\n',
+    language: 'javascript',
+    theme: 'skillswap-dark',
+    automaticLayout: true,
+    fontSize: 14,
+    fontFamily: "'Fira Code', 'Consolas', 'Monaco', monospace",
+    fontLigatures: true,
+    minimap: { enabled: true, scale: 1 },
+    scrollBeyondLastLine: false,
+    wordWrap: 'on',
+    tabSize: 2,
+    insertSpaces: true,
+    renderWhitespace: 'selection',
+    bracketPairColorization: { enabled: true },
+    cursorBlinking: 'smooth',
+    cursorSmoothCaretAnimation: 'on',
+    smoothScrolling: true,
+    padding: { top: 20, bottom: 20 },
+    lineNumbers: 'on',
+    glyphMargin: true,
+    folding: true,
+    lineDecorationsWidth: 10,
+    renderLineHighlight: 'all',
+  });
+
+  // Listen for auth state
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    currentUserUid = user.uid;
+    
+    // Get user name
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (userDoc.exists()) {
+      currentUserName = userDoc.data().name || "You";
+    }
+
+    // Hide loading overlay
+    document.getElementById("loadingOverlay").classList.add("hidden");
+
+    // Initialize room
+    if (roomId) {
+      await initializeRoom();
+    }
+  });
+});
+
+// Initialize room and start real-time sync
+async function initializeRoom() {
+  roomRef = doc(db, "codeRooms", roomId);
+
+  // Check if room exists
+  const roomSnap = await getDoc(roomRef);
+  if (!roomSnap.exists()) {
+    // Create room if it doesn't exist
+    await setDoc(roomRef, {
+      code: '// 👨‍💻 Welcome to SkillSwap Live Coding!\n// Start coding with your partner...\n\nconsole.log("Hello, partner! Let\'s code together!");\n',
+      language: 'javascript',
+      users: [],
+      userNames: {},
+      status: 'active',
+      createdAt: serverTimestamp(),
+      lastUpdated: serverTimestamp()
+    });
+  }
+
+  // Update user presence
+  await updateDoc(roomRef, {
+    [`users.${currentUserUid}`]: true,
+    [`userNames.${currentUserUid}`]: currentUserName,
+    lastUpdated: serverTimestamp()
+  });
+
+  // Show partner info
+  const roomData = roomSnap.exists() ? roomSnap.data() : {};
+  const partnerName = Object.entries(roomData.userNames || {})
+    .find(([uid]) => uid !== currentUserUid)?.[1];
+  
+  if (partnerName) {
+    document.getElementById("partnerInfo").style.display = "flex";
+    document.getElementById("partnerName").textContent = partnerName;
+  }
+
+  // Listen for real-time updates
+  unsubscribe = onSnapshot(roomRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const currentCode = editor.getValue();
+
+      // Update language if changed
+      if (data.language && data.language !== currentLanguage) {
+        currentLanguage = data.language;
+        document.getElementById("languageSelect").value = data.language;
+        monaco.editor.setModelLanguage(editor.getModel(), data.language);
+      }
+
+      // Update code if different and not from current user
+      if (data.code !== currentCode && !isUpdatingFromRemote) {
+        isUpdatingFromRemote = true;
+        
+        // Save cursor position
+        const position = editor.getPosition();
+        
+        editor.setValue(data.code);
+        
+        // Restore cursor position
+        if (position) {
+          editor.setPosition(position);
+        }
+        
+        isUpdatingFromRemote = false;
+      }
+
+      // Update partner info
+      const newPartnerName = Object.entries(data.userNames || {})
+        .find(([uid]) => uid !== currentUserUid)?.[1];
+      if (newPartnerName) {
+        document.getElementById("partnerInfo").style.display = "flex";
+        document.getElementById("partnerName").textContent = newPartnerName;
+      }
+
+      // Validate code and show problems
+      validateCode(data.code || "", data.language || "javascript");
+    }
+  });
+
+  // Listen for content changes
+  editor.onDidChangeModelContent(() => {
+    if (isUpdatingFromRemote) return;
+
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(async () => {
+      const code = editor.getValue();
+      
+      // Show sync indicator
+      document.getElementById("syncIndicator").classList.add("show");
+
+      // Save to Firebase
+      await setDoc(roomRef, {
+        code: code,
+        language: currentLanguage,
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+
+      // Hide sync indicator
+      setTimeout(() => {
+        document.getElementById("syncIndicator").classList.remove("show");
+      }, 500);
+
+      // Validate code
+      validateCode(code, currentLanguage);
+
+    }, 300); // 300ms debounce
+  });
+}
+
+// Code validation and problem detection
+function validateCode(code, language) {
+  problems = [];
+
+  if (!code || language !== 'javascript') {
+    updateProblemsPanel();
+    return;
+  }
+
+  try {
+    // Parse code to find syntax errors
+    new Function(code);
+  } catch (e) {
+    problems.push({
+      type: 'error',
+      message: e.message,
+      line: getLineFromError(e.message),
+      column: getColumnFromError(e.message)
+    });
+  }
+
+  // Check for common issues
+  const lines = code.split('\n');
+  lines.forEach((line, index) => {
+    const lineNum = index + 1;
+
+    // Check for console.log without semicolon
+    if (line.includes('console.log') && !line.trim().endsWith(';') && !line.trim().endsWith('{')) {
+      problems.push({
+        type: 'warning',
+        message: 'Missing semicolon',
+        line: lineNum,
+        column: line.length
+      });
+    }
+
+    // Check for var usage
+    if (/\bvar\b/.test(line)) {
+      problems.push({
+        type: 'warning',
+        message: 'Consider using "let" or "const" instead of "var"',
+        line: lineNum,
+        column: line.indexOf('var')
+      });
+    }
+
+    // Check for == instead of ===
+    if (/\s==\s/.test(line) || /\s!=\s/.test(line)) {
+      problems.push({
+        type: 'warning',
+        message: 'Consider using strict equality (=== or !==)',
+        line: lineNum,
+        column: line.indexOf('==') !== -1 ? line.indexOf('==') : line.indexOf('!=')
+      });
+    }
+
+    // Check for unused variables (simple check)
+    const unusedVarMatch = line.match(/^\s*(?:const|let|var)\s+(\w+)\s*=/);
+    if (unusedVarMatch) {
+      const varName = unusedVarMatch[1];
+      const varCount = (code.match(new RegExp(`\\b${varName}\\b`, 'g')) || []).length;
+      if (varCount === 1) {
+        problems.push({
+          type: 'info',
+          message: `Variable "${varName}" is declared but never used`,
+          line: lineNum,
+          column: line.indexOf(varName)
+        });
+      }
+    }
+  });
+
+  updateProblemsPanel();
+}
+
+function getLineFromError(errorMessage) {
+  const match = errorMessage.match(/line (\d+)/i);
+  return match ? parseInt(match[1]) : 1;
+}
+
+function getColumnFromError(errorMessage) {
+  const match = errorMessage.match(/column (\d+)/i);
+  return match ? parseInt(match[1]) : 1;
+}
+
+function updateProblemsPanel() {
+  const errors = problems.filter(p => p.type === 'error');
+  const warnings = problems.filter(p => p.type === 'warning');
+  const infos = problems.filter(p => p.type === 'info');
+
+  const errorCountEl = document.getElementById("errorCount");
+  const warningCountEl = document.getElementById("warningCount");
+  const problemsBadge = document.getElementById("problemsBadge");
+  const problemsList = document.getElementById("problemsList");
+
+  // Update counts
+  if (errors.length > 0) {
+    errorCountEl.textContent = errors.length;
+    errorCountEl.classList.remove("hidden");
+  } else {
+    errorCountEl.classList.add("hidden");
+  }
+
+  if (warnings.length > 0) {
+    warningCountEl.textContent = warnings.length;
+    warningCountEl.classList.remove("hidden");
+  } else {
+    warningCountEl.classList.add("hidden");
+  }
+
+  // Update badge
+  const totalProblems = problems.length;
+  if (totalProblems > 0) {
+    problemsBadge.textContent = totalProblems;
+    problemsBadge.classList.remove("hidden");
+  } else {
+    problemsBadge.classList.add("hidden");
+  }
+
+  // Build problems list
+  if (problems.length === 0) {
+    problemsList.innerHTML = `
+      <div class="problem-item" style="border-left: 3px solid #10b981;">
+        <i class="fa-solid fa-check-circle problem-icon" style="color: #10b981;"></i>
+        <div class="problem-content">
+          <div class="problem-message" style="color: #10b981;">No problems found! ✨</div>
+        </div>
+      </div>
+    `;
+  } else {
+    problemsList.innerHTML = problems.map((problem, index) => `
+      <div class="problem-item ${problem.type}" onclick="goToLine(${problem.line})">
+        <i class="fa-solid ${problem.type === 'error' ? 'fa-times-circle' : 'fa-exclamation-circle'} problem-icon"></i>
+        <div class="problem-content">
+          <div class="problem-message">${escapeHtml(problem.message)}</div>
+          <div class="problem-location">Line ${problem.line}${problem.column ? `, Column ${problem.column}` : ''}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function goToLine(lineNumber) {
+  if (editor && lineNumber > 0) {
+    editor.focus();
+    editor.setPosition({ lineNumber: lineNumber, column: 1 });
+    editor.revealLineInCenter(lineNumber);
+  }
+}
+
+// Toggle functions
+function toggleProblems() {
+  const panel = document.getElementById("problemsPanel");
+  panel.classList.toggle("show");
+}
+
+function toggleOutput() {
+  const panel = document.getElementById("outputPanel");
+  panel.classList.toggle("show");
+}
+
+// Language change
+window.changeLanguage = function() {
+  const language = document.getElementById("languageSelect").value;
+  currentLanguage = language;
+  
+  monaco.editor.setModelLanguage(editor.getModel(), language);
+  
+  // Save language preference
+  if (roomRef) {
+    setDoc(roomRef, { language: language }, { merge: true });
+  }
+
+  // Re-validate code
+  validateCode(editor.getValue(), language);
+};
+
+// Format code
+window.formatCode = function() {
+  editor.getAction("editor.action.formatDocument").run();
+};
+
+// Undo
+window.undoCode = function() {
+  editor.trigger("keyboard", "undo", null);
+};
+
+// Redo
+window.redoCode = function() {
+  editor.trigger("keyboard", "redo", null);
+};
+
+// Clear code
+window.clearCode = function() {
+  if (confirm("Are you sure you want to clear all code?")) {
+    editor.setValue("// Code cleared\n");
+    saveCode();
+  }
+};
+
+// Download code
+window.downloadCode = function() {
+  const code = editor.getValue();
+  const extensions = {
+    javascript: 'js',
+    typescript: 'ts',
+    python: 'py',
+    html: 'html',
+    css: 'css',
+    json: 'json',
+    java: 'java',
+    cpp: 'cpp',
+    csharp: 'cs',
+    go: 'go',
+    rust: 'rs',
+      php: 'php',
+    ruby: 'rb',
+    sql: 'sql',
+    markdown: 'md',
+    xml: 'xml',
+    yaml: 'yml'
+  };
+
+  const extension = extensions[currentLanguage] || 'txt';
+  const blob = new Blob([code], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `code.${extension}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// Copy code to clipboard
+window.copyCode = async function() {
+  const code = editor.getValue();
+  try {
+    await navigator.clipboard.writeText(code);
+    showNotification("Code copied to clipboard! 📋");
+  } catch (err) {
+    console.error("Failed to copy:", err);
+    showNotification("Failed to copy code", "error");
+  }
+};
+
+// Run code
+window.runCode = function() {
+  const code = editor.getValue();
+  const outputPanel = document.getElementById("outputPanel");
+  const outputContent = document.getElementById("outputContent");
+
+  outputPanel.classList.add("show");
+  outputContent.innerHTML = '<div class="output-line"><i class="fa-solid fa-spinner fa-spin"></i> Running code...</div>';
+
+  // Capture console.log output
+  const logs = [];
+  const originalLog = console.log;
+  const originalError = console.error;
+  const originalWarn = console.warn;
+
+  console.log = function(...args) {
+    logs.push({ type: 'log', message: args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+    ).join(' ') });
+    originalLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    logs.push({ type: 'error', message: args.join(' ') });
+    originalError.apply(console, args);
+  };
+
+  console.warn = function(...args) {
+    logs.push({ type: 'warn', message: args.join(' ') });
+    originalWarn.apply(console, args);
+  };
+
+  try {
+    // Execute code
+    const result = new Function(code)();
+
+    // Restore console
+    console.log = originalLog;
+    console.error = originalError;
+    console.warn = originalWarn;
+
+    // Display output
+    let outputHtml = '';
+
+    if (logs.length > 0) {
+      logs.forEach(log => {
+        const className = log.type === 'error' ? 'output-error' : 
+                         log.type === 'warn' ? 'output-warning' : 'output-info';
+        outputHtml += `<div class="output-line ${className}">${escapeHtml(log.message)}</div>`;
+      });
+    }
+
+    if (result !== undefined) {
+      outputHtml += `<div class="output-line output-success">→ ${escapeHtml(String(result))}</div>`;
+    }
+
+    if (logs.length === 0 && result === undefined) {
+      outputHtml = '<div class="output-line output-info">Code executed successfully (no output)</div>';
+    }
+
+    outputContent.innerHTML = outputHtml;
+
+  } catch (error) {
+    // Restore console
+    console.log = originalLog;
+    console.error = originalError;
+    console.warn = originalWarn;
+
+    outputContent.innerHTML = `
+      <div class="output-line output-error">
+        <i class="fa-solid fa-times-circle"></i> ${escapeHtml(error.message)}
+      </div>
+      ${error.stack ? `<div class="output-line" style="color: #666; font-size: 0.8rem;">${escapeHtml(error.stack.split('\n')[0])}</div>` : ''}
+    `;
+  }
+};
+
+// Go to trades page
+window.goToTrades = function() {
+  window.location.href = "trades.html";
+};
+
+// Save code to Firebase
+async function saveCode() {
+  if (!roomRef) return;
+
+  const code = editor.getValue();
+
+  document.getElementById("syncIndicator").classList.add("show");
+
+  await setDoc(roomRef, {
+    code: code,
+    language: currentLanguage,
+    lastUpdated: serverTimestamp()
+  }, { merge: true });
+
+  setTimeout(() => {
+    document.getElementById("syncIndicator").classList.remove("show");
+  }, 500);
+}
+
+// Show notification
+function showNotification(message, type = "success") {
+  const notification = document.createElement("div");
+  notification.style.cssText = `
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: ${type === "success" ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #ef4444, #dc2626)"};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+  `;
+
+  notification.innerHTML = `
+    <i class="fa-solid ${type === "success" ? "fa-check-circle" : "fa-times-circle"}"></i>
+    ${message}
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.animation = "slideOut 0.3s ease";
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Add animation styles
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(100px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100px); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+
+// Show error
+function showError(message) {
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  loadingOverlay.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #ef4444; margin-bottom: 20px;"></i>
+      <h2 style="margin-bottom: 10px;">Error</h2>
+      <p style="color: #a1a1aa; margin-bottom: 20px;">${message}</p>
+      <button onclick="window.location.href='trades.html'" class="btn btn-primary">
+        <i class="fa-solid fa-arrow-left"></i> Back to Trades
+      </button>
+    </div>
+  `;
+}
+
+// Keyboard shortcuts
+document.addEventListener("keydown", function(e) {
+  // Ctrl/Cmd + Enter to run code
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    e.preventDefault();
+    runCode();
+  }
+
+  // Ctrl/Cmd + S to save
+  if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+    e.preventDefault();
+    saveCode();
+    showNotification("Code saved! 💾");
+  }
+
+  // Ctrl/Cmd + Shift + F to format
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
+    e.preventDefault();
+    formatCode();
+  }
+});
+
+// Handle window resize
+window.addEventListener("resize", function() {
+  if (editor) {
+    editor.layout();
+  }
+});
+
+// Cleanup on page unload
+window.addEventListener("beforeunload", async function() {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
+  // Remove user presence
+  if (roomRef && currentUserUid) {
+    await updateDoc(roomRef, {
+      [`users.${currentUserUid}`]: false,
+      lastUpdated: serverTimestamp()
+    });
+  }
+});
+</script>
+
+</body>
+</html>
