@@ -423,7 +423,59 @@
             position: relative;
             z-index: 1;
         }
-    </style>
+    
+/* ===== MOBILE BOTTOM NAV ===== */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15,15,18,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 9999;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.mbn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #71717a;
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.mbn-item i { font-size: 1.15rem; }
+.mbn-item:hover, .mbn-item.active {
+  color: #6366f1;
+  background: rgba(99,102,241,0.1);
+}
+@media (max-width: 768px) {
+  .mobile-bottom-nav { display: flex; }
+  body { padding-bottom: 70px; }
+}
+
+/* Touch friendly buttons globally */
+@media (max-width: 768px) {
+  button, .btn, a.btn, .btn-action, .btn-primary, .btn-secondary, .btn-submit, .btn-hire, .btn-request, .btn-search {
+    min-height: 44px;
+  }
+  input, select, textarea {
+    font-size: 16px !important; /* prevent iOS zoom */
+  }
+}
+</style>
 </head>
 <body>
 
@@ -857,4 +909,3 @@ function escapeHtml(text) {
 
 </body>
 </html>
-        
