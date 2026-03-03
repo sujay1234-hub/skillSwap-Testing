@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Our Platform</title>
+<style>
+    :root {
+        --bg-color: #09090b;
+        --card-bg: #18181b;
+        --input-bg: #27272a;
+        --border-color: #3f3f46;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --text-main: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --expert-color: #6366f1; /* Indigo */
+        --learner-color: #10b981; /* Emerald */
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    /* --- Main Layout --- */
+    .main-wrapper {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(to right, var(--expert-color), var(--learner-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    /* --- Selection Cards --- */
+    .selection-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 40px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .role-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        width: 45%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .role-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--text-muted);
+    }
+
+    .role-card.active {
+        border-color: var(--primary);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .role-card h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.5rem;
+    }
+
+    .role-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .role-card .icon {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    /* --- Form Container --- */
+    .form-container {
+        background-color: var(--card-bg);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        width: 100%;
+        border: 1px solid var(--border-color);
+        display: none; /* Hidden by default */
+        animation: fadeIn 0.5s ease;
+    }
+
+    .form-container.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Form Elements --- */
+    h2 {
+        margin-top: 0;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: white;
+        font-size: 1rem;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .row {
+        display: flex;
+        gap: 20px;
+    }
+    .col {
+        flex: 1;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        color: var(--primary);
+        margin: 30px 0 15px 0;
+        font-weight: 600;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        background-color: var(--primary);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: var(--primary-hover);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 600px) {
+        .selection-container {
+            flex-direction: column;
+        }
+        .role-card {
+            width: 100%;
+        }
+        .row {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    
+    <!-- Header -->
+    <div class="header">
+        <h1>Join the Community</h1>
+        <p>Select your role to get started</p>
+    </div>
+
+    <!-- Role Selection -->
+    <div class="selection-container">
+        <div class="role-card" onclick="selectRole('expert')">
+            <span class="icon">🎓</span>
+            <h3>Expert</h3>
+            <p>Share your skills, verify your profile, and get hired.</p>
+        </div>
+        <div class="role-card" onclick="selectRole('learner')">
+            <span class="icon">🚀</span>
+            <h3>Learner</h3>
+            <p>Create your profile, find mentors, and start learning.</p>
+        </div>
+    </div>
+
+    <!-- EXPERT FORM -->
+    <div id="expert-form" class="form-container">
+        <h2>Expert Verification</h2>
+        <form action="#" method="POST">
+            
+            <!-- Personal Info -->
+            <div class="row">
+                <div class="col form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="John Doe" required>
+                </div>
+                <div class="col form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+                </div>
+                <div class="col form-group">
+                    <label for="location">Location / Timezone</label>
+                    <input type="text" id="location" name="location" placeholder="New York, EST">
+                </div>
+            </div>
+
+            <!-- Professional Details -->
+            <div class="section-title">Professional Details</div>
+
+            <div class="form-group">
+                <label for="role">Current Job Title / Role</label>
+                <input type="text" id="role" name="role" placeholder="e.g. Senior Python Developer">
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label for="skills">Primary Skills (Comma separated)</label>
+                    <input type="text" id="skills" name="skills" placeholder="Python, Django, AWS">
+                </div>
+                <div class="col form-group">
+                    <label for="experience">Years of Experience</label>
+                    <input type="number" id="experience" name="experience" min="0" placeholder="5">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label for="rate">Hourly Rate ($)</label>
+                    <input type="number" id="rate" name="rate" placeholder="50">
+                </div>
+                <div class="col form-group">
+                    <label for="availability">Availability</label>
+                    <select id="availability" name="availability">
+                        <option value="full-time">Full Time (40h+)</option>
+                        <option value="part-time">Part Time (10-20h)</option>
+                        <option value="project">Project Based</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Links -->
+            <div class="section-title">Portfolio & Socials</div>
+            
+            <div class="form-group">
+                <label for="linkedin">LinkedIn Profile URL</label>
+                <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username">
+            </div>
+            <div class="form-group">
+                <label for="portfolio">Personal Website / GitHub</label>
+                <input type="url" id="portfolio" name="portfolio" placeholder="https://github.com/username">
+            </div>
+
+            <!-- Documents -->
+            <div class="section-title">Verification Documents</div>
+
+            <div class="form-group">
+                <label>Upload Resume / CV (PDF)</label>
+                <input type="file" accept=".pdf,.doc,.docx">
+            </div>
+
+            <div class="form-group">
+                <label>Upload Certification or Proof of Work</label>
+                <input type="file" accept=".pdf,.jpg,.png">
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Brief Bio</label>
+                <textarea id="bio" name="bio" rows="4" placeholder="Tell us about your background..."></textarea>
+            </div>
+
+            <button type="submit">Submit Application</button>
+        </form>
+    </div>
+
+    <!-- LEARNER FORM -->
+    <div id="learner-form" class="form-container">
+        <h2>Create Your Profile</h2>
+        <form action="#" method="POST">
+            
+            <!-- Account Info -->
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Jane Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <div class="col form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <!-- Profile Details -->
+            <div class="section-title">Profile Details</div>
+
+            <div class="form-group">
+                <label for="city">City & Country</label>
+                <input type="text" id="city" name="city" placeholder="London, UK">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+            </div>
+
+            <div class="form-group">
+                <label for="education">Current Education / Occupation</label>
+                <select id="education" name="education">
+                    <option value="" disabled selected>Select your status</option>
+                    <option value="student">Student</option>
+                    <option value="employed">Employed</option>
+                    <option value="unemployed">Unemployed / Seeking Work</option>
+                    <option value="freelancer">Freelancer</option>
+                </select>
+            </div>
+
+            <!-- Learning Goals -->
+            <div class="section-title">Learning Goals</div>
+
+            <div class="form-group">
+                <label for="interests">What do you want to learn?</label>
+                <input type="text" id="interests" name="interests" placeholder="e.g. Web Development, Data Science">
+            </div>
+
+            <div class="form-group">
+                <label for="goals">Learning Objectives</label>
+                <textarea id="goals" name="goals" rows="3" placeholder="I want to build a portfolio website..."></textarea>
+            </div>
+
+            <!-- Profile Picture -->
+            <div class="form-group">
+                <label>Profile Picture</label>
+                <input type="file" accept="image/*">
+            </div>
+
+            <button type="submit">Complete Registration</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function selectRole(role) {
+        // Remove active class from all cards
+        document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+        
+        // Hide all forms
+        document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+
+        // Activate selected card
+        if (role === 'expert') {
+            document.querySelector('.role-card:nth-child(1)').classList.add('active');
+            document.getElementById('expert-form').classList.add('active');
+        } else {
+            document.querySelector('.role-card:nth-child(2)').classList.add('active');
+            document.getElementById('learner-form').classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>
