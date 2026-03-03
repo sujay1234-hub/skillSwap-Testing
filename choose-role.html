@@ -1,225 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join Our Platform</title>
-<style>
-    :root {
-        --bg-color: #09090b;
-        --card-bg: #18181b;
-        --input-bg: #27272a;
-        --border-color: #3f3f46;
-        --primary: #6366f1;
-        --primary-hover: #4f46e5;
-        --text-main: #f4f4f5;
-        --text-muted: #a1a1aa;
-        --expert-color: #6366f1; /* Indigo */
-        --learner-color: #10b981; /* Emerald */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap - Join Our Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    body {
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 40px 20px;
-        display: flex;
-        justify-content: center;
-        min-height: 100vh;
-    }
-
-    /* --- Main Layout --- */
-    .main-wrapper {
-        width: 100%;
-        max-width: 800px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        background: linear-gradient(to right, var(--expert-color), var(--learner-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .header p {
-        color: var(--text-muted);
-        font-size: 1.1rem;
-    }
-
-    /* --- Selection Cards --- */
-    .selection-container {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 40px;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .role-card {
-        background-color: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 30px;
-        width: 45%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .role-card:hover {
-        transform: translateY(-5px);
-        border-color: var(--text-muted);
-    }
-
-    .role-card.active {
-        border-color: var(--primary);
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-    }
-
-    .role-card h3 {
-        margin: 0 0 10px 0;
-        font-size: 1.5rem;
-    }
-
-    .role-card p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
-    .role-card .icon {
-        font-size: 2rem;
-        margin-bottom: 15px;
-        display: block;
-    }
-
-    /* --- Form Container --- */
-    .form-container {
-        background-color: var(--card-bg);
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        width: 100%;
-        border: 1px solid var(--border-color);
-        display: none; /* Hidden by default */
-        animation: fadeIn 0.5s ease;
-    }
-
-    .form-container.active {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* --- Form Elements --- */
-    h2 {
-        margin-top: 0;
-        font-weight: 600;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    input, textarea, select {
-        width: 100%;
-        padding: 12px;
-        background-color: var(--input-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        color: white;
-        font-size: 1rem;
-        box-sizing: border-box;
-        transition: border-color 0.2s;
-    }
-
-    input:focus, textarea:focus, select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    }
-
-    .row {
-        display: flex;
-        gap: 20px;
-    }
-    .col {
-        flex: 1;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-        color: var(--primary);
-        margin: 30px 0 15px 0;
-        font-weight: 600;
-    }
-
-    button {
-        width: 100%;
-        padding: 14px;
-        background-color: var(--primary);
-        border: none;
-        color: white;
-        font-weight: 600;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background 0.2s;
-        margin-top: 10px;
-    }
-
-    button:hover {
-        background-color: var(--primary-hover);
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 600px) {
-        .selection-container {
-            flex-direction: column;
+    <style>
+        :root {
+            --bg-color: #09090b;
+            --card-bg: #18181b;
+            --input-bg: #27272a;
+            --border-color: #3f3f46;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --expert-color: #6366f1;
+            --learner-color: #10b981;
         }
-        .role-card {
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 30%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        /* --- Main Wrapper --- */
+        .main-wrapper {
             width: 100%;
-        }
-        .row {
+            max-width: 800px;
+            display: flex;
             flex-direction: column;
-            gap: 0;
+            align-items: center;
         }
-    }
-</style>
+
+        /* --- Branding Header --- */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .brand-logo i {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--expert-color), var(--learner-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-name {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--expert-color), var(--learner-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        /* --- Role Selection Cards --- */
+        .selection-container {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            width: 45%;
+            min-width: 280px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--expert-color), var(--learner-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .role-card:hover::before {
+            opacity: 1;
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .role-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .role-card.active::before {
+            opacity: 1;
+        }
+
+        .role-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .role-card:hover .icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .role-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .role-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* --- Form Container --- */
+        .form-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            border: 1px solid var(--border-color);
+            display: none;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Form Elements --- */
+        .form-container h2 {
+            margin-top: 0;
+            font-weight: 700;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-container h2 i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background-color: rgba(39, 39, 42, 0.8);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin: 35px 0 18px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            font-size: 0.9rem;
+        }
+
+        /* --- File Upload Styling --- */
+        .file-upload-wrapper {
+            border: 2px dashed var(--border-color);
+            padding: 24px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-wrapper i {
+            font-size: 2rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .file-upload-wrapper span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- Submit Button --- */
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px var(--primary-glow);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px var(--primary-glow);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 768px) {
+            .brand-name {
+                font-size: 2rem;
+            }
+
+            .selection-container {
+                flex-direction: column;
+            }
+
+            .role-card {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .form-container {
+                padding: 30px 20px;
+            }
+
+            .form-container h2 {
+                font-size: 1.5rem;
+            }
+
+            body {
+                padding: 20px 15px;
+            }
+        }
+
+        /* --- Loading Spinner --- */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        button.loading .spinner {
+            display: inline-block;
+        }
+
+        button.loading span {
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     
-    <!-- Header -->
-    <div class="header">
-        <h1>Join the Community</h1>
-        <p>Select your role to get started</p>
+    <!-- Branding Header -->
+    <div class="brand-header">
+        <div class="brand-logo">
+            <i class="fa-solid fa-layer-group"></i>
+            <div class="brand-name">SkillSwap</div>
+        </div>
+        <p class="brand-tagline">Connect, Learn, and Grow Together</p>
     </div>
 
     <!-- Role Selection -->
@@ -227,19 +409,19 @@
         <div class="role-card" onclick="selectRole('expert')">
             <span class="icon">🎓</span>
             <h3>Expert</h3>
-            <p>Share your skills, verify your profile, and get hired.</p>
+            <p>Share your skills, verify your profile, and get hired by learners worldwide.</p>
         </div>
         <div class="role-card" onclick="selectRole('learner')">
             <span class="icon">🚀</span>
             <h3>Learner</h3>
-            <p>Create your profile, find mentors, and start learning.</p>
+            <p>Create your profile, find mentors, and start your learning journey today.</p>
         </div>
     </div>
 
     <!-- EXPERT FORM -->
     <div id="expert-form" class="form-container">
-        <h2>Expert Verification</h2>
-        <form action="#" method="POST">
+        <h2><i class="fa-solid fa-certificate"></i> Expert Verification</h2>
+        <form id="expertForm" onsubmit="submitExpertForm(event)">
             
             <!-- Personal Info -->
             <div class="row">
@@ -265,7 +447,9 @@
             </div>
 
             <!-- Professional Details -->
-            <div class="section-title">Professional Details</div>
+            <div class="section-title">
+                <i class="fa-solid fa-briefcase"></i> Professional Details
+            </div>
 
             <div class="form-group">
                 <label for="role">Current Job Title / Role</label>
@@ -299,7 +483,9 @@
             </div>
 
             <!-- Links -->
-            <div class="section-title">Portfolio & Socials</div>
+            <div class="section-title">
+                <i class="fa-solid fa-link"></i> Portfolio & Socials
+            </div>
             
             <div class="form-group">
                 <label for="linkedin">LinkedIn Profile URL</label>
@@ -311,31 +497,44 @@
             </div>
 
             <!-- Documents -->
-            <div class="section-title">Verification Documents</div>
+            <div class="section-title">
+                <i class="fa-solid fa-file-upload"></i> Verification Documents
+            </div>
 
             <div class="form-group">
                 <label>Upload Resume / CV (PDF)</label>
-                <input type="file" accept=".pdf,.doc,.docx">
+                <div class="file-upload-wrapper">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Click to upload your resume</span>
+                    <input type="file" id="expertResume" accept=".pdf,.doc,.docx">
+                </div>
             </div>
 
             <div class="form-group">
                 <label>Upload Certification or Proof of Work</label>
-                <input type="file" accept=".pdf,.jpg,.png">
+                <div class="file-upload-wrapper">
+                    <i class="fa-solid fa-certificate"></i>
+                    <span>Click to upload certifications</span>
+                    <input type="file" id="expertCertification" accept=".pdf,.jpg,.png">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="bio">Brief Bio</label>
-                <textarea id="bio" name="bio" rows="4" placeholder="Tell us about your background..."></textarea>
+                <textarea id="bio" name="bio" rows="4" placeholder="Tell us about your background and expertise..."></textarea>
             </div>
 
-            <button type="submit">Submit Application</button>
+            <button type="submit" id="submitBtn">
+                <span>Submit Application</span>
+                <div class="spinner"></div>
+            </button>
         </form>
     </div>
 
     <!-- LEARNER FORM -->
     <div id="learner-form" class="form-container">
-        <h2>Create Your Profile</h2>
-        <form action="#" method="POST">
+        <h2><i class="fa-solid fa-user-plus"></i> Create Your Profile</h2>
+        <form id="learnerForm" onsubmit="submitLearnerForm(event)">
             
             <!-- Account Info -->
             <div class="form-group">
@@ -360,7 +559,9 @@
             </div>
 
             <!-- Profile Details -->
-            <div class="section-title">Profile Details</div>
+            <div class="section-title">
+                <i class="fa-solid fa-location-dot"></i> Profile Details
+            </div>
 
             <div class="form-group">
                 <label for="city">City & Country</label>
@@ -384,7 +585,9 @@
             </div>
 
             <!-- Learning Goals -->
-            <div class="section-title">Learning Goals</div>
+            <div class="section-title">
+                <i class="fa-solid fa-lightbulb"></i> Learning Goals
+            </div>
 
             <div class="form-group">
                 <label for="interests">What do you want to learn?</label>
@@ -399,14 +602,137 @@
             <!-- Profile Picture -->
             <div class="form-group">
                 <label>Profile Picture</label>
-                <input type="file" accept="image/*">
+                <div class="file-upload-wrapper">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Click to upload your profile picture</span>
+                    <input type="file" id="profilePicture" accept="image/*">
+                </div>
             </div>
 
-            <button type="submit">Complete Registration</button>
+            <button type="submit" id="submitBtn">
+                <span>Complete Registration</span>
+                <div class="spinner"></div>
+            </button>
         </form>
     </div>
 
 </div>
+
+<!-- Firebase Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+// 🔐 AUTH CHECK
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    currentUser = user;
+  }
+});
+
+// 🚀 EXPERT FORM SUBMISSION
+window.submitExpertForm = async function (event) {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+
+  const expertData = {
+    userId: currentUser.uid,
+    userName: currentUser.displayName || "User",
+    email: currentUser.email,
+    fullName: document.getElementById("fullname").value,
+    phone: document.getElementById("phone").value,
+    location: document.getElementById("location").value,
+    role: document.getElementById("role").value,
+    skills: document.getElementById("skills").value,
+    experience: document.getElementById("experience").value,
+    rate: document.getElementById("rate").value,
+    availability: document.getElementById("availability").value,
+    linkedin: document.getElementById("linkedin").value,
+    portfolio: document.getElementById("portfolio").value,
+    bio: document.getElementById("bio").value,
+    resume: document.getElementById("expertResume").value,
+    certification: document.getElementById("expertCertification").value,
+    status: "pending",
+    verified: false,
+    createdAt: serverTimestamp()
+  };
+
+  try {
+    await addDoc(collection(db, "experts"), expertData);
+    alert("Expert application submitted successfully! We will review your credentials.");
+    document.getElementById("expertForm").reset();
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  } catch (error) {
+    console.error("Error submitting expert form:", error);
+    alert("Error submitting form. Please try again.");
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  }
+};
+
+// 🚀 LEARNER FORM SUBMISSION
+window.submitLearnerForm = async function (event) {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+
+  const learnerData = {
+    userId: currentUser.uid,
+    userName: currentUser.displayName || "User",
+    email: currentUser.email,
+    fullName: document.getElementById("fullname").value,
+    city: document.getElementById("city").value,
+    phone: document.getElementById("phone").value,
+    education: document.getElementById("education").value,
+    interests: document.getElementById("interests").value,
+    goals: document.getElementById("goals").value,
+    profilePicture: document.getElementById("profilePicture").value,
+    createdAt: serverTimestamp()
+  };
+
+  try {
+    await addDoc(collection(db, "learners"), learnerData);
+    alert("Profile created successfully! Welcome to SkillSwap.");
+    document.getElementById("learnerForm").reset();
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  } catch (error) {
+    console.error("Error submitting learner form:", error);
+    alert("Error creating profile. Please try again.");
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  }
+};
+</script>
 
 <script>
     function selectRole(role) {
@@ -425,11 +751,6 @@
             document.getElementById('learner-form').classList.add('active');
         }
     }
-    onAuthStateChanged(auth, (user) => {
-   if(!user){
-      window.location.href = "login.html";
-   }
-});
 </script>
 
 </body>
