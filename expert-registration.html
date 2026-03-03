@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expert Registration - SkillSwap</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#09090b;
+--primary:#6366f1;
+--accent:#a855f7;
+--border:rgba(255,255,255,0.08);
+--muted:#a1a1aa;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+font-family:'Plus Jakarta Sans',sans-serif;
+background:var(--bg);
+color:white;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:50px 20px;
+}
+
+.card{
+background:rgba(255,255,255,0.03);
+border:1px solid var(--border);
+border-radius:20px;
+padding:40px;
+}
+
+h1{
+margin-bottom:30px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.input-group{
+display:flex;
+flex-direction:column;
+}
+
+.input-group.full{
+grid-column:1/-1;
+}
+
+label{
+margin-bottom:6px;
+font-size:0.9rem;
+color:var(--muted);
+}
+
+input,textarea,select{
+padding:14px;
+border-radius:10px;
+border:1px solid var(--border);
+background:rgba(0,0,0,0.3);
+color:white;
+}
+
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+button{
+margin-top:25px;
+width:100%;
+padding:16px;
+border:none;
+border-radius:12px;
+background:linear-gradient(135deg,var(--primary),var(--accent));
+color:white;
+font-weight:600;
+cursor:pointer;
+}
+
+@media(max-width:768px){
+.form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+<h1>Apply as Verified Expert</h1>
+
+<div class="form-grid">
+
+<div class="input-group">
+<label>Full Name</label>
+<input id="fullName" required>
+</div>
+
+<div class="input-group">
+<label>Phone Number</label>
+<input id="phone" required>
+</div>
+
+<div class="input-group">
+<label>Primary Skill</label>
+<input id="skill" required>
+</div>
+
+<div class="input-group">
+<label>Category</label>
+<select id="category">
+<option>Programming</option>
+<option>Design</option>
+<option>Marketing</option>
+<option>Business</option>
+<option>Other</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>Years of Experience</label>
+<input id="experience" type="number" required>
+</div>
+
+<div class="input-group">
+<label>Hourly Rate (₹)</label>
+<input id="rate" type="number" required>
+</div>
+
+<div class="input-group full">
+<label>Professional Bio</label>
+<textarea id="bio"></textarea>
+</div>
+
+<div class="input-group">
+<label>LinkedIn URL</label>
+<input id="linkedin">
+</div>
+
+<div class="input-group">
+<label>Portfolio URL</label>
+<input id="portfolio">
+</div>
+
+<div class="input-group full">
+<label>Upload Certificate (PDF/Image)</label>
+<input type="file" id="certificate" accept=".pdf,.jpg,.png" required>
+</div>
+
+<div class="input-group full">
+<label>Upload Resume (Optional)</label>
+<input type="file" id="resume" accept=".pdf">
+</div>
+
+</div>
+
+<button onclick="submitApplication()">Submit Application</button>
+
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore,collection,addDoc,serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage,ref,uploadBytes,getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+ const firebaseConfig = {
+            apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+            authDomain: "skillswapp-35e86.firebaseapp.com",
+            projectId: "skillswapp-35e86",
+            storageBucket: "skillswapp-35e86.appspot.com",
+            messagingSenderId: "668466292157",
+            appId: "1:668466292157:web:9be85414fc752b67779ed4"
+        };
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+let currentUser;
+
+onAuthStateChanged(auth,user=>{
+if(!user){
+window.location.href="login.html";
+}else{
+currentUser=user;
+}
+});
+
+window.submitApplication = async function(){
+
+const certFile=document.getElementById("certificate").files[0];
+const resumeFile=document.getElementById("resume").files[0];
+
+if(!certFile){
+alert("Certificate required");
+return;
+}
+
+try{
+
+// Upload certificate
+const certRef=ref(storage,"expertCertificates/"+currentUser.uid+"_"+certFile.name);
+await uploadBytes(certRef,certFile);
+const certURL=await getDownloadURL(certRef);
+
+let resumeURL="";
+if(resumeFile){
+const resumeRef=ref(storage,"expertResumes/"+currentUser.uid+"_"+resumeFile.name);
+await uploadBytes(resumeRef,resumeFile);
+resumeURL=await getDownloadURL(resumeRef);
+}
+
+await addDoc(collection(db,"expertApplications"),{
+userId:currentUser.uid,
+fullName:fullName.value,
+phone:phone.value,
+skill:skill.value,
+category:category.value,
+experience:Number(experience.value),
+rate:Number(rate.value),
+bio:bio.value,
+linkedin:linkedin.value,
+portfolio:portfolio.value,
+certificateURL:certURL,
+resumeURL:resumeURL,
+status:"pending",
+isVerified:false,
+appliedAt:serverTimestamp()
+});
+
+alert("Application submitted successfully!");
+
+}catch(error){
+console.error(error);
+alert("Something went wrong.");
+}
+
+};
+</script>
+
+</body>
+</html>

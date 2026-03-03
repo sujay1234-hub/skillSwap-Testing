@@ -316,6 +316,102 @@
             .post-card { padding: 24px; }
             .services-grid { grid-template-columns: 1fr; }
         }
+
+
+
+/* --- Professional Expert Button --- */
+.expert-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 10px 25px var(--primary-glow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+}
+
+.expert-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.expert-btn:hover::before {
+    left: 100%;
+}
+
+.expert-btn:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 35px var(--primary-glow);
+}
+
+.expert-btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expert-btn:hover i {
+    transform: rotate(15deg);
+}
+
+.expert-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Active State --- */
+.expert-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px var(--primary-glow);
+}
+
+/* --- Mobile Responsive --- */
+@media (max-width: 768px) {
+    .expert-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px 32px;
+        font-size: 1rem;
+    }
+}
+
+/* --- Desktop Positioning --- */
+@media (min-width: 769px) {
+    .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .expert-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+}
     </style>
 </head>
 <body>
@@ -326,7 +422,17 @@
         <h1>Expert Help <span>Marketplace</span></h1>
         <p>Hire talented students for 1-on-1 sessions. Learn faster, grow smarter with personalized paid help.</p>
     </div>
-
+<!-- Hero Section -->
+<div class="hero">
+    <!-- Professional Expert Button -->
+    <a href="expert-registration.html" class="expert-btn">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Become an Expert</span>
+        
+    </a>
+</div>
+</div>
+<div class="container">
     <!-- Post Service Form -->
     <div class="post-card">
         <h2><i class="fa-solid fa-plus-circle"></i> Offer Your Service</h2>
@@ -367,76 +473,6 @@
 @keyframes loading {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
-}
-
-/* ===== MOBILE BOTTOM NAV ===== */
-.mobile-bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15,15,18,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 9999;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-}
-.mbn-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #71717a;
-  text-decoration: none;
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  flex: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-.mbn-item i { font-size: 1.15rem; }
-.mbn-item:hover, .mbn-item.active {
-  color: #6366f1;
-  background: rgba(99,102,241,0.1);
-}
-@media (max-width: 768px) {
-  .mobile-bottom-nav { display: flex; }
-  body { padding-bottom: 70px; }
-}
-
-/* ===== MOBILE HEADER FIXES ===== */
-@media (max-width: 768px) {
-  header nav { display: none !important; }
-  header { 
-    padding: 14px 16px !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 0 !important;
-  }
-  header .logo { font-size: 1.2rem !important; }
-  /* Fix containers */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-  /* Chip/category overflow */
-  .categories { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-  .categories::-webkit-scrollbar { display: none; }
-}
-
-/* Touch friendly buttons globally */
-@media (max-width: 768px) {
-  button, .btn, a.btn, .btn-action, .btn-primary, .btn-secondary, .btn-submit, .btn-hire, .btn-request, .btn-search {
-    min-height: 44px;
-  }
-  input, select, textarea {
-    font-size: 16px !important; /* prevent iOS zoom */
-  }
 }
 </style>
 
