@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Live Session — SkillSwap</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
     :root {
@@ -25,15 +26,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      height: 100%;
+      height: 100%; height: 100dvh;
       background: var(--bg);
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     .app {
-      height: 100vh;
+      height: 100vh; height: 100dvh;
       display: flex;
       flex-direction: column;
     }
@@ -47,11 +50,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
-      gap: 16px;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 10;
     }
 
-    .hd-left { display: flex; align-items: center; gap: 10px; }
+    .hd-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
     .brand {
       display: flex;
@@ -60,6 +64,7 @@
       font-weight: 700;
       font-size: 15px;
       letter-spacing: -.3px;
+      flex-shrink: 0;
     }
 
     .brand-icon {
@@ -70,13 +75,13 @@
       font-size: 14px;
     }
 
-    .sep { width: 1px; height: 20px; background: var(--border); }
+    .sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
 
     .live-pill {
       display: flex; align-items: center; gap: 5px;
       font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
       color: var(--muted); padding: 3px 8px; border-radius: 20px;
-      border: 1px solid var(--border); transition: all .3s;
+      border: 1px solid var(--border); transition: all .3s; flex-shrink: 0;
     }
     .live-pill.live { color: var(--green); border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.06); }
     .live-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -85,24 +90,27 @@
 
     .room-chip {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--sub);
+      font-size: 11px; color: var(--sub);
       background: rgba(255,255,255,.04); border: 1px solid var(--border);
-      padding: 4px 10px; border-radius: 6px; cursor: pointer;
-      display: flex; align-items: center; gap: 5px; transition: all .2s;
+      padding: 4px 8px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; transition: all .2s;
+      max-width: 130px; overflow: hidden;
     }
+    .room-chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .room-chip:hover { border-color: var(--accent); color: var(--text); }
 
-    .hd-right { display: flex; align-items: center; gap: 10px; }
+    .hd-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .timer-display {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px; color: var(--muted); min-width: 48px; text-align: right;
+      font-size: 13px; color: var(--muted); min-width: 44px; text-align: right;
     }
 
     .hd-btn {
-      height: 34px; padding: 0 14px; border-radius: 8px; border: none;
+      height: 34px; padding: 0 12px; border-radius: 8px; border: none;
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
       cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all .15s;
+      position: relative; flex-shrink: 0;
     }
     .hd-btn-ghost { background: rgba(255,255,255,.04); color: var(--sub); border: 1px solid var(--border); }
     .hd-btn-ghost:hover { background: rgba(255,255,255,.08); color: var(--text); }
@@ -112,17 +120,18 @@
     /* ── CONTENT ── */
     .content {
       flex: 1; overflow: hidden; display: flex; position: relative;
+      min-height: 0;
     }
 
     /* ══ SETUP SCREEN ══ */
     #setup-screen {
       flex: 1; display: flex; align-items: center;
-      justify-content: center; padding: 32px;
+      justify-content: center; padding: 24px; overflow-y: auto;
     }
 
     .setup-wrap {
-      display: flex; gap: 40px; align-items: flex-start;
-      width: 100%; max-width: 900px;
+      display: flex; gap: 32px; align-items: flex-start;
+      width: 100%; max-width: 860px;
     }
 
     .preview-col { flex: 1; display: flex; flex-direction: column; gap: 12px; }
@@ -160,22 +169,22 @@
       display: flex; align-items: center; gap: 8px;
       font-size: 13px; color: var(--muted);
     }
-    .status-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+    .status-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
     .status-row.ok .dot   { background: var(--green); box-shadow: 0 0 6px var(--green); }
     .status-row.warn .dot { background: var(--amber); }
     .status-row.err .dot  { background: var(--red); }
 
-    .setup-col { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+    .setup-col { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
 
     .setup-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 28px;
-      display: flex; flex-direction: column; gap: 20px;
+      border-radius: 16px; padding: 24px;
+      display: flex; flex-direction: column; gap: 18px;
       box-shadow: 0 20px 40px rgba(0,0,0,.4);
     }
 
-    .setup-card h2 { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
-    .setup-card .sub { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: -12px; }
+    .setup-card h2 { font-size: 19px; font-weight: 700; letter-spacing: -.3px; }
+    .setup-card .sub { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: -10px; }
 
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label {
@@ -224,13 +233,13 @@
 
     /* ══ VIDEO SCREEN ══ */
     #video-screen {
-      flex: 1; display: none; flex-direction: column;
+      flex: 1; display: none; flex-direction: column; min-height: 0;
     }
 
     .status-strip {
-      height: 36px; flex-shrink: 0;
+      height: 34px; flex-shrink: 0;
       background: var(--surface); border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 16px; gap: 12px;
+      display: flex; align-items: center; padding: 0 14px; gap: 10px;
     }
 
     .conn-badge {
@@ -247,40 +256,137 @@
 
     .strip-room {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--muted); cursor: pointer;
+      font-size: 11px; color: var(--muted); cursor: pointer;
       display: flex; align-items: center; gap: 5px;
+      overflow: hidden;
     }
     .strip-room:hover { color: var(--text); }
+    .strip-room span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+
+    /* ── ROOM BODY ── */
+    .room-body { 
+      flex: 1; display: flex; overflow: hidden; min-height: 0;
+      position: relative;
+    }
+
+    /* ── LEFT PANEL (Share/Invite) ── */
+    .left-panel {
+      width: 0; flex-shrink: 0; overflow: hidden;
+      background: var(--surface); border-right: 0px solid var(--border);
+      display: flex; flex-direction: column;
+      transition: width .3s ease, border-right-width .3s ease;
+      z-index: 20;
+    }
+    .left-panel.open { width: 280px; border-right-width: 1px; }
+    .left-panel-inner { width: 280px; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+    .lp-header {
+      height: 48px; flex-shrink: 0; padding: 0 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .lp-header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+    .lp-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 6px; border-radius: 6px; line-height: 1; }
+    .lp-close:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    .lp-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .lp-body::-webkit-scrollbar { width: 3px; }
+    .lp-body::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+
+    .lp-section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted); margin-bottom: 2px;
+    }
+
+    /* Room share box */
+    .room-share-box {
+      background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.25);
+      border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .room-link-display {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      background: rgba(0,0,0,.35); border: 1px solid var(--border);
+      border-radius: 7px; padding: 8px 10px; color: var(--sub);
+      word-break: break-all; line-height: 1.5;
+    }
+    .copy-link-btn {
+      width: 100%; height: 34px; background: var(--accent); color: white;
+      border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .2s;
+    }
+    .copy-link-btn:hover { opacity: .88; }
+
+    /* Accepted trades list */
+    .trade-user-list { display: flex; flex-direction: column; gap: 8px; }
+    .trade-user-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; cursor: pointer;
+      transition: all .2s;
+    }
+    .trade-user-item:hover { border-color: var(--accent); background: rgba(99,102,241,.06); }
+    .trade-user-avatar {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .trade-user-info { flex: 1; min-width: 0; }
+    .trade-user-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .trade-user-skill { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+    .trade-invite-btn {
+      height: 28px; padding: 0 10px; background: var(--accent); color: white;
+      border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: 11px; cursor: pointer; flex-shrink: 0;
+      transition: all .15s; white-space: nowrap;
+    }
+    .trade-invite-btn:hover { opacity: .85; }
+    .trade-invite-btn.sent { background: var(--green); pointer-events: none; }
+
+    .no-trades {
+      text-align: center; padding: 24px 12px; color: var(--muted);
+      font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .no-trades i { font-size: 24px; opacity: .4; }
+
+    /* Share toggle button in controls */
+    .share-fab {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--sub); cursor: pointer; display: none;
+      align-items: center; justify-content: center; font-size: 16px;
+      transition: all .2s; z-index: 5;
+    }
+    .share-fab:hover { background: rgba(99,102,241,.15); border-color: var(--accent); color: var(--accent); }
+    .share-fab.active { background: rgba(99,102,241,.15); border-color: var(--accent); color: var(--accent); }
 
     /* ── VIDEO AREA ── */
+    .video-col {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative;
+    }
+
     .video-area {
       flex: 1;
       overflow: hidden;
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      padding: 16px;
-      gap: 12px;
+      padding: 12px;
+      gap: 10px;
       background: var(--bg);
+      min-height: 0;
     }
 
-    /* Solo: single centered tile */
     .video-area.solo .video-tile {
-      height: 100%;
-      max-height: 100%;
-      aspect-ratio: 16/9;
-      width: auto;
-      max-width: 100%;
+      flex: 1;
+      max-width: 900px;
     }
 
-    /* Dual: two equal side-by-side tiles */
     .video-area.dual .video-tile {
-      height: 100%;
-      max-height: 100%;
-      aspect-ratio: 16/9;
-      width: calc(50% - 6px);
-      max-width: calc(50% - 6px);
-      flex-shrink: 0;
+      flex: 1;
     }
 
     .video-tile {
@@ -293,6 +399,7 @@
       align-items: center;
       justify-content: center;
       transition: border-color .3s;
+      min-width: 0;
     }
 
     .video-tile video {
@@ -304,42 +411,78 @@
 
     #local-video { transform: scaleX(-1); }
 
+    /* ── FIX: remote video visibility ── */
+    #remote-video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+      background: #0c0c14;
+    }
+
     .tile-name {
-      position: absolute; bottom: 12px; left: 12px;
+      position: absolute; bottom: 10px; left: 10px;
       display: flex; align-items: center; gap: 6px;
-      background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
-      border-radius: 20px; padding: 4px 12px;
-      font-size: 12px; font-weight: 600; pointer-events: none;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+      border-radius: 20px; padding: 4px 11px;
+      font-size: 12px; font-weight: 600; pointer-events: none; z-index: 2;
     }
 
     .tile-icons {
-      position: absolute; top: 10px; right: 10px;
-      display: flex; gap: 5px;
+      position: absolute; top: 8px; right: 8px;
+      display: flex; gap: 5px; z-index: 2;
     }
 
     .tile-icon {
-      background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
       border-radius: 6px; padding: 4px 7px;
       font-size: 12px; display: none;
     }
     .tile-icon.show { display: block; }
 
     .tile-avatar {
+      position: absolute; inset: 0;
       display: flex; flex-direction: column;
-      align-items: center; gap: 14px; color: var(--muted);
+      align-items: center; justify-content: center;
+      gap: 12px; color: var(--muted); z-index: 1;
+      background: #0c0c14;
     }
     .avatar-ring {
-      width: 80px; height: 80px; border-radius: 50%;
+      width: 72px; height: 72px; border-radius: 50%;
       border: 2px solid var(--border); background: var(--surface2);
-      display: flex; align-items: center; justify-content: center; font-size: 34px;
+      display: flex; align-items: center; justify-content: center; font-size: 30px;
     }
-    .tile-avatar p { font-size: 14px; }
+    .tile-avatar p { font-size: 13px; }
+
+    /* Waiting overlay for remote */
+    .waiting-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px; background: #0c0c14; z-index: 3;
+    }
+    .waiting-ring {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      animation: spin 1.5s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .waiting-overlay p { font-size: 14px; color: var(--muted); font-weight: 500; }
+    .waiting-overlay small { font-size: 12px; color: #4b5563; }
 
     /* ── CONTROLS BAR ── */
     .controls-bar {
       height: 72px; flex-shrink: 0;
       background: var(--surface); border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center; gap: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      position: relative; padding: 0 60px;
+    }
+
+    /* Share button in controls bar - LEFT side */
+    .ctrl-share-btn {
+      position: absolute; left: 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
 
     .ctrl-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
@@ -349,82 +492,27 @@
       border: 1px solid var(--border); background: var(--surface2);
       color: var(--text); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; transition: all .15s;
+      font-size: 17px; transition: all .15s;
     }
     .ctrl:hover { background: #2a2a3a; border-color: #3a3a50; }
     .ctrl.off { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); color: var(--red); }
-    .ctrl.hangup { width: 52px; height: 52px; background: var(--red); border-color: var(--red); font-size: 20px; }
+    .ctrl.on  { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.35); color: var(--accent); }
+    .ctrl.hangup { width: 52px; height: 52px; background: var(--red); border-color: var(--red); font-size: 18px; }
     .ctrl.hangup:hover { opacity: .85; }
-    .ctrl-label { font-size: 11px; color: var(--muted); }
+    .ctrl-label { font-size: 10px; color: var(--muted); }
 
     /* ── TOAST ── */
     #toast {
-      position: fixed; bottom: 90px; left: 50%;
+      position: fixed; bottom: 86px; left: 50%;
       transform: translateX(-50%) translateY(10px);
       background: var(--surface2); border: 1px solid var(--border);
       color: var(--text); padding: 10px 20px; border-radius: 10px;
       font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none;
-      transition: opacity .25s, transform .25s; z-index: 999;
-      white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      transition: opacity .25s, transform .25s; z-index: 9999;
+      white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      max-width: calc(100vw - 32px); text-align: center;
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── MOBILE ACTION BAR (Chat + Exit + End) ── */
-    .mobile-action-bar {
-      display: none; /* hidden on desktop */
-      height: 56px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 12px;
-      gap: 8px;
-    }
-    .mob-btn {
-      flex: 1;
-      height: 40px;
-      border-radius: 10px;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all .15s;
-      position: relative;
-    }
-    .mob-btn-chat { background: rgba(99,102,241,.15); color: var(--accent); border: 1px solid rgba(99,102,241,.3); }
-    .mob-btn-chat:hover { background: rgba(99,102,241,.25); }
-    .mob-btn-exit { background: rgba(255,255,255,.05); color: var(--sub); border: 1px solid var(--border); }
-    .mob-btn-exit:hover { color: var(--text); }
-    .mob-btn-end  { background: var(--red); color: white; }
-    .mob-btn-end:hover { opacity: .88; }
-    .mob-unread-badge {
-      position: absolute; top: -3px; right: -3px;
-      width: 15px; height: 15px; border-radius: 50%;
-      background: var(--red); color: white; font-size: 8px; font-weight: 700;
-      display: none; align-items: center; justify-content: center;
-      border: 2px solid var(--surface);
-    }
-    .mob-unread-badge.show { display: flex; }
-
-    /* ── CHAT TOGGLE BUTTON ── */
-    .hd-btn-chat { background: rgba(99,102,241,.15); color: var(--accent); border: 1px solid rgba(99,102,241,.3); position: relative; }
-    .hd-btn-chat:hover { background: rgba(99,102,241,.25); }
-    .chat-unread-badge {
-      position: absolute; top: -4px; right: -4px;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: var(--red); color: white; font-size: 9px; font-weight: 700;
-      display: none; align-items: center; justify-content: center; border: 2px solid var(--surface);
-    }
-    .chat-unread-badge.show { display: flex; }
-
-    /* ── ROOM BODY ── */
-    .room-body { flex: 1; display: flex; overflow: hidden; }
 
     /* ── CHAT PANEL ── */
     .chat-panel {
@@ -432,34 +520,19 @@
       background: var(--surface); border-left: 0px solid var(--border);
       display: flex; flex-direction: column;
       transition: width .3s ease, border-left-width .3s ease;
+      z-index: 20;
     }
-    .chat-panel.open { width: 300px; border-left-width: 1px; }
-    .chat-panel-inner { width: 300px; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .chat-panel.open { width: 290px; border-left-width: 1px; }
+    .chat-panel-inner { width: 290px; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
     .cp-header {
       height: 48px; flex-shrink: 0; padding: 0 14px;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
     .cp-header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
-    .cp-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; border-radius: 6px; }
+    .cp-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 6px; border-radius: 6px; }
     .cp-close:hover { color: var(--text); background: rgba(255,255,255,.06); }
-    .invite-section { padding: 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-    .invite-section label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
-    .invite-btn {
-      width: 100%; height: 38px; background: rgba(99,102,241,.15); color: var(--accent);
-      border: 1px solid rgba(99,102,241,.35); border-radius: 8px;
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s;
-    }
-    .invite-btn:hover { background: rgba(99,102,241,.25); }
-    .invite-btn:disabled { opacity: .5; cursor: not-allowed; }
-    .invite-select {
-      width: 100%; height: 36px; background: rgba(0,0,0,.3); border: 1px solid var(--border);
-      color: var(--text); border-radius: 8px; padding: 0 10px;
-      font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; cursor: pointer;
-    }
-    .invite-select:focus { border-color: var(--accent); }
-    .invite-select option { background: #18181b; }
+
     .cp-messages {
       flex: 1; overflow-y: auto; padding: 12px;
       display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth;
@@ -473,6 +546,7 @@
     .cp-msg.sent     { align-self: flex-end; background: #6366f1; color: white; border-bottom-right-radius: 4px; }
     .cp-msg.received { align-self: flex-start; background: #27272a; color: #e4e4e7; border-bottom-left-radius: 4px; }
     .cp-msg-time { font-size: 10px; opacity: .6; margin-top: 3px; display: block; text-align: right; }
+
     .invite-card-cp {
       align-self: flex-start; background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.3);
       border-radius: 14px; padding: 12px; max-width: 95%; display: flex; flex-direction: column; gap: 8px;
@@ -484,7 +558,8 @@
     .invite-card-cp .ic-join  { height: 32px; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .invite-card-cp .ic-join:hover { opacity: .88; }
     .invite-card-cp .ic-time  { font-size: 10px; opacity: .5; text-align: right; }
-    .cp-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); gap: 8px; font-size: 13px; }
+
+    .cp-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); gap: 8px; font-size: 13px; text-align: center; }
     .cp-empty i { font-size: 28px; opacity: .4; }
     .cp-input-row { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
     .cp-input {
@@ -494,75 +569,126 @@
     }
     .cp-input:focus { border-color: var(--accent); }
     .cp-input::placeholder { color: var(--muted); }
-    .cp-send { width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--accent); color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .cp-send { width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--accent); color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
     .cp-send:hover { opacity: .88; }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 720px) {
-      /* Header: compact on mobile */
-      .header { padding: 0 10px; gap: 6px; }
-      .brand-name  { display: none; }
-      .sep         { display: none; }
-      .live-pill   { padding: 3px 5px; font-size: 10px; gap: 4px; }
-      .room-chip   { max-width: 100px; font-size: 10px; padding: 3px 6px; }
-      .timer-display { font-size: 12px; min-width: 36px; }
-      .hd-right    { gap: 5px; }
+    /* ── CHAT BADGE ── */
+    .hd-btn-chat { background: rgba(99,102,241,.15); color: var(--accent); border: 1px solid rgba(99,102,241,.3); }
+    .hd-btn-chat:hover { background: rgba(99,102,241,.25); }
+    .chat-unread-badge {
+      position: absolute; top: -4px; right: -4px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--red); color: white; font-size: 9px; font-weight: 700;
+      display: none; align-items: center; justify-content: center; border: 2px solid var(--surface);
+    }
+    .chat-unread-badge.show { display: flex; }
 
-      /* Shrink buttons to fit on mobile */
-      .hd-btn { height: 32px; padding: 0 10px; font-size: 12px; gap: 4px; }
-      .hd-btn-chat .chat-btn-text { display: none; }
-      .hd-btn-ghost .exit-text { display: none; }
-      .hd-btn-ghost { padding: 0 10px; min-width: 36px; justify-content: center; }
+    /* ── MOBILE BOTTOM BAR ── */
+    .mobile-bottom-bar {
+      display: none;
+      height: 54px; flex-shrink: 0;
+      background: var(--surface); border-top: 1px solid var(--border);
+      align-items: center; justify-content: space-around; padding: 0 8px; gap: 6px;
+    }
+    .mob-btn {
+      flex: 1; height: 38px; border-radius: 9px; border: none;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+      transition: all .15s; position: relative;
+    }
+    .mob-btn-share { background: rgba(99,102,241,.15); color: var(--accent); border: 1px solid rgba(99,102,241,.3); }
+    .mob-btn-chat  { background: rgba(255,255,255,.06); color: var(--sub); border: 1px solid var(--border); position: relative; }
+    .mob-btn-exit  { background: rgba(255,255,255,.04); color: var(--sub); border: 1px solid var(--border); }
+    .mob-btn-end   { background: var(--red); color: white; }
+    .mob-unread {
+      position: absolute; top: -3px; right: -3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--red); color: white; font-size: 8px; font-weight: 700;
+      display: none; align-items: center; justify-content: center;
+      border: 2px solid var(--surface);
+    }
+    .mob-unread.show { display: flex; }
 
-      /* Keep mobile action bar hidden (chat/exit/end are in header) */
-      .mobile-action-bar { display: none !important; }
+    /* ── MOBILE OVERLAY PANELS ── */
+    .mobile-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(4px);
+      align-items: flex-end;
+    }
+    .mobile-overlay.show { display: flex; }
+    .mobile-sheet {
+      width: 100%; max-height: 75vh;
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle {
+      width: 36px; height: 4px; border-radius: 2px;
+      background: var(--border); margin: 12px auto 4px;
+      flex-shrink: 0;
+    }
+    .sheet-header {
+      padding: 8px 16px 12px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .sheet-header h3 { font-size: 15px; font-weight: 700; }
+    .sheet-close {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 18px; padding: 4px; border-radius: 6px;
+    }
+    .sheet-body { flex: 1; overflow-y: auto; padding: 14px; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 700px) {
+      /* Header compact */
+      .header { padding: 0 10px; gap: 6px; height: 52px; }
+      .brand-name { display: none; }
+      .sep { display: none; }
+      .live-pill { padding: 3px 6px; font-size: 10px; }
+      .room-chip { max-width: 90px; font-size: 10px; padding: 3px 6px; }
+      .timer-display { font-size: 11px; min-width: 36px; }
+      .hd-right { gap: 5px; }
+      .hd-btn { height: 32px; padding: 0 9px; font-size: 12px; }
+      /* Hide chat/exit/end from header on mobile — moved to bottom bar */
+      .hd-btn-chat, .hd-btn-ghost, .hd-btn-red { display: none !important; }
+
+      /* Show mobile bottom bar */
+      .mobile-bottom-bar { display: flex; }
 
       /* Setup */
-      .setup-wrap  { flex-direction: column; }
-      .setup-col   { width: 100%; }
+      .setup-wrap { flex-direction: column; gap: 20px; }
+      .setup-col { width: 100%; }
       .preview-col { display: none; }
       #setup-screen { padding: 16px; }
 
-      /* Video tiles */
-      .video-area  { padding: 8px; gap: 8px; }
-      .video-area.dual { flex-direction: column; }
-      .video-area.dual .video-tile { width: 100%; max-width: 100%; height: calc(50% - 4px); aspect-ratio: unset; }
-      .video-area.solo .video-tile { width: 100%; height: 100%; aspect-ratio: unset; }
+      /* Status strip */
+      .status-strip { height: 30px; padding: 0 10px; }
+      .conn-badge { font-size: 11px; padding: 2px 8px; }
+      .strip-room { display: none; }
 
-      /* Controls: tighter */
-      .controls-bar { height: 64px; gap: 10px; }
-      .ctrl { width: 42px; height: 42px; font-size: 16px; }
-      .ctrl.hangup { width: 48px; height: 48px; font-size: 18px; }
-      .ctrl-label  { font-size: 10px; }
+      /* Video layout: stack vertically on mobile */
+      .video-area { padding: 8px; gap: 8px; flex-direction: column; }
+      .video-area.solo .video-tile { flex: 1; max-width: 100%; }
+      .video-area.dual .video-tile { flex: 1; }
 
-      /* Chat panel full-screen on mobile */
-      .chat-panel.open {
-        position: fixed;
-        left: 0; right: 0; top: 0; bottom: 0;
-        width: 100% !important;
-        z-index: 50;
-        border-left: none;
-      }
+      /* Controls: tighter, smaller padding */
+      .controls-bar { height: 64px; gap: 10px; padding: 0 50px; }
+      .ctrl-share-btn { left: 8px; }
+      .ctrl { width: 42px; height: 42px; font-size: 15px; }
+      .ctrl.hangup { width: 48px; height: 48px; font-size: 17px; }
+      .ctrl-label { font-size: 9px; }
+
+      /* Desktop side panels hidden on mobile */
+      .left-panel, .chat-panel { display: none !important; }
     }
   </style>
-
-<style id="mob">
-.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
-@media(max-width:768px){
-.mobile-back-btn{display:flex;}
-.video-grid,.peers-grid{grid-template-columns:1fr !important;}
-.video-container,.video-wrapper{height:200px !important;}
-.controls,.video-controls{padding:10px 8px;gap:8px;flex-wrap:wrap;justify-content:center;}
-.control-btn,.ctrl-btn{width:48px;height:48px;font-size:1rem;}
-.side-panel,.chat-panel{position:fixed;bottom:0;left:0;right:0;height:55vh;border-radius:20px 20px 0 0;z-index:100;transform:translateY(100%);transition:transform 0.3s;}
-.side-panel.open,.chat-panel.open{transform:translateY(0);}
-.room-header{padding:10px 16px;}
-}
-</style>
 </head>
 <body>
-<a class="mobile-back-btn" href="skill-room.html" title="Back">&#8592;</a>
 
 <div class="app">
 
@@ -585,12 +711,11 @@
     </div>
     <div class="hd-right">
       <span class="timer-display" id="timer">00:00</span>
-      <!-- Chat toggle (shown when in video screen) -->
       <button class="hd-btn hd-btn-chat" id="chat-toggle-btn" onclick="toggleChatPanel()" title="Chat" style="display:none">
-        <i class="fa-solid fa-comments"></i><span class="chat-btn-text"> Chat</span>
+        <i class="fa-solid fa-comments"></i> Chat
         <span class="chat-unread-badge" id="unread-badge"></span>
       </button>
-      <button class="hd-btn hd-btn-ghost" onclick="exitSession()"><span class="exit-text">← </span>Exit</button>
+      <button class="hd-btn hd-btn-ghost" onclick="exitSession()">← Exit</button>
       <button class="hd-btn hd-btn-red"   onclick="endSession()">End Call</button>
     </div>
   </header>
@@ -602,7 +727,6 @@
     <div id="setup-screen">
       <div class="setup-wrap">
 
-        <!-- Camera preview -->
         <div class="preview-col">
           <div class="cam-preview-box">
             <div class="cam-placeholder" id="cam-placeholder">
@@ -621,18 +745,12 @@
           </div>
         </div>
 
-        <!-- Setup card -->
         <div class="setup-col">
           <div class="setup-card">
             <h2>Join a Live Session</h2>
             <p class="sub">Start a new room or paste a room code to join. No plugins, no time limits.</p>
-
-            <button class="btn-accent-full" onclick="createRoom()">
-              ✦ &nbsp;Create New Room
-            </button>
-
+            <button class="btn-accent-full" onclick="createRoom()">✦ &nbsp;Create New Room</button>
             <div class="or-divider">or join an existing room</div>
-
             <div class="field">
               <label>Room Code</label>
               <div class="field-row">
@@ -641,7 +759,6 @@
               </div>
             </div>
           </div>
-
           <div class="tips">
             <div>✓ &nbsp;Peer-to-peer — video goes directly to your partner</div>
             <div>✓ &nbsp;No account or plugin needed</div>
@@ -666,11 +783,49 @@
         </span>
       </div>
 
-      <!-- Room body: video + chat side by side -->
+      <!-- Room body -->
       <div class="room-body">
 
-        <!-- Video + controls column -->
-        <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;">
+        <!-- LEFT PANEL: Share & Invite -->
+        <div class="left-panel" id="left-panel">
+          <div class="left-panel-inner">
+            <div class="lp-header">
+              <div class="lp-header-left">
+                <i class="fa-solid fa-share-nodes" style="color:var(--accent)"></i>
+                Share Session
+              </div>
+              <button class="lp-close" onclick="toggleSharePanel()">✕</button>
+            </div>
+            <div class="lp-body">
+
+              <!-- Room link sharing -->
+              <div>
+                <div class="lp-section-title">Room Link</div>
+                <div class="room-share-box">
+                  <div class="room-link-display" id="share-room-link">—</div>
+                  <button class="copy-link-btn" onclick="copyRoomLink()">
+                    <i class="fa-solid fa-copy"></i> Copy Link
+                  </button>
+                </div>
+              </div>
+
+              <!-- Accepted trade users -->
+              <div>
+                <div class="lp-section-title" style="margin-bottom:8px">Invite Accepted Trades</div>
+                <div class="trade-user-list" id="trade-user-list">
+                  <div class="no-trades">
+                    <i class="fa-solid fa-handshake-slash"></i>
+                    <span>Loading accepted trades…</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO COLUMN -->
+        <div class="video-col">
 
           <div class="video-area solo" id="video-area">
             <!-- Local tile -->
@@ -691,20 +846,30 @@
 
             <!-- Remote tile -->
             <div class="video-tile" id="remote-tile" style="display:none">
-              <div class="tile-avatar" id="remote-avatar">
-                <div class="avatar-ring">👤</div>
-                <p id="remote-avatar-text">Waiting for peer…</p>
+              <!-- Waiting overlay shown until stream arrives -->
+              <div class="waiting-overlay" id="waiting-overlay">
+                <div class="waiting-ring"></div>
+                <p>Waiting for peer…</p>
+                <small>Share the room code to invite</small>
               </div>
-              <video id="remote-video" autoplay playsinline style="display:none"></video>
+              <video id="remote-video" autoplay playsinline></video>
               <div class="tile-name" id="remote-name" style="display:none">
                 <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
-                Peer
+                <span id="remote-name-text">Peer</span>
               </div>
             </div>
           </div>
 
           <!-- Controls bar -->
           <div class="controls-bar">
+            <!-- Share button - left side -->
+            <div class="ctrl-share-btn">
+              <button class="ctrl" id="share-ctrl" onclick="toggleSharePanel()" title="Share & Invite">
+                <i class="fa-solid fa-share-nodes"></i>
+              </button>
+              <span class="ctrl-label">Share</span>
+            </div>
+
             <div class="ctrl-wrap">
               <button class="ctrl" id="mic-ctrl" onclick="toggleMic()" title="Mute / Unmute">🎤</button>
               <span class="ctrl-label">Mic</span>
@@ -718,27 +883,28 @@
               <span class="ctrl-label" style="color:var(--red)">End</span>
             </div>
           </div>
+
+          <!-- Mobile bottom bar -->
+          <div class="mobile-bottom-bar" id="mobile-bottom-bar" style="display:none">
+            <button class="mob-btn mob-btn-share" onclick="openMobileSheet('share')">
+              <i class="fa-solid fa-share-nodes"></i> Share
+            </button>
+            <button class="mob-btn mob-btn-chat" onclick="openMobileSheet('chat')">
+              <i class="fa-solid fa-comments"></i> Chat
+              <span class="mob-unread" id="mob-unread"></span>
+            </button>
+            <button class="mob-btn mob-btn-exit" onclick="exitSession()">Exit</button>
+            <button class="mob-btn mob-btn-end" onclick="endSession()">End</button>
+          </div>
         </div>
 
-        <!-- Chat panel (desktop: right sidebar) -->
+        <!-- CHAT PANEL (desktop: right sidebar) -->
         <div class="chat-panel" id="chat-panel">
           <div class="chat-panel-inner">
             <div class="cp-header">
               <div class="cp-header-left"><i class="fa-solid fa-comments" style="color:var(--accent)"></i> Session Chat</div>
-              <button class="cp-close" onclick="toggleChatPanel()"><i class="fa-solid fa-xmark"></i></button>
+              <button class="cp-close" onclick="toggleChatPanel()">✕</button>
             </div>
-
-            <!-- Invite section -->
-            <div class="invite-section">
-              <label>📨 Invite to this session</label>
-              <select class="invite-select" id="invite-chat-select">
-                <option value="">Loading your chats…</option>
-              </select>
-              <button class="invite-btn" id="invite-send-btn" onclick="sendInviteToChat()" disabled>
-                <i class="fa-solid fa-video"></i> Send Video Invite
-              </button>
-            </div>
-
             <div class="cp-messages" id="cp-messages">
               <div class="cp-empty" id="cp-empty">
                 <i class="fa-regular fa-comments"></i>
@@ -746,7 +912,6 @@
                 <span style="font-size:11px;color:#4b5563">Chat with your peer here</span>
               </div>
             </div>
-
             <div class="cp-input-row">
               <input class="cp-input" id="cp-input" placeholder="Type a message…" onkeypress="if(event.key==='Enter')sendChatMsg()"/>
               <button class="cp-send" onclick="sendChatMsg()"><i class="fa-solid fa-paper-plane"></i></button>
@@ -755,11 +920,59 @@
         </div>
 
       </div><!-- /room-body -->
-
     </div><!-- /video-screen -->
 
   </div><!-- /content -->
 </div><!-- /app -->
+
+<!-- MOBILE OVERLAYS -->
+<!-- Share Sheet -->
+<div class="mobile-overlay" id="share-overlay" onclick="closeMobileSheet('share', event)">
+  <div class="mobile-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3><i class="fa-solid fa-share-nodes" style="color:var(--accent);margin-right:6px"></i>Share Session</h3>
+      <button class="sheet-close" onclick="closeMobileSheet('share')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div class="lp-section-title" style="margin-bottom:8px">Room Link</div>
+          <div class="room-share-box">
+            <div class="room-link-display" id="share-room-link-mob">—</div>
+            <button class="copy-link-btn" onclick="copyRoomLink()"><i class="fa-solid fa-copy"></i> Copy Link</button>
+          </div>
+        </div>
+        <div>
+          <div class="lp-section-title" style="margin-bottom:8px">Invite Accepted Trades</div>
+          <div class="trade-user-list" id="trade-user-list-mob">
+            <div class="no-trades"><i class="fa-solid fa-handshake-slash"></i><span>Loading…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Sheet -->
+<div class="mobile-overlay" id="chat-overlay" onclick="closeMobileSheet('chat', event)">
+  <div class="mobile-sheet" style="max-height:80vh">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3><i class="fa-solid fa-comments" style="color:var(--accent);margin-right:6px"></i>Session Chat</h3>
+      <button class="sheet-close" onclick="closeMobileSheet('chat')">✕</button>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:200px">
+      <div class="cp-messages" id="cp-messages-mob" style="flex:1;padding:12px">
+        <div class="cp-empty"><i class="fa-regular fa-comments"></i><span>No messages yet</span></div>
+      </div>
+      <div class="cp-input-row" style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px">
+        <input class="cp-input" id="cp-input-mob" placeholder="Type a message…" onkeypress="if(event.key==='Enter')sendChatMsgMob()"/>
+        <button class="cp-send" onclick="sendChatMsgMob()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -769,13 +982,15 @@
 const ICE = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' }
+  { urls: 'stun:stun.cloudflare.com:3478' },
+  { urls: 'stun:stun.services.mozilla.com' }
 ];
 
 let peer = null, localStream = null, activeCall = null;
 let micOn = true, camOn = true;
 let timerInt = null, seconds = 0;
 let previewStream = null, prevMicOn = true, prevCamOn = true;
+let sharePanelOpen = false, chatPanelOpen = false;
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -783,6 +998,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (room) document.getElementById('join-id').value = room;
   await startPreview();
 });
+
+/* ── DETECT MOBILE ── */
+function isMobile() { return window.innerWidth <= 700; }
 
 /* ── PREVIEW CAM ── */
 async function startPreview() {
@@ -827,8 +1045,9 @@ function stopPreview() {
 /* ── GET MEDIA ── */
 async function getMedia() {
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('local-video').srcObject = localStream;
+    localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+    const lv = document.getElementById('local-video');
+    lv.srcObject = localStream;
     return true;
   } catch (err) {
     const msgs = { NotAllowedError: 'Camera/mic permission denied.', NotFoundError: 'No camera or mic found.' };
@@ -846,7 +1065,7 @@ async function createRoom() {
   setRoomId(roomId);
   setBadge('connecting', 'Waiting for peer…');
   peer = buildPeer(roomId);
-  peer.on('open', () => setLive(true));
+  peer.on('open', () => { setLive(true); });
   peer.on('call', call => { call.answer(localStream); handleCall(call); });
   peer.on('error', onPeerError);
 }
@@ -863,7 +1082,9 @@ async function joinRoom() {
   peer = buildPeer();
   peer.on('open', () => {
     setLive(true);
-    handleCall(peer.call(roomId, localStream, { config: { iceServers: ICE } }));
+    const call = peer.call(roomId, localStream, { config: { iceServers: ICE } });
+    if (!call) { showToast('Could not reach room.'); setBadge('error','Call failed'); return; }
+    handleCall(call);
   });
   peer.on('error', onPeerError);
 }
@@ -873,31 +1094,64 @@ function buildPeer(id) {
   return id ? new Peer(id, cfg) : new Peer(cfg);
 }
 
-/* ── HANDLE CALL ── */
+/* ── HANDLE CALL (FIXED remote video) ── */
 function handleCall(call) {
+  if (!call) return;
   activeCall = call;
+
   call.on('stream', remoteStream => {
     const rv = document.getElementById('remote-video');
-    const ra = document.getElementById('remote-avatar');
+    const wo = document.getElementById('waiting-overlay');
     const rn = document.getElementById('remote-name');
     const rt = document.getElementById('remote-tile');
+
+    // Show remote tile
     rt.style.display = '';
+
+    // Assign stream and ensure video plays
     rv.srcObject = remoteStream;
-    rv.style.display = '';
-    ra.style.display = 'none';
-    rn.style.display = '';
+    rv.style.display = 'block';
+
+    // Force play (needed on some mobile browsers)
+    rv.play().catch(() => {});
+
+    // Hide waiting overlay
+    if (wo) wo.style.display = 'none';
+
+    // Show name label
+    if (rn) rn.style.display = '';
+
+    // Switch to dual layout
     document.getElementById('video-area').className = 'video-area dual';
     setBadge('connected', 'Connected');
     startTimer();
     showToast('🟢 Peer connected');
   });
+
   call.on('close', () => {
     showToast('Peer disconnected.');
     setBadge('connecting', 'Peer left — waiting…');
     resetRemoteTile();
     stopTimer();
   });
-  call.on('error', err => { showToast('Call error: ' + err.message); setBadge('error', 'Call error'); });
+
+  call.on('error', err => {
+    showToast('Call error: ' + (err.message || err.type));
+    setBadge('error', 'Call error');
+  });
+
+  // Additional: listen for stream via connection events too
+  if (call.peerConnection) {
+    call.peerConnection.ontrack = (e) => {
+      if (e.streams && e.streams[0]) {
+        const rv = document.getElementById('remote-video');
+        if (!rv.srcObject) {
+          rv.srcObject = e.streams[0];
+          rv.play().catch(() => {});
+        }
+      }
+    };
+  }
 }
 
 /* ── MIC / CAM ── */
@@ -936,11 +1190,42 @@ function cleanup() {
   try { if (localStream) localStream.getTracks().forEach(t => t.stop()); } catch(_){}
 }
 
+/* ── SHARE PANEL ── */
+function toggleSharePanel() {
+  sharePanelOpen = !sharePanelOpen;
+  document.getElementById('left-panel').classList.toggle('open', sharePanelOpen);
+  document.getElementById('share-ctrl').classList.toggle('on', sharePanelOpen);
+}
+
+/* ── CHAT PANEL ── */
+function toggleChatPanel() {
+  chatPanelOpen = !chatPanelOpen;
+  document.getElementById('chat-panel').classList.toggle('open', chatPanelOpen);
+  document.getElementById('unread-badge').classList.remove('show');
+  if (chatPanelOpen && !window._currentUser) showToast('Log in to use chat features.');
+}
+
+/* ── MOBILE SHEETS ── */
+function openMobileSheet(type) {
+  document.getElementById(type + '-overlay').classList.add('show');
+  document.getElementById('mob-unread').classList.remove('show');
+}
+function closeMobileSheet(type, evt) {
+  if (evt && evt.target !== document.getElementById(type + '-overlay')) return;
+  document.getElementById(type + '-overlay').classList.remove('show');
+}
+
 /* ── UI HELPERS ── */
 function showVideoScreen() {
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('video-screen').style.display = 'flex';
   document.getElementById('chat-toggle-btn').style.display = '';
+  // Show mobile bottom bar on mobile
+  if (isMobile()) {
+    document.getElementById('mobile-bottom-bar').style.display = 'flex';
+  }
+  // Show remote tile immediately (waiting state)
+  document.getElementById('remote-tile').style.display = '';
 }
 
 function setRoomId(id) {
@@ -948,6 +1233,12 @@ function setRoomId(id) {
   document.getElementById('room-chip-text').textContent = id;
   document.getElementById('strip-room').style.display = '';
   document.getElementById('strip-room-text').textContent = id;
+  // Update share links
+  const link = window.location.origin + window.location.pathname + '?room=' + id;
+  const el1 = document.getElementById('share-room-link');
+  const el2 = document.getElementById('share-room-link-mob');
+  if (el1) el1.textContent = link;
+  if (el2) el2.textContent = link;
   const url = new URL(window.location.href);
   url.searchParams.set('room', id);
   window.history.replaceState({}, '', url.toString());
@@ -967,11 +1258,12 @@ function setLive(on) {
 
 function resetRemoteTile() {
   const rv = document.getElementById('remote-video');
-  rv.srcObject = null; rv.style.display = 'none';
-  document.getElementById('remote-avatar').style.display = '';
-  document.getElementById('remote-avatar-text').textContent = 'Peer disconnected';
+  rv.srcObject = null;
+  const wo = document.getElementById('waiting-overlay');
+  if (wo) { wo.style.display = ''; wo.querySelector('p').textContent = 'Peer disconnected'; wo.querySelector('small').textContent = 'Waiting for reconnection…'; }
   document.getElementById('remote-name').style.display = 'none';
   document.getElementById('video-area').className = 'video-area solo';
+  document.getElementById('remote-tile').style.display = 'none';
 }
 
 function copyRoomId() {
@@ -980,6 +1272,14 @@ function copyRoomId() {
   navigator.clipboard.writeText(id)
     .then(() => showToast('📋 Room code copied!'))
     .catch(() => showToast('Room: ' + id));
+}
+
+function copyRoomLink() {
+  const link = document.getElementById('share-room-link')?.textContent || '';
+  if (!link || link === '—') { showToast('Start a room first.'); return; }
+  navigator.clipboard.writeText(link)
+    .then(() => showToast('🔗 Link copied!'))
+    .catch(() => showToast(link));
 }
 
 /* ── TIMER ── */
@@ -1002,19 +1302,11 @@ function showToast(msg) {
   clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ── CHAT PANEL TOGGLE ── */
-let chatPanelOpen = false;
-function toggleChatPanel() {
-  chatPanelOpen = !chatPanelOpen;
-  document.getElementById('chat-panel').classList.toggle('open', chatPanelOpen);
-  document.getElementById('unread-badge').classList.remove('show');
-  if (chatPanelOpen && !window._currentUser) showToast('Log in to use chat features.');
-}
-
-/* stubs — overridden by Firebase module below */
-window.sendInviteToChat = function() { showToast('Log in to send invites.'); };
+/* stubs */
 window.sendChatMsg = function() { showToast('Log in to send messages.'); };
+window.sendChatMsgMob = function() { showToast('Log in to send messages.'); };
 window.joinFromInvite = function(roomId) {
+  closeMobileSheet('share');
   document.getElementById('join-id').value = roomId;
   document.getElementById('setup-screen').style.display = '';
   document.getElementById('video-screen').style.display = 'none';
@@ -1029,13 +1321,20 @@ function onPeerError(err) {
     'socket-error':     'Socket error. Refresh and retry.',
     'unavailable-id':   'Room ID taken. Create a new one.',
   };
-  showToast(map[err.type] || 'Error: ' + err.message);
+  showToast(map[err.type] || 'Error: ' + (err.message || err.type));
   setBadge('error', map[err.type] || err.type);
   setLive(false);
 }
+
+/* ── Resize handler: show/hide mobile bar ── */
+window.addEventListener('resize', () => {
+  const isInCall = document.getElementById('video-screen').style.display !== 'none';
+  if (!isInCall) return;
+  document.getElementById('mobile-bottom-bar').style.display = isMobile() ? 'flex' : 'none';
+});
 </script>
 
-<!-- Firebase Chat Module -->
+<!-- Firebase Module -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -1052,6 +1351,7 @@ const firebaseConfig = {
   messagingSenderId: "668466292157",
   appId: "1:668466292157:web:9be85414fc752b67779ed4"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -1064,104 +1364,204 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) return;
   currentUser = user;
   window._currentUser = user;
-  await loadUserChats();
+  await loadAcceptedTrades();
 });
 
-async function loadUserChats() {
-  const sel = document.getElementById('invite-chat-select');
-  try {
-    let snap = await getDocs(query(collection(db,'chats'), where('participants','array-contains', currentUser.uid)));
-    if (snap.empty) snap = await getDocs(query(collection(db,'chats'), where('users','array-contains', currentUser.uid)));
-    sel.innerHTML = '<option value="">Select a contact…</option>';
-    for (const d of snap.docs) {
-      const data = d.data();
-      const others = (data.participants || data.users || []).filter(u => u !== currentUser.uid);
-      if (!others.length) continue;
-      let name = 'User';
-      try {
-        const uSnap = await getDoc(doc(db,'users', others[0]));
-        if (uSnap.exists()) { const u = uSnap.data(); name = u.name || u.displayName || 'User'; }
-      } catch(_){}
-      const opt = document.createElement('option');
-      opt.value = d.id; opt.textContent = name;
-      sel.appendChild(opt);
-    }
-    sel.addEventListener('change', () => {
-      document.getElementById('invite-send-btn').disabled = !sel.value;
-      if (sel.value) openPanelChat(sel.value);
-    });
-  } catch(e) { sel.innerHTML = '<option value="">Could not load chats</option>'; }
-}
+/* ── Load accepted trade users ── */
+async function loadAcceptedTrades() {
+  const listDesktop = document.getElementById('trade-user-list');
+  const listMobile = document.getElementById('trade-user-list-mob');
 
-function openPanelChat(chatId) {
-  if (chatUnsub) chatUnsub();
-  activeChatId = chatId;
-  const area = document.getElementById('cp-messages');
-  area.innerHTML = '';
-  const q = query(collection(db,'chats', chatId,'messages'), orderBy('createdAt'));
-  chatUnsub = onSnapshot(q, snap => {
-    area.innerHTML = '';
-    if (snap.empty) {
-      area.innerHTML = '<div class="cp-empty"><i class="fa-regular fa-comments"></i><span>No messages yet</span></div>';
+  try {
+    // Query trades where current user is involved and status is accepted
+    const [snap1, snap2] = await Promise.all([
+      getDocs(query(collection(db, 'trades'),
+        where('fromUserId', '==', currentUser.uid),
+        where('status', '==', 'accepted'))),
+      getDocs(query(collection(db, 'trades'),
+        where('toUserId', '==', currentUser.uid),
+        where('status', '==', 'accepted')))
+    ]);
+
+    const allDocs = [...snap1.docs, ...snap2.docs];
+
+    if (allDocs.length === 0) {
+      const empty = '<div class="no-trades"><i class="fa-solid fa-handshake-slash"></i><span>No accepted trades yet</span></div>';
+      listDesktop.innerHTML = empty;
+      listMobile.innerHTML = empty;
       return;
     }
-    snap.forEach(d => {
-      const msg = d.data();
-      const isSent = msg.senderId === currentUser?.uid;
-      const t = msg.createdAt?.toDate();
-      const ts = t ? t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
-      if (msg.type === 'video_invite') {
-        const card = document.createElement('div');
-        card.className = 'invite-card-cp' + (isSent ? ' sent' : '');
-        const joinUrl = msg.joinUrl || ('video-room.html?room=' + esc(msg.roomId||''));
-        card.innerHTML = `
-          <div class="ic-title"><i class="fa-solid fa-video"></i> Live Session Invite</div>
-          <div class="ic-body">${isSent ? 'You sent an invite' : 'Join the live session'}</div>
-          <div class="ic-code">🔑 ${esc(msg.roomId||'')}</div>
-          ${!isSent ? `<button class="ic-join" onclick="window.joinFromInvite('${esc(msg.roomId||'')}')"><i class="fa-solid fa-video"></i> Join Now</button>` : '<span style="font-size:11px;color:var(--muted)">⏳ Waiting…</span>'}
-          <div class="ic-time">${ts}</div>`;
-        area.appendChild(card);
-      } else {
-        const div = document.createElement('div');
-        div.className = 'cp-msg ' + (isSent ? 'sent' : 'received');
-        div.innerHTML = esc(msg.text) + `<span class="cp-msg-time">${ts}</span>`;
-        area.appendChild(div);
-      }
+
+    listDesktop.innerHTML = '';
+    listMobile.innerHTML = '';
+
+    for (const tradeDoc of allDocs) {
+      const trade = tradeDoc.data();
+      const otherUid = trade.fromUserId === currentUser.uid ? trade.toUserId : trade.fromUserId;
+
+      let name = 'User', skill = trade.skill || trade.requestedSkill || '';
+      try {
+        const uSnap = await getDoc(doc(db, 'users', otherUid));
+        if (uSnap.exists()) {
+          const u = uSnap.data();
+          name = u.name || u.displayName || u.username || 'User';
+          if (!skill) skill = u.skills?.[0] || '';
+        }
+      } catch(_) {}
+
+      const initial = name.charAt(0).toUpperCase();
+      const cardHtml = (uid, tradeId) => `
+        <div class="trade-user-item" onclick="inviteTradeUser('${esc(uid)}', '${esc(name)}', '${esc(tradeId)}', this)">
+          <div class="trade-user-avatar">${initial}</div>
+          <div class="trade-user-info">
+            <div class="trade-user-name">${esc(name)}</div>
+            <div class="trade-user-skill">${esc(skill)}</div>
+          </div>
+          <button class="trade-invite-btn" onclick="event.stopPropagation();inviteTradeUser('${esc(uid)}','${esc(name)}','${esc(tradeId)}',this.closest('.trade-user-item'))">
+            Invite
+          </button>
+        </div>`;
+
+      listDesktop.insertAdjacentHTML('beforeend', cardHtml(otherUid, tradeDoc.id));
+      listMobile.insertAdjacentHTML('beforeend', cardHtml(otherUid, tradeDoc.id));
+    }
+  } catch(e) {
+    const err = '<div class="no-trades"><i class="fa-solid fa-triangle-exclamation"></i><span>Could not load trades</span></div>';
+    listDesktop.innerHTML = err;
+    listMobile.innerHTML = err;
+  }
+}
+
+/* ── Send invite to a specific accepted trade user via their chat ── */
+window.inviteTradeUser = async function(otherUid, name, tradeId, itemEl) {
+  const roomId = document.getElementById('room-chip-text').textContent;
+  if (!roomId || roomId === '—') { showToast('Start a room first, then invite.'); return; }
+  if (!currentUser) { showToast('Not logged in.'); return; }
+
+  const btn = itemEl?.querySelector('.trade-invite-btn');
+  if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
+
+  try {
+    // Find existing chat between these two users
+    let chatId = null;
+    const [s1, s2] = await Promise.all([
+      getDocs(query(collection(db,'chats'), where('participants','array-contains', currentUser.uid))),
+      getDocs(query(collection(db,'chats'), where('users','array-contains', currentUser.uid)))
+    ]);
+    const allChats = [...s1.docs, ...s2.docs];
+    for (const c of allChats) {
+      const d = c.data();
+      const parts = d.participants || d.users || [];
+      if (parts.includes(otherUid)) { chatId = c.id; break; }
+    }
+
+    // If no chat exists, create one
+    if (!chatId) {
+      const newChat = await addDoc(collection(db,'chats'), {
+        participants: [currentUser.uid, otherUid],
+        users: [currentUser.uid, otherUid],
+        createdAt: serverTimestamp(), lastActivity: serverTimestamp()
+      });
+      chatId = newChat.id;
+    }
+
+    const joinUrl = window.location.origin + window.location.pathname + '?room=' + roomId;
+    await addDoc(collection(db,'chats', chatId, 'messages'), {
+      text: '📹 You have been invited to a live video session!',
+      senderId: currentUser.uid,
+      createdAt: serverTimestamp(),
+      type: 'video_invite',
+      roomId,
+      joinUrl
     });
-    setTimeout(() => { area.scrollTop = area.scrollHeight; }, 60);
+    await updateDoc(doc(db,'chats', chatId), { lastActivity: serverTimestamp() });
+
+    if (btn) { btn.textContent = '✓ Sent'; btn.classList.add('sent'); }
+    showToast(`✅ Invite sent to ${name}!`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Retry'; btn.disabled = false; }
+    showToast('Error sending invite: ' + e.message);
+  }
+};
+
+/* ── Chat (peer-to-peer via Firebase, same chat as the active trade chat) ── */
+function openPeerChat(chatId) {
+  if (chatUnsub) chatUnsub();
+  activeChatId = chatId;
+  const areas = [document.getElementById('cp-messages'), document.getElementById('cp-messages-mob')];
+  areas.forEach(a => { if(a) a.innerHTML = ''; });
+
+  const q = query(collection(db,'chats', chatId,'messages'), orderBy('createdAt'));
+  chatUnsub = onSnapshot(q, snap => {
+    areas.forEach(area => {
+      if (!area) return;
+      area.innerHTML = '';
+      if (snap.empty) {
+        area.innerHTML = '<div class="cp-empty"><i class="fa-regular fa-comments"></i><span>No messages yet</span></div>';
+        return;
+      }
+      snap.forEach(d => {
+        const msg = d.data();
+        const isSent = msg.senderId === currentUser?.uid;
+        const t = msg.createdAt?.toDate();
+        const ts = t ? t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+        if (msg.type === 'video_invite') {
+          const card = document.createElement('div');
+          card.className = 'invite-card-cp' + (isSent ? ' sent' : '');
+          card.innerHTML = `
+            <div class="ic-title"><i class="fa-solid fa-video"></i> Live Session Invite</div>
+            <div class="ic-body">${isSent ? 'You sent an invite' : 'Join the live session'}</div>
+            <div class="ic-code">🔑 ${esc(msg.roomId||'')}</div>
+            ${!isSent ? `<button class="ic-join" onclick="window.joinFromInvite('${esc(msg.roomId||'')}')"><i class="fa-solid fa-video"></i> Join Now</button>` : '<span style="font-size:11px;color:var(--muted)">⏳ Waiting…</span>'}
+            <div class="ic-time">${ts}</div>`;
+          area.appendChild(card);
+        } else {
+          const div = document.createElement('div');
+          div.className = 'cp-msg ' + (isSent ? 'sent' : 'received');
+          div.innerHTML = esc(msg.text) + `<span class="cp-msg-time">${ts}</span>`;
+          area.appendChild(div);
+        }
+      });
+      setTimeout(() => { area.scrollTop = area.scrollHeight; }, 60);
+    });
+
+    // Unread badge
+    if (!chatPanelOpen && !document.getElementById('chat-overlay')?.classList.contains('show')) {
+      document.getElementById('unread-badge')?.classList.add('show');
+      document.getElementById('mob-unread')?.classList.add('show');
+    }
   });
 }
 
-window.sendInviteToChat = async function() {
-  const chatId = document.getElementById('invite-chat-select').value;
-  const roomId = document.getElementById('room-chip-text').textContent;
-  if (!chatId || !roomId || roomId === '—') { showToast('Start a room first, then invite.'); return; }
-  if (!currentUser) { showToast('Not logged in.'); return; }
-  const joinUrl = window.location.origin + window.location.pathname + '?room=' + roomId;
+async function sendMsg(text) {
+  if (!text || !activeChatId || !currentUser) return;
   try {
-    await addDoc(collection(db,'chats',chatId,'messages'), {
-      text: '📹 You have been invited to a live video session!',
-      senderId: currentUser.uid, createdAt: serverTimestamp(),
-      type: 'video_invite', roomId, joinUrl
-    });
-    await updateDoc(doc(db,'chats',chatId), { lastActivity: serverTimestamp() });
-    showToast('✅ Invite sent!');
-    openPanelChat(chatId);
-  } catch(e) { showToast('Error: ' + e.message); }
-};
+    await addDoc(collection(db,'chats', activeChatId,'messages'), { text, senderId: currentUser.uid, createdAt: serverTimestamp() });
+    await updateDoc(doc(db,'chats', activeChatId), { lastActivity: serverTimestamp() });
+  } catch(e) { showToast('Send failed.'); }
+}
 
 window.sendChatMsg = async function() {
   const input = document.getElementById('cp-input');
   const text = input.value.trim();
-  if (!text || !activeChatId || !currentUser) return;
-  try {
-    await addDoc(collection(db,'chats',activeChatId,'messages'), { text, senderId: currentUser.uid, createdAt: serverTimestamp() });
-    await updateDoc(doc(db,'chats',activeChatId), { lastActivity: serverTimestamp() });
-    input.value = '';
-  } catch(e) { showToast('Send failed.'); }
+  await sendMsg(text);
+  input.value = '';
 };
 
-function esc(t) { if(!t)return''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+window.sendChatMsgMob = async function() {
+  const input = document.getElementById('cp-input-mob');
+  const text = input.value.trim();
+  await sendMsg(text);
+  input.value = '';
+};
+
+function esc(t) {
+  if(!t) return '';
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
