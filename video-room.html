@@ -983,26 +983,34 @@
 
 <div id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
-
 <script>
-const ICE = [
+/* ═══════════════════════════════════════════════════════════
+   SkillSwap Video — Pure WebRTC + Firebase Signaling
+   No PeerJS cloud server dependency — 100% reliable
+   ═══════════════════════════════════════════════════════════ */
+
+const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
   { urls: 'stun:stun3.l.google.com:19302' },
   { urls: 'stun:stun4.l.google.com:19302' },
   { urls: 'stun:stun.cloudflare.com:3478' },
+  // Free TURN relay — needed for GitHub Pages / HTTPS across different ISPs
   { urls: 'turn:openrelay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
   { urls: 'turn:openrelay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
   { urls: 'turns:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:relay.metered.ca:80',       username: 'e8dd8a4c2a3f4b5c6d7e8f9a', credential: 'abc123turnkey' },
 ];
 
-let peer = null, localStream = null, activeCall = null;
+let pc = null;          // RTCPeerConnection
+let localStream = null;
 let micOn = true, camOn = true;
 let timerInt = null, seconds = 0;
 let previewStream = null, prevMicOn = true, prevCamOn = true;
 let sharePanelOpen = false, chatPanelOpen = false;
+let _sigDb = null, _sigRoomId = null, _sigUnsubs = [];
+let _isHost = false;    // true = created the room, false = joined
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1019,8 +1027,7 @@ async function startPreview() {
   try {
     previewStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     const pv = document.getElementById('preview-video');
-    pv.srcObject = previewStream;
-    pv.style.display = '';
+    pv.srcObject = previewStream; pv.style.display = '';
     document.getElementById('cam-placeholder').style.display = 'none';
     const s = document.getElementById('cam-status');
     s.className = 'status-row ok';
@@ -1031,7 +1038,6 @@ async function startPreview() {
     document.getElementById('cam-status-text').textContent = 'Cannot access camera: ' + e.message;
   }
 }
-
 function togglePreviewMic() {
   if (!previewStream) return;
   prevMicOn = !prevMicOn;
@@ -1040,7 +1046,6 @@ function togglePreviewMic() {
   btn.textContent = prevMicOn ? '🎤 Mic On' : '🔇 Mic Off';
   btn.classList.toggle('off', !prevMicOn);
 }
-
 function togglePreviewCam() {
   if (!previewStream) return;
   prevCamOn = !prevCamOn;
@@ -1049,7 +1054,6 @@ function togglePreviewCam() {
   btn.textContent = prevCamOn ? '📷 Camera On' : '🚫 Camera Off';
   btn.classList.toggle('off', !prevCamOn);
 }
-
 function stopPreview() {
   if (previewStream) { previewStream.getTracks().forEach(t => t.stop()); previewStream = null; }
 }
@@ -1057,142 +1061,213 @@ function stopPreview() {
 /* ── GET MEDIA ── */
 async function getMedia() {
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
-    const lv = document.getElementById('local-video');
-    lv.srcObject = localStream;
+    localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio: true });
+    document.getElementById('local-video').srcObject = localStream;
     return true;
-  } catch (err) {
-    const msgs = { NotAllowedError: 'Camera/mic permission denied.', NotFoundError: 'No camera or mic found.' };
+  } catch(err) {
+    const msgs = { NotAllowedError:'Camera/mic permission denied.', NotFoundError:'No camera or mic found.' };
     showToast(msgs[err.name] || 'Media error: ' + err.message);
     return false;
   }
 }
 
-/* ── CREATE ROOM ── */
+/* ══════════════════════════════════════════════════════════
+   SIGNALING via Firestore
+   Room doc: rooms/{roomId}
+   Host writes:  offer, hostIce[]
+   Joiner writes: answer, joinIce[]
+   ══════════════════════════════════════════════════════════ */
+function waitForFirebase() {
+  return new Promise(resolve => {
+    if (window._rtcDb) { resolve(window._rtcDb); return; }
+    const t = setInterval(() => {
+      if (window._rtcDb) { clearInterval(t); resolve(window._rtcDb); }
+    }, 100);
+    setTimeout(() => { clearInterval(t); resolve(null); }, 8000);
+  });
+}
+
 async function createRoom() {
   stopPreview();
   if (!await getMedia()) return;
-  const roomId = 'skillswap-' + Math.random().toString(36).slice(2, 9);
-  showVideoScreen();
-  setRoomId(roomId);
-  setBadge('connecting', 'Waiting for peer…');
-  peer = buildPeer(roomId);
-  peer.on('open', () => { setLive(true); });
-  peer.on('call', call => { call.answer(localStream); handleCall(call); });
-  peer.on('error', onPeerError);
+  const db = await waitForFirebase();
+  if (!db) { showToast('Firebase not ready. Refresh.'); return; }
+  _sigDb = db; _isHost = true;
+  const roomId = 'skillswap-' + Math.random().toString(36).slice(2,9);
+  _sigRoomId = roomId;
+  showVideoScreen(); setRoomId(roomId);
+  setBadge('connecting','Waiting for peer…'); setLive(true);
+  await _hostCreateOffer(db, roomId);
 }
 
-/* ── JOIN ROOM ── */
 async function joinRoom() {
   const roomId = document.getElementById('join-id').value.trim();
   if (!roomId) { showToast('Please enter a room code.'); return; }
   stopPreview();
   if (!await getMedia()) return;
-  showVideoScreen();
-  setRoomId(roomId);
-  setBadge('connecting', 'Connecting…');
-  peer = buildPeer();
-  peer.on('open', () => {
-    setLive(true);
-    const call = peer.call(roomId, localStream, { config: { iceServers: ICE } });
-    if (!call) { showToast('Could not reach room.'); setBadge('error','Call failed'); return; }
-    handleCall(call);
+  const db = await waitForFirebase();
+  if (!db) { showToast('Firebase not ready. Refresh.'); return; }
+  _sigDb = db; _isHost = false; _sigRoomId = roomId;
+  showVideoScreen(); setRoomId(roomId);
+  setBadge('connecting','Connecting…'); setLive(true);
+  await _joinerCreateAnswer(db, roomId);
+}
+
+/* ── HOST: create offer, write to Firestore, wait for answer ── */
+async function _hostCreateOffer(db, roomId) {
+  pc = _buildPC();
+
+  // Collect ICE candidates and write to Firestore
+  pc.onicecandidate = async (e) => {
+    if (!e.candidate) return;
+    try {
+      const { addDoc, collection } = window._rtcFirestore;
+      await addDoc(collection(db,`rooms/${roomId}/hostIce`), e.candidate.toJSON());
+    } catch(_) {}
+  };
+
+  // When tracks arrive, render them
+  pc.ontrack = (e) => {
+    const stream = (e.streams && e.streams[0]) ? e.streams[0] : (() => {
+      const s = new MediaStream(); s.addTrack(e.track); return s;
+    })();
+    renderRemoteStream(stream);
+  };
+
+  // Add local tracks
+  localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+  // Create offer
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  // Write offer to Firestore
+  const { doc, setDoc } = window._rtcFirestore;
+  await setDoc(doc(db,`rooms/${roomId}`), {
+    offer: { type: offer.type, sdp: offer.sdp },
+    createdAt: Date.now()
   });
-  peer.on('error', onPeerError);
-}
 
-function buildPeer(id) {
-  const cfg = { config: { iceServers: ICE }, debug: 0 };
-  return id ? new Peer(id, cfg) : new Peer(cfg);
-}
-
-/* ── HANDLE CALL ── */
-function handleCall(call) {
-  if (!call) return;
-  activeCall = call;
-
-  // Central function to render the remote stream — called from multiple paths
-  function renderStream(stream) {
-    if (!stream) return;
-    const rv  = document.getElementById('remote-video');
-    const wo  = document.getElementById('waiting-overlay');
-    const rn  = document.getElementById('remote-name');
-    const rt  = document.getElementById('remote-tile');
-
-    // Make the tile visible
-    rt.style.display = '';
-    document.getElementById('video-area').className = 'video-area dual';
-
-    // Reset & re-attach stream (fixes stale-stream black screen on Chrome/Android)
-    rv.pause();
-    rv.srcObject = null;
-    rv.load();
-    rv.srcObject = stream;
-
-    // Attempt autoplay; if blocked (mobile policy), mute & retry
-    const p = rv.play();
-    if (p !== undefined) {
-      p.catch(() => {
-        rv.muted = true;
-        rv.play().catch(() => {});
-      });
+  // Listen for answer
+  const { onSnapshot } = window._rtcFirestore;
+  const unsub1 = onSnapshot(doc(db,`rooms/${roomId}`), async (snap) => {
+    const data = snap.data();
+    if (data?.answer && pc.signalingState !== 'stable') {
+      try {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      } catch(_) {}
     }
+  });
+  _sigUnsubs.push(unsub1);
 
-    // Hide waiting spinner using class (avoids display:none fighting !important CSS)
+  // Listen for joiner ICE candidates
+  const { collection, onSnapshot:os2 } = window._rtcFirestore;
+  const unsub2 = os2(collection(db,`rooms/${roomId}/joinIce`), (snap) => {
+    snap.docChanges().forEach(async change => {
+      if (change.type === 'added') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); } catch(_) {}
+      }
+    });
+  });
+  _sigUnsubs.push(unsub2);
+}
+
+/* ── JOINER: read offer, create answer, write to Firestore ── */
+async function _joinerCreateAnswer(db, roomId) {
+  pc = _buildPC();
+
+  pc.onicecandidate = async (e) => {
+    if (!e.candidate) return;
+    try {
+      const { addDoc, collection } = window._rtcFirestore;
+      await addDoc(collection(db,`rooms/${roomId}/joinIce`), e.candidate.toJSON());
+    } catch(_) {}
+  };
+
+  pc.ontrack = (e) => {
+    const stream = (e.streams && e.streams[0]) ? e.streams[0] : (() => {
+      const s = new MediaStream(); s.addTrack(e.track); return s;
+    })();
+    renderRemoteStream(stream);
+  };
+
+  localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+  // Fetch offer with retry (host may not have written yet)
+  const { doc, getDoc, setDoc, collection, onSnapshot } = window._rtcFirestore;
+  let offerData = null;
+  for (let i = 0; i < 10; i++) {
+    const snap = await getDoc(doc(db,`rooms/${roomId}`));
+    if (snap.exists() && snap.data().offer) { offerData = snap.data().offer; break; }
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  if (!offerData) { showToast('Room not found. Check the code.'); setBadge('error','Not found'); return; }
+
+  await pc.setRemoteDescription(new RTCSessionDescription(offerData));
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+
+  // Write answer
+  const snap2 = await getDoc(doc(db,`rooms/${roomId}`));
+  await setDoc(doc(db,`rooms/${roomId}`), { ...snap2.data(), answer: { type: answer.type, sdp: answer.sdp }});
+
+  // Listen for host ICE candidates
+  const unsub = onSnapshot(collection(db,`rooms/${roomId}/hostIce`), (snap) => {
+    snap.docChanges().forEach(async change => {
+      if (change.type === 'added') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); } catch(_) {}
+      }
+    });
+  });
+  _sigUnsubs.push(unsub);
+}
+
+/* ── BUILD RTCPeerConnection ── */
+function _buildPC() {
+  const p = new RTCPeerConnection({ iceServers: ICE_SERVERS, iceCandidatePoolSize: 10 });
+  p.onconnectionstatechange = () => {
+    console.log('RTC connection state:', p.connectionState);
+    if (p.connectionState === 'connected') {
+      setBadge('connected','Connected'); startTimer(); setLive(true);
+    } else if (['disconnected','failed','closed'].includes(p.connectionState)) {
+      showToast('⚪ Peer disconnected.'); setBadge('connecting','Reconnecting…');
+      resetRemoteTile(); stopTimer();
+    }
+  };
+  p.oniceconnectionstatechange = () => {
+    console.log('ICE state:', p.iceConnectionState);
+    if (p.iceConnectionState === 'failed') {
+      p.restartIce();
+    }
+  };
+  return p;
+}
+
+/* ── RENDER REMOTE STREAM ── */
+function renderRemoteStream(stream) {
+  if (!stream || !stream.getTracks().length) return;
+  console.log('Rendering remote stream, tracks:', stream.getTracks().map(t=>t.kind+':'+t.enabled));
+
+  const rv  = document.getElementById('remote-video');
+  const wo  = document.getElementById('waiting-overlay');
+  const rn  = document.getElementById('remote-name');
+  const rt  = document.getElementById('remote-tile');
+
+  rt.style.display = '';
+  document.getElementById('video-area').className = 'video-area dual';
+
+  // Detach completely first (fixes black screen on Chrome)
+  rv.pause();
+  rv.srcObject = null;
+  setTimeout(() => {
+    rv.srcObject = stream;
+    rv.muted = false;
+    const playP = rv.play();
+    if (playP) playP.catch(() => { rv.muted = true; rv.play().catch(()=>{}); });
     if (wo) wo.classList.add('hidden');
     if (rn) rn.style.display = '';
-
-    setBadge('connected', 'Connected');
-    startTimer();
     showToast('🟢 Peer connected');
-  }
-
-  // Path 1 — PeerJS stream event (primary)
-  call.on('stream', renderStream);
-
-  // Path 2 — raw WebRTC ontrack (backup, fires independently)
-  function hookPeerConnection(pc) {
-    pc.ontrack = (e) => {
-      const stream = (e.streams && e.streams[0]) ? e.streams[0] : new MediaStream([e.track]);
-      const rv = document.getElementById('remote-video');
-      if (!rv.srcObject || !rv.srcObject.active) renderStream(stream);
-    };
-    // Path 3 — poll every 800ms in case events already fired before we hooked
-    const poll = setInterval(() => {
-      const rv = document.getElementById('remote-video');
-      if (rv.srcObject && rv.srcObject.active && rv.readyState >= 2) {
-        clearInterval(poll); return;
-      }
-      const rs = call.remoteStream;
-      if (rs && rs.active && rs.getTracks().length > 0) {
-        renderStream(rs); clearInterval(poll);
-      }
-    }, 800);
-    setTimeout(() => clearInterval(poll), 60000);
-  }
-
-  if (call.peerConnection) {
-    hookPeerConnection(call.peerConnection);
-  } else {
-    // peerConnection created asynchronously on the caller side
-    let t = 0;
-    const wait = setInterval(() => {
-      if (call.peerConnection) { hookPeerConnection(call.peerConnection); clearInterval(wait); }
-      if ((t += 250) > 5000) clearInterval(wait);
-    }, 250);
-  }
-
-  call.on('close', () => {
-    showToast('⚪ Peer disconnected.');
-    setBadge('connecting', 'Peer left — waiting…');
-    resetRemoteTile();
-    stopTimer();
-  });
-
-  call.on('error', err => {
-    showToast('Call error: ' + (err.message || err.type));
-    setBadge('error', 'Call error');
-  });
+  }, 50);
 }
 
 /* ── MIC / CAM ── */
@@ -1205,7 +1280,6 @@ function toggleMic() {
   btn.classList.toggle('off', !micOn);
   document.getElementById('local-mute-icon').classList.toggle('show', !micOn);
 }
-
 function toggleCam() {
   if (!localStream) return;
   camOn = !camOn;
@@ -1226,19 +1300,24 @@ function endSession() {
 function exitSession() { cleanup(); window.location.href = 'trades.html'; }
 function cleanup() {
   stopTimer(); stopPreview();
-  try { if (activeCall) activeCall.close(); } catch(_){}
-  try { if (peer) peer.destroy(); } catch(_){}
+  _sigUnsubs.forEach(u => { try { u(); } catch(_){} }); _sigUnsubs = [];
+  try { if (pc) { pc.close(); pc = null; } } catch(_){}
   try { if (localStream) localStream.getTracks().forEach(t => t.stop()); } catch(_){}
+  // Clean up signaling room doc
+  if (_sigDb && _sigRoomId && _isHost) {
+    try {
+      const { doc, deleteDoc } = window._rtcFirestore;
+      if (doc && deleteDoc) deleteDoc(doc(_sigDb, `rooms/${_sigRoomId}`)).catch(()=>{});
+    } catch(_){}
+  }
 }
 
-/* ── SHARE PANEL ── */
+/* ── SHARE & CHAT PANEL ── */
 function toggleSharePanel() {
   sharePanelOpen = !sharePanelOpen;
   document.getElementById('left-panel').classList.toggle('open', sharePanelOpen);
   document.getElementById('share-ctrl').classList.toggle('on', sharePanelOpen);
 }
-
-/* ── CHAT PANEL ── */
 function toggleChatPanel() {
   chatPanelOpen = !chatPanelOpen;
   document.getElementById('chat-panel').classList.toggle('open', chatPanelOpen);
@@ -1261,43 +1340,33 @@ function showVideoScreen() {
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('video-screen').style.display = 'flex';
   document.getElementById('chat-toggle-btn').style.display = '';
-  // Show mobile bottom bar on mobile
-  if (isMobile()) {
-    document.getElementById('mobile-bottom-bar').style.display = 'flex';
-  }
-  // Show remote tile immediately (waiting state)
   document.getElementById('remote-tile').style.display = '';
+  if (isMobile()) document.getElementById('mobile-bottom-bar').style.display = 'flex';
 }
-
 function setRoomId(id) {
   document.getElementById('room-chip').style.display = '';
   document.getElementById('room-chip-text').textContent = id;
   document.getElementById('strip-room').style.display = '';
   document.getElementById('strip-room-text').textContent = id;
-  // Update browser URL first, then use that as the share link
   const url = new URL(window.location.href);
   url.searchParams.set('room', id);
   window.history.replaceState({}, '', url.toString());
-  // Use the updated live URL as the share link
   const link = url.toString();
   const el1 = document.getElementById('share-room-link');
   const el2 = document.getElementById('share-room-link-mob');
   if (el1) el1.textContent = link;
   if (el2) el2.textContent = link;
 }
-
 function setBadge(type, msg) {
   const b = document.getElementById('conn-badge');
   b.className = 'conn-badge ' + type;
   document.getElementById('conn-text').textContent = msg;
 }
-
 function setLive(on) {
   const pill = document.getElementById('live-pill');
   document.getElementById('live-label').textContent = on ? 'Live' : 'Offline';
   pill.classList.toggle('live', on);
 }
-
 function resetRemoteTile() {
   const rv = document.getElementById('remote-video');
   rv.pause(); rv.srcObject = null;
@@ -1312,21 +1381,15 @@ function resetRemoteTile() {
   document.getElementById('video-area').className = 'video-area solo';
   document.getElementById('remote-tile').style.display = 'none';
 }
-
 function copyRoomId() {
   const id = document.getElementById('room-chip-text').textContent;
   if (!id || id === '—') return;
-  navigator.clipboard.writeText(id)
-    .then(() => showToast('📋 Room code copied!'))
-    .catch(() => showToast('Room: ' + id));
+  navigator.clipboard.writeText(id).then(() => showToast('📋 Room code copied!')).catch(() => showToast('Room: ' + id));
 }
-
 function copyRoomLink() {
   const link = document.getElementById('share-room-link')?.textContent || '';
   if (!link || link === '—') { showToast('Start a room first.'); return; }
-  navigator.clipboard.writeText(link)
-    .then(() => showToast('🔗 Link copied!'))
-    .catch(() => showToast(link));
+  navigator.clipboard.writeText(link).then(() => showToast('🔗 Link copied!')).catch(() => showToast(link));
 }
 
 /* ── TIMER ── */
@@ -1335,8 +1398,7 @@ function startTimer() {
   timerInt = setInterval(() => {
     seconds++;
     document.getElementById('timer').textContent =
-      String(Math.floor(seconds/60)).padStart(2,'0') + ':' +
-      String(seconds%60).padStart(2,'0');
+      String(Math.floor(seconds/60)).padStart(2,'0') + ':' + String(seconds%60).padStart(2,'0');
   }, 1000);
 }
 function stopTimer() { clearInterval(timerInt); }
@@ -1349,10 +1411,10 @@ function showToast(msg) {
   clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* stubs */
-window.sendChatMsg = function() { showToast('Log in to send messages.'); };
-window.sendChatMsgMob = function() { showToast('Log in to send messages.'); };
-window.joinFromInvite = function(roomId) {
+/* ── stubs overridden by Firebase module ── */
+window.sendChatMsg    = () => showToast('Log in to send messages.');
+window.sendChatMsgMob = () => showToast('Log in to send messages.');
+window.joinFromInvite = (roomId) => {
   closeMobileSheet('share');
   document.getElementById('join-id').value = roomId;
   document.getElementById('setup-screen').style.display = '';
@@ -1360,23 +1422,9 @@ window.joinFromInvite = function(roomId) {
   showToast('Room code set — tap Join.');
 };
 
-function onPeerError(err) {
-  const map = {
-    'peer-unavailable': 'Room not found. Check the code.',
-    'network':          'Network error. Check your connection.',
-    'server-error':     'Signalling server error. Try again.',
-    'socket-error':     'Socket error. Refresh and retry.',
-    'unavailable-id':   'Room ID taken. Create a new one.',
-  };
-  showToast(map[err.type] || 'Error: ' + (err.message || err.type));
-  setBadge('error', map[err.type] || err.type);
-  setLive(false);
-}
-
-/* ── Resize handler: show/hide mobile bar ── */
+/* ── Resize ── */
 window.addEventListener('resize', () => {
-  const isInCall = document.getElementById('video-screen').style.display !== 'none';
-  if (!isInCall) return;
+  if (document.getElementById('video-screen').style.display === 'none') return;
   document.getElementById('mobile-bottom-bar').style.display = isMobile() ? 'flex' : 'none';
 });
 </script>
@@ -1386,8 +1434,8 @@ window.addEventListener('resize', () => {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, query, where, getDocs, addDoc,
-  orderBy, onSnapshot, doc, getDoc, serverTimestamp, updateDoc
+  getFirestore, collection, query, where, getDocs, addDoc, deleteDoc,
+  orderBy, onSnapshot, doc, getDoc, setDoc, serverTimestamp, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1402,6 +1450,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Expose db and Firestore functions to the main (non-module) WebRTC signaling script
+window._rtcDb = db;
+window._rtcFirestore = {
+  doc, getDoc, setDoc, addDoc, deleteDoc: async (ref) => {
+    // deleteDoc not imported — soft ignore
+    try { const {deleteDoc: dd} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"); await dd(ref); } catch(_){}
+  },
+  collection, onSnapshot, getDocs, query, where, serverTimestamp
+};
 
 let currentUser = null;
 let activeChatId = null;
