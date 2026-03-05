@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Live Session — SkillSwap</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎥</text></svg>"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
@@ -411,13 +412,15 @@
 
     #local-video { transform: scaleX(-1); }
 
-    /* ── FIX: remote video visibility ── */
+    /* ── remote video ── */
     #remote-video {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block !important;
-      background: #0c0c14;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+      position: relative;
+      z-index: 2;
     }
 
     .tile-name {
@@ -459,7 +462,11 @@
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 16px; background: #0c0c14; z-index: 3;
+      gap: 16px; background: #0c0c14; z-index: 4;
+      transition: opacity 0.3s;
+    }
+    .waiting-overlay.hidden {
+      opacity: 0; pointer-events: none; z-index: 0;
     }
     .waiting-ring {
       width: 80px; height: 80px; border-radius: 50%;
@@ -982,8 +989,13 @@
 const ICE = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
   { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'stun:stun.services.mozilla.com' }
+  { urls: 'turn:openrelay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turns:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
 ];
 
 let peer = null, localStream = null, activeCall = null;
@@ -1099,32 +1111,35 @@ function handleCall(call) {
   if (!call) return;
   activeCall = call;
 
-  function showRemoteStream(remoteStream) {
-    if (!remoteStream || !remoteStream.active) return;
+  // Central function to render the remote stream — called from multiple paths
+  function renderStream(stream) {
+    if (!stream) return;
     const rv  = document.getElementById('remote-video');
     const wo  = document.getElementById('waiting-overlay');
     const rn  = document.getElementById('remote-name');
     const rt  = document.getElementById('remote-tile');
 
+    // Make the tile visible
     rt.style.display = '';
     document.getElementById('video-area').className = 'video-area dual';
 
-    // Detach first to force re-attach (fixes Chrome stream-already-set bug)
+    // Reset & re-attach stream (fixes stale-stream black screen on Chrome/Android)
+    rv.pause();
     rv.srcObject = null;
-    rv.srcObject = remoteStream;
-    rv.style.display = 'block';
+    rv.load();
+    rv.srcObject = stream;
 
-    // Unmute and play (autoplay policy workaround)
-    rv.muted = false;
-    const playPromise = rv.play();
-    if (playPromise) playPromise.catch(() => {
-      // If autoplay blocked, add a click-to-play overlay
-      rv.muted = true;
-      rv.play().catch(() => {});
-      showToast('Tap the peer video to unmute');
-    });
+    // Attempt autoplay; if blocked (mobile policy), mute & retry
+    const p = rv.play();
+    if (p !== undefined) {
+      p.catch(() => {
+        rv.muted = true;
+        rv.play().catch(() => {});
+      });
+    }
 
-    if (wo) wo.style.display = 'none';
+    // Hide waiting spinner using class (avoids display:none fighting !important CSS)
+    if (wo) wo.classList.add('hidden');
     if (rn) rn.style.display = '';
 
     setBadge('connected', 'Connected');
@@ -1132,61 +1147,43 @@ function handleCall(call) {
     showToast('🟢 Peer connected');
   }
 
-  // Primary: PeerJS stream event
-  call.on('stream', remoteStream => {
-    showRemoteStream(remoteStream);
-  });
+  // Path 1 — PeerJS stream event (primary)
+  call.on('stream', renderStream);
 
-  // Fallback: raw WebRTC track event (fires even when PeerJS stream event lags)
-  call.on('iceStateChanged', (state) => {
-    if (state === 'connected' || state === 'completed') {
-      // Check if we already have a stream
-      const rv = document.getElementById('remote-video');
-      if (!rv.srcObject && call.remoteStream) {
-        showRemoteStream(call.remoteStream);
-      }
-    }
-  });
-
-  // Second fallback via peerConnection directly
-  function attachPeerConnectionFallback() {
-    const pc = call.peerConnection;
-    if (!pc) return;
+  // Path 2 — raw WebRTC ontrack (backup, fires independently)
+  function hookPeerConnection(pc) {
     pc.ontrack = (e) => {
-      if (e.streams && e.streams[0]) {
-        const rv = document.getElementById('remote-video');
-        if (!rv.srcObject || !rv.srcObject.active) {
-          showRemoteStream(e.streams[0]);
-        }
-      }
+      const stream = (e.streams && e.streams[0]) ? e.streams[0] : new MediaStream([e.track]);
+      const rv = document.getElementById('remote-video');
+      if (!rv.srcObject || !rv.srcObject.active) renderStream(stream);
     };
-    // Also poll for remoteStream in case events already fired
+    // Path 3 — poll every 800ms in case events already fired before we hooked
     const poll = setInterval(() => {
       const rv = document.getElementById('remote-video');
-      if (rv.srcObject && rv.srcObject.active) { clearInterval(poll); return; }
-      if (call.remoteStream && call.remoteStream.active) {
-        showRemoteStream(call.remoteStream);
-        clearInterval(poll);
+      if (rv.srcObject && rv.srcObject.active && rv.readyState >= 2) {
+        clearInterval(poll); return;
       }
-    }, 500);
-    setTimeout(() => clearInterval(poll), 30000); // stop after 30s
+      const rs = call.remoteStream;
+      if (rs && rs.active && rs.getTracks().length > 0) {
+        renderStream(rs); clearInterval(poll);
+      }
+    }, 800);
+    setTimeout(() => clearInterval(poll), 60000);
   }
 
-  // peerConnection may not exist immediately on the joiner side
   if (call.peerConnection) {
-    attachPeerConnectionFallback();
+    hookPeerConnection(call.peerConnection);
   } else {
-    // Wait up to 3s for peerConnection to be created
-    let waited = 0;
-    const waitPC = setInterval(() => {
-      waited += 200;
-      if (call.peerConnection) { attachPeerConnectionFallback(); clearInterval(waitPC); }
-      if (waited >= 3000) clearInterval(waitPC);
-    }, 200);
+    // peerConnection created asynchronously on the caller side
+    let t = 0;
+    const wait = setInterval(() => {
+      if (call.peerConnection) { hookPeerConnection(call.peerConnection); clearInterval(wait); }
+      if ((t += 250) > 5000) clearInterval(wait);
+    }, 250);
   }
 
   call.on('close', () => {
-    showToast('Peer disconnected.');
+    showToast('⚪ Peer disconnected.');
     setBadge('connecting', 'Peer left — waiting…');
     resetRemoteTile();
     stopTimer();
@@ -1303,9 +1300,14 @@ function setLive(on) {
 
 function resetRemoteTile() {
   const rv = document.getElementById('remote-video');
-  rv.srcObject = null;
+  rv.pause(); rv.srcObject = null;
   const wo = document.getElementById('waiting-overlay');
-  if (wo) { wo.style.display = ''; wo.querySelector('p').textContent = 'Peer disconnected'; wo.querySelector('small').textContent = 'Waiting for reconnection…'; }
+  if (wo) {
+    wo.classList.remove('hidden');
+    const p = wo.querySelector('p'), s = wo.querySelector('small');
+    if (p) p.textContent = 'Peer disconnected';
+    if (s) s.textContent = 'Waiting for reconnection…';
+  }
   document.getElementById('remote-name').style.display = 'none';
   document.getElementById('video-area').className = 'video-area solo';
   document.getElementById('remote-tile').style.display = 'none';
@@ -1412,67 +1414,39 @@ onAuthStateChanged(auth, async (user) => {
   await loadAcceptedTrades();
 });
 
-/* ── Load accepted trade users (tries ALL possible field name combos) ── */
+/* ── Load accepted trade users (robust: tries all field name combos) ── */
 async function loadAcceptedTrades() {
   const listDesktop = document.getElementById('trade-user-list');
   const listMobile  = document.getElementById('trade-user-list-mob');
   const uid = currentUser.uid;
-
-  const setHTML = (html) => { listDesktop.innerHTML = html; listMobile.innerHTML = html; };
-  setHTML('<div class="no-trades"><span style="font-size:11px;color:var(--muted)">Loading…</span></div>');
+  const setHTML = h => { listDesktop.innerHTML = h; listMobile.innerHTML = h; };
+  setHTML('<div class="no-trades"><span style="font-size:11px;color:var(--muted)">Loading trades…</span></div>');
 
   try {
-    // ── Try every field name variation Firestore might have ──
-    // Possible "user" fields: fromUserId, toUserId, senderId, receiverId,
-    //                         requesterId, providerId, userId, participants (array)
-    // Possible "status" values: 'accepted', 'Accepted', 'active', 'approved'
-
-    const statusValues  = ['accepted', 'Accepted', 'active', 'approved'];
-    const fromFields    = ['fromUserId', 'senderId',   'requesterId', 'userId'];
-    const toFields      = ['toUserId',   'receiverId', 'providerId'];
-
-    const snaps = [];
-
-    // Query by from/to fields × status values
+    // Try every possible field + status combination in parallel
+    const userFields   = ['fromUserId','toUserId','senderId','receiverId','requesterId','providerId','userId'];
+    const statusValues = ['accepted','Accepted','active','approved'];
     const promises = [];
-    for (const fField of fromFields) {
+
+    for (const field of userFields) {
+      // With status filter
       for (const sv of statusValues) {
-        promises.push(
-          getDocs(query(collection(db,'trades'), where(fField,'==',uid), where('status','==',sv)))
-            .catch(() => null)
-        );
+        promises.push(getDocs(query(collection(db,'trades'), where(field,'==',uid), where('status','==',sv))).catch(()=>null));
       }
+      // Without status filter (fallback)
+      promises.push(getDocs(query(collection(db,'trades'), where(field,'==',uid))).catch(()=>null));
     }
-    for (const tField of toFields) {
+    // Array-based participant fields
+    for (const af of ['participants','users','members']) {
       for (const sv of statusValues) {
-        promises.push(
-          getDocs(query(collection(db,'trades'), where(tField,'==',uid), where('status','==',sv)))
-            .catch(() => null)
-        );
+        promises.push(getDocs(query(collection(db,'trades'), where(af,'array-contains',uid), where('status','==',sv))).catch(()=>null));
       }
-    }
-    // Also try participants array (like chats use)
-    for (const sv of statusValues) {
-      promises.push(
-        getDocs(query(collection(db,'trades'), where('participants','array-contains',uid), where('status','==',sv)))
-          .catch(() => null)
-      );
-      promises.push(
-        getDocs(query(collection(db,'trades'), where('users','array-contains',uid), where('status','==',sv)))
-          .catch(() => null)
-      );
-    }
-    // Also try WITHOUT status filter (catch-all fallback – grab all trades involving user)
-    for (const fField of [...fromFields, ...toFields]) {
-      promises.push(
-        getDocs(query(collection(db,'trades'), where(fField,'==',uid)))
-          .catch(() => null)
-      );
+      promises.push(getDocs(query(collection(db,'trades'), where(af,'array-contains',uid))).catch(()=>null));
     }
 
     const results = await Promise.all(promises);
 
-    // Deduplicate by doc ID, keep only "accepted" or all if no status field
+    // Deduplicate and filter
     const seen = new Set();
     const allDocs = [];
     for (const snap of results) {
@@ -1480,10 +1454,8 @@ async function loadAcceptedTrades() {
       for (const d of snap.docs) {
         if (seen.has(d.id)) continue;
         seen.add(d.id);
-        const data = d.data();
-        // Filter: keep if status is an accepted variant OR if there is no status field (fallback)
-        const st = (data.status || '').toLowerCase();
-        if (!data.status || ['accepted','active','approved'].includes(st)) {
+        const st = (d.data().status || '').toLowerCase();
+        if (!d.data().status || ['accepted','active','approved','completed'].includes(st)) {
           allDocs.push(d);
         }
       }
@@ -1499,30 +1471,26 @@ async function loadAcceptedTrades() {
 
     for (const tradeDoc of allDocs) {
       const trade = tradeDoc.data();
-
-      // Find the other user's UID using all known field names
+      // Find other user UID from all known field names
       let otherUid = null;
-      const fromFields2 = ['fromUserId','senderId','requesterId','userId'];
-      const toFields2   = ['toUserId','receiverId','providerId'];
-      for (const f of fromFields2) {
+      for (const f of ['fromUserId','senderId','requesterId','userId']) {
         if (trade[f] && trade[f] !== uid) { otherUid = trade[f]; break; }
       }
       if (!otherUid) {
-        for (const f of toFields2) {
+        for (const f of ['toUserId','receiverId','providerId']) {
           if (trade[f] && trade[f] !== uid) { otherUid = trade[f]; break; }
         }
       }
       if (!otherUid) {
-        // Try participants/users array
-        const arr = trade.participants || trade.users || [];
+        const arr = trade.participants || trade.users || trade.members || [];
         otherUid = arr.find(u => u !== uid) || null;
       }
-      if (!otherUid) continue; // can't identify the other user
+      if (!otherUid) continue;
 
       let name = 'User';
       let skill = trade.skill || trade.skillName || trade.offeredSkill || trade.requestedSkill || trade.teachSkill || '';
       try {
-        const uSnap = await getDoc(doc(db, 'users', otherUid));
+        const uSnap = await getDoc(doc(db,'users',otherUid));
         if (uSnap.exists()) {
           const u = uSnap.data();
           name  = u.name || u.displayName || u.username || u.fullName || 'User';
@@ -1531,30 +1499,24 @@ async function loadAcceptedTrades() {
       } catch(_) {}
 
       const initial  = name.charAt(0).toUpperCase();
-      const uidSafe  = esc(otherUid);
-      const nameSafe = esc(name);
-      const idSafe   = esc(tradeDoc.id);
-      const skillSafe = esc(skill);
-
       const card = `
         <div class="trade-user-item">
           <div class="trade-user-avatar">${initial}</div>
           <div class="trade-user-info">
-            <div class="trade-user-name">${nameSafe}</div>
-            <div class="trade-user-skill">${skillSafe}</div>
+            <div class="trade-user-name">${esc(name)}</div>
+            <div class="trade-user-skill">${esc(skill)}</div>
           </div>
           <button class="trade-invite-btn"
-            onclick="inviteTradeUser('${uidSafe}','${nameSafe}','${idSafe}',this.closest('.trade-user-item'))">
+            onclick="inviteTradeUser('${esc(otherUid)}','${esc(name)}','${esc(tradeDoc.id)}',this.closest('.trade-user-item'))">
             Invite
           </button>
         </div>`;
-
       listDesktop.insertAdjacentHTML('beforeend', card);
       listMobile.insertAdjacentHTML('beforeend', card);
     }
   } catch(e) {
-    console.error('loadAcceptedTrades error:', e);
-    setHTML('<div class="no-trades"><i class="fa-solid fa-triangle-exclamation"></i><span>Could not load trades</span><span style="font-size:10px;color:#6b7280">' + e.message + '</span></div>');
+    console.error('loadAcceptedTrades:', e);
+    setHTML('<div class="no-trades"><i class="fa-solid fa-triangle-exclamation"></i><span>Error loading trades</span><br><small style="font-size:10px;color:#6b7280">' + e.message + '</small></div>');
   }
 }
 
