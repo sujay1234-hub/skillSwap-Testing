@@ -1233,15 +1233,16 @@ function setRoomId(id) {
   document.getElementById('room-chip-text').textContent = id;
   document.getElementById('strip-room').style.display = '';
   document.getElementById('strip-room-text').textContent = id;
-  // Update share links
-  const link = window.location.origin + window.location.pathname + '?room=' + id;
+  // Update browser URL first, then use that as the share link
+  const url = new URL(window.location.href);
+  url.searchParams.set('room', id);
+  window.history.replaceState({}, '', url.toString());
+  // Use the updated live URL as the share link
+  const link = url.toString();
   const el1 = document.getElementById('share-room-link');
   const el2 = document.getElementById('share-room-link-mob');
   if (el1) el1.textContent = link;
   if (el2) el2.textContent = link;
-  const url = new URL(window.location.href);
-  url.searchParams.set('room', id);
-  window.history.replaceState({}, '', url.toString());
 }
 
 function setBadge(type, msg) {
@@ -1465,7 +1466,7 @@ window.inviteTradeUser = async function(otherUid, name, tradeId, itemEl) {
       chatId = newChat.id;
     }
 
-    const joinUrl = window.location.origin + window.location.pathname + '?room=' + roomId;
+    const joinUrl = (() => { const u = new URL(window.location.href); u.searchParams.set('room', roomId); return u.toString(); })();
     await addDoc(collection(db,'chats', chatId, 'messages'), {
       text: '📹 You have been invited to a live video session!',
       senderId: currentUser.uid,
