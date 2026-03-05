@@ -1094,39 +1094,96 @@ function buildPeer(id) {
   return id ? new Peer(id, cfg) : new Peer(cfg);
 }
 
-/* ── HANDLE CALL (FIXED remote video) ── */
+/* ── HANDLE CALL ── */
 function handleCall(call) {
   if (!call) return;
   activeCall = call;
 
-  call.on('stream', remoteStream => {
-    const rv = document.getElementById('remote-video');
-    const wo = document.getElementById('waiting-overlay');
-    const rn = document.getElementById('remote-name');
-    const rt = document.getElementById('remote-tile');
+  function showRemoteStream(remoteStream) {
+    if (!remoteStream || !remoteStream.active) return;
+    const rv  = document.getElementById('remote-video');
+    const wo  = document.getElementById('waiting-overlay');
+    const rn  = document.getElementById('remote-name');
+    const rt  = document.getElementById('remote-tile');
 
-    // Show remote tile
     rt.style.display = '';
+    document.getElementById('video-area').className = 'video-area dual';
 
-    // Assign stream and ensure video plays
+    // Detach first to force re-attach (fixes Chrome stream-already-set bug)
+    rv.srcObject = null;
     rv.srcObject = remoteStream;
     rv.style.display = 'block';
 
-    // Force play (needed on some mobile browsers)
-    rv.play().catch(() => {});
+    // Unmute and play (autoplay policy workaround)
+    rv.muted = false;
+    const playPromise = rv.play();
+    if (playPromise) playPromise.catch(() => {
+      // If autoplay blocked, add a click-to-play overlay
+      rv.muted = true;
+      rv.play().catch(() => {});
+      showToast('Tap the peer video to unmute');
+    });
 
-    // Hide waiting overlay
     if (wo) wo.style.display = 'none';
-
-    // Show name label
     if (rn) rn.style.display = '';
 
-    // Switch to dual layout
-    document.getElementById('video-area').className = 'video-area dual';
     setBadge('connected', 'Connected');
     startTimer();
     showToast('🟢 Peer connected');
+  }
+
+  // Primary: PeerJS stream event
+  call.on('stream', remoteStream => {
+    showRemoteStream(remoteStream);
   });
+
+  // Fallback: raw WebRTC track event (fires even when PeerJS stream event lags)
+  call.on('iceStateChanged', (state) => {
+    if (state === 'connected' || state === 'completed') {
+      // Check if we already have a stream
+      const rv = document.getElementById('remote-video');
+      if (!rv.srcObject && call.remoteStream) {
+        showRemoteStream(call.remoteStream);
+      }
+    }
+  });
+
+  // Second fallback via peerConnection directly
+  function attachPeerConnectionFallback() {
+    const pc = call.peerConnection;
+    if (!pc) return;
+    pc.ontrack = (e) => {
+      if (e.streams && e.streams[0]) {
+        const rv = document.getElementById('remote-video');
+        if (!rv.srcObject || !rv.srcObject.active) {
+          showRemoteStream(e.streams[0]);
+        }
+      }
+    };
+    // Also poll for remoteStream in case events already fired
+    const poll = setInterval(() => {
+      const rv = document.getElementById('remote-video');
+      if (rv.srcObject && rv.srcObject.active) { clearInterval(poll); return; }
+      if (call.remoteStream && call.remoteStream.active) {
+        showRemoteStream(call.remoteStream);
+        clearInterval(poll);
+      }
+    }, 500);
+    setTimeout(() => clearInterval(poll), 30000); // stop after 30s
+  }
+
+  // peerConnection may not exist immediately on the joiner side
+  if (call.peerConnection) {
+    attachPeerConnectionFallback();
+  } else {
+    // Wait up to 3s for peerConnection to be created
+    let waited = 0;
+    const waitPC = setInterval(() => {
+      waited += 200;
+      if (call.peerConnection) { attachPeerConnectionFallback(); clearInterval(waitPC); }
+      if (waited >= 3000) clearInterval(waitPC);
+    }, 200);
+  }
 
   call.on('close', () => {
     showToast('Peer disconnected.');
@@ -1139,19 +1196,6 @@ function handleCall(call) {
     showToast('Call error: ' + (err.message || err.type));
     setBadge('error', 'Call error');
   });
-
-  // Additional: listen for stream via connection events too
-  if (call.peerConnection) {
-    call.peerConnection.ontrack = (e) => {
-      if (e.streams && e.streams[0]) {
-        const rv = document.getElementById('remote-video');
-        if (!rv.srcObject) {
-          rv.srcObject = e.streams[0];
-          rv.play().catch(() => {});
-        }
-      }
-    };
-  }
 }
 
 /* ── MIC / CAM ── */
@@ -1368,68 +1412,149 @@ onAuthStateChanged(auth, async (user) => {
   await loadAcceptedTrades();
 });
 
-/* ── Load accepted trade users ── */
+/* ── Load accepted trade users (tries ALL possible field name combos) ── */
 async function loadAcceptedTrades() {
   const listDesktop = document.getElementById('trade-user-list');
-  const listMobile = document.getElementById('trade-user-list-mob');
+  const listMobile  = document.getElementById('trade-user-list-mob');
+  const uid = currentUser.uid;
+
+  const setHTML = (html) => { listDesktop.innerHTML = html; listMobile.innerHTML = html; };
+  setHTML('<div class="no-trades"><span style="font-size:11px;color:var(--muted)">Loading…</span></div>');
 
   try {
-    // Query trades where current user is involved and status is accepted
-    const [snap1, snap2] = await Promise.all([
-      getDocs(query(collection(db, 'trades'),
-        where('fromUserId', '==', currentUser.uid),
-        where('status', '==', 'accepted'))),
-      getDocs(query(collection(db, 'trades'),
-        where('toUserId', '==', currentUser.uid),
-        where('status', '==', 'accepted')))
-    ]);
+    // ── Try every field name variation Firestore might have ──
+    // Possible "user" fields: fromUserId, toUserId, senderId, receiverId,
+    //                         requesterId, providerId, userId, participants (array)
+    // Possible "status" values: 'accepted', 'Accepted', 'active', 'approved'
 
-    const allDocs = [...snap1.docs, ...snap2.docs];
+    const statusValues  = ['accepted', 'Accepted', 'active', 'approved'];
+    const fromFields    = ['fromUserId', 'senderId',   'requesterId', 'userId'];
+    const toFields      = ['toUserId',   'receiverId', 'providerId'];
+
+    const snaps = [];
+
+    // Query by from/to fields × status values
+    const promises = [];
+    for (const fField of fromFields) {
+      for (const sv of statusValues) {
+        promises.push(
+          getDocs(query(collection(db,'trades'), where(fField,'==',uid), where('status','==',sv)))
+            .catch(() => null)
+        );
+      }
+    }
+    for (const tField of toFields) {
+      for (const sv of statusValues) {
+        promises.push(
+          getDocs(query(collection(db,'trades'), where(tField,'==',uid), where('status','==',sv)))
+            .catch(() => null)
+        );
+      }
+    }
+    // Also try participants array (like chats use)
+    for (const sv of statusValues) {
+      promises.push(
+        getDocs(query(collection(db,'trades'), where('participants','array-contains',uid), where('status','==',sv)))
+          .catch(() => null)
+      );
+      promises.push(
+        getDocs(query(collection(db,'trades'), where('users','array-contains',uid), where('status','==',sv)))
+          .catch(() => null)
+      );
+    }
+    // Also try WITHOUT status filter (catch-all fallback – grab all trades involving user)
+    for (const fField of [...fromFields, ...toFields]) {
+      promises.push(
+        getDocs(query(collection(db,'trades'), where(fField,'==',uid)))
+          .catch(() => null)
+      );
+    }
+
+    const results = await Promise.all(promises);
+
+    // Deduplicate by doc ID, keep only "accepted" or all if no status field
+    const seen = new Set();
+    const allDocs = [];
+    for (const snap of results) {
+      if (!snap) continue;
+      for (const d of snap.docs) {
+        if (seen.has(d.id)) continue;
+        seen.add(d.id);
+        const data = d.data();
+        // Filter: keep if status is an accepted variant OR if there is no status field (fallback)
+        const st = (data.status || '').toLowerCase();
+        if (!data.status || ['accepted','active','approved'].includes(st)) {
+          allDocs.push(d);
+        }
+      }
+    }
 
     if (allDocs.length === 0) {
-      const empty = '<div class="no-trades"><i class="fa-solid fa-handshake-slash"></i><span>No accepted trades yet</span></div>';
-      listDesktop.innerHTML = empty;
-      listMobile.innerHTML = empty;
+      setHTML('<div class="no-trades"><i class="fa-solid fa-handshake-slash"></i><span>No accepted trades yet</span></div>');
       return;
     }
 
     listDesktop.innerHTML = '';
-    listMobile.innerHTML = '';
+    listMobile.innerHTML  = '';
 
     for (const tradeDoc of allDocs) {
       const trade = tradeDoc.data();
-      const otherUid = trade.fromUserId === currentUser.uid ? trade.toUserId : trade.fromUserId;
 
-      let name = 'User', skill = trade.skill || trade.requestedSkill || '';
+      // Find the other user's UID using all known field names
+      let otherUid = null;
+      const fromFields2 = ['fromUserId','senderId','requesterId','userId'];
+      const toFields2   = ['toUserId','receiverId','providerId'];
+      for (const f of fromFields2) {
+        if (trade[f] && trade[f] !== uid) { otherUid = trade[f]; break; }
+      }
+      if (!otherUid) {
+        for (const f of toFields2) {
+          if (trade[f] && trade[f] !== uid) { otherUid = trade[f]; break; }
+        }
+      }
+      if (!otherUid) {
+        // Try participants/users array
+        const arr = trade.participants || trade.users || [];
+        otherUid = arr.find(u => u !== uid) || null;
+      }
+      if (!otherUid) continue; // can't identify the other user
+
+      let name = 'User';
+      let skill = trade.skill || trade.skillName || trade.offeredSkill || trade.requestedSkill || trade.teachSkill || '';
       try {
         const uSnap = await getDoc(doc(db, 'users', otherUid));
         if (uSnap.exists()) {
           const u = uSnap.data();
-          name = u.name || u.displayName || u.username || 'User';
-          if (!skill) skill = u.skills?.[0] || '';
+          name  = u.name || u.displayName || u.username || u.fullName || 'User';
+          if (!skill) skill = (u.skills || u.teachSkills || [])[0] || '';
         }
       } catch(_) {}
 
-      const initial = name.charAt(0).toUpperCase();
-      const cardHtml = (uid, tradeId) => `
-        <div class="trade-user-item" onclick="inviteTradeUser('${esc(uid)}', '${esc(name)}', '${esc(tradeId)}', this)">
+      const initial  = name.charAt(0).toUpperCase();
+      const uidSafe  = esc(otherUid);
+      const nameSafe = esc(name);
+      const idSafe   = esc(tradeDoc.id);
+      const skillSafe = esc(skill);
+
+      const card = `
+        <div class="trade-user-item">
           <div class="trade-user-avatar">${initial}</div>
           <div class="trade-user-info">
-            <div class="trade-user-name">${esc(name)}</div>
-            <div class="trade-user-skill">${esc(skill)}</div>
+            <div class="trade-user-name">${nameSafe}</div>
+            <div class="trade-user-skill">${skillSafe}</div>
           </div>
-          <button class="trade-invite-btn" onclick="event.stopPropagation();inviteTradeUser('${esc(uid)}','${esc(name)}','${esc(tradeId)}',this.closest('.trade-user-item'))">
+          <button class="trade-invite-btn"
+            onclick="inviteTradeUser('${uidSafe}','${nameSafe}','${idSafe}',this.closest('.trade-user-item'))">
             Invite
           </button>
         </div>`;
 
-      listDesktop.insertAdjacentHTML('beforeend', cardHtml(otherUid, tradeDoc.id));
-      listMobile.insertAdjacentHTML('beforeend', cardHtml(otherUid, tradeDoc.id));
+      listDesktop.insertAdjacentHTML('beforeend', card);
+      listMobile.insertAdjacentHTML('beforeend', card);
     }
   } catch(e) {
-    const err = '<div class="no-trades"><i class="fa-solid fa-triangle-exclamation"></i><span>Could not load trades</span></div>';
-    listDesktop.innerHTML = err;
-    listMobile.innerHTML = err;
+    console.error('loadAcceptedTrades error:', e);
+    setHTML('<div class="no-trades"><i class="fa-solid fa-triangle-exclamation"></i><span>Could not load trades</span><span style="font-size:10px;color:#6b7280">' + e.message + '</span></div>');
   }
 }
 
