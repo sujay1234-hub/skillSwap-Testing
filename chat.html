@@ -499,8 +499,27 @@
             text-align: right;
         }
     </style>
+
+<style id="mob">
+.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+@media(max-width:768px){
+.mobile-back-btn{display:flex;}
+.sidebar{position:fixed;left:0;top:0;height:100vh;width:85% !important;max-width:320px;transform:translateX(0);z-index:200;transition:transform 0.3s ease;}
+.sidebar.hidden{transform:translateX(-100%);}
+.chat-main{width:100% !important;}
+.back-btn{display:flex !important;}
+.chat-header{padding:0 14px;}
+.message-input-area,.input-area{padding:10px 12px;}
+.chat-input,.message-input{font-size:16px !important;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:199;}
+.sidebar-overlay.show{display:block;}
+}
+</style>
 </head>
 <body>
+<a class="mobile-back-btn" href="index.html" title="Back">&#8592;</a>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app-container">
 
@@ -959,6 +978,31 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+</script>
+
+
+<script>
+// Mobile sidebar toggle for chat
+function openSidebar(){
+    document.querySelector('.sidebar').classList.remove('hidden');
+    document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar(){
+    if(window.innerWidth<=768){
+        document.querySelector('.sidebar').classList.add('hidden');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+    }
+}
+// Auto-close sidebar when a chat is selected on mobile
+document.querySelectorAll('.chat-item').forEach(el=>{
+    el.addEventListener('click', ()=>{ if(window.innerWidth<=768) closeSidebar(); });
+});
+// Make existing .back-btn in chat-header open sidebar on mobile
+const backBtn = document.querySelector('.back-btn');
+if(backBtn){ backBtn.addEventListener('click', ()=>{ if(window.innerWidth<=768) openSidebar(); }); }
+// Init: hide sidebar on mobile
+if(window.innerWidth<=768){ document.querySelector('.sidebar').classList.add('hidden'); }
+window.addEventListener('resize',()=>{ if(window.innerWidth>768){ document.querySelector('.sidebar').classList.remove('hidden'); document.getElementById('sidebarOverlay').classList.remove('show'); } });
 </script>
 
 </body>

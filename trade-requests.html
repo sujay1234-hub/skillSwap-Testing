@@ -423,61 +423,24 @@
                 width: 100%;
             }
         }
-    
-/* ===== MOBILE BOTTOM NAV ===== */
-.mobile-bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15,15,18,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 9999;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-}
-.mbn-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #71717a;
-  text-decoration: none;
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  flex: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-.mbn-item i { font-size: 1.15rem; }
-.mbn-item:hover, .mbn-item.active {
-  color: #6366f1;
-  background: rgba(99,102,241,0.1);
-}
-@media (max-width: 768px) {
-  .mobile-bottom-nav { display: flex; }
-  body { padding-bottom: 70px; }
-}
+    </style>
 
-/* Touch friendly buttons globally */
-@media (max-width: 768px) {
-  button, .btn, a.btn, .btn-action, .btn-primary, .btn-secondary, .btn-submit, .btn-hire, .btn-request, .btn-search {
-    min-height: 44px;
-  }
-  input, select, textarea {
-    font-size: 16px !important; /* prevent iOS zoom */
-  }
+<style id="mob">
+.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+@media(max-width:768px){
+.mobile-back-btn{display:flex;}
+.container{padding:70px 16px 30px !important;}
+h1,.page-title{font-size:1.4rem !important;}
+.requests-grid,.grid{grid-template-columns:1fr !important;gap:14px;}
+.request-card,.card{padding:18px;}
+.action-btns{flex-direction:column;gap:8px;}
+.action-btns button{width:100%;padding:12px;}
 }
 </style>
 </head>
 <body>
+<a class="mobile-back-btn" href="dashboard.html" title="Back">&#8592;</a>
 
     <div class="bg-gradient"></div>
 

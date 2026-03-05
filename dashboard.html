@@ -353,61 +353,30 @@
             header { flex-direction: column; align-items: flex-start; gap: 20px; }
             .profile-pill { width: 100%; justify-content: space-between; }
         }
-    
-/* ===== MOBILE BOTTOM NAV ===== */
-.mobile-bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15,15,18,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 9999;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-}
-.mbn-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #71717a;
-  text-decoration: none;
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  flex: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-.mbn-item i { font-size: 1.15rem; }
-.mbn-item:hover, .mbn-item.active {
-  color: #6366f1;
-  background: rgba(99,102,241,0.1);
-}
-@media (max-width: 768px) {
-  .mobile-bottom-nav { display: flex; }
-  body { padding-bottom: 70px; }
-}
+    </style>
 
-/* Touch friendly buttons globally */
-@media (max-width: 768px) {
-  button, .btn, a.btn, .btn-action, .btn-primary, .btn-secondary, .btn-submit, .btn-hire, .btn-request, .btn-search {
-    min-height: 44px;
-  }
-  input, select, textarea {
-    font-size: 16px !important; /* prevent iOS zoom */
-  }
+<style id="mob">
+.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+@media(max-width:768px){
+.mobile-back-btn{display:flex;}
+.container{padding:70px 16px 30px;}
+header{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:24px;}
+.user-greeting h1{font-size:1.4rem;}
+.profile-pill{width:100%;}
+.stats-grid{grid-template-columns:1fr;gap:16px;margin-bottom:32px;}
+.stat-card{padding:20px;}
+.stat-value{font-size:1.6rem;}
+.activity-item{flex-direction:column;align-items:flex-start;gap:12px;}
+.modal-box{padding:28px 20px;border-radius:18px;}
+}
+@media(max-width:480px){
+.stats-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
+<a class="mobile-back-btn" href="index.html" title="Back">&#8592;</a>
 
     <div class="container">
         <header>
@@ -550,47 +519,65 @@
 
   </div>
 </div>
-</div></div>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswapp-35e86.firebaseapp.com",projectId:"skillswapp-35e86"};
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-onAuthStateChanged(auth,(user)=>{
-  if(!user){window.location.href="login.html";return;}
-  const n=user.displayName||"User";
-  document.getElementById("userName").textContent=n;
-  document.getElementById("userAvatar").textContent=n.charAt(0).toUpperCase();
-  document.getElementById("userXP").textContent="0";
-  onSnapshot(doc(db,"earnings",user.uid),(snap)=>{
-    if(snap.exists()){
-      const bal=snap.data().balance||0;
-      document.getElementById("walletBalance").textContent="₹"+bal;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+    authDomain: "skillswapp-35e86.firebaseapp.com",
+    projectId: "skillswapp-35e86",
+    storageBucket: "skillswapp-35e86.appspot.com",
+    messagingSenderId: "668466292157",
+    appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "login.html"; return; }
+
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("userName").innerText = data.name || user.displayName || "User";
+        document.getElementById("userAvatar").innerText = (data.name || "U")[0].toUpperCase();
+        document.getElementById("userXP").innerText = data.xp || 0;
+        document.getElementById("repLevel").innerText = data.level || "Beginner";
+        const xp = data.xp || 0;
+        const pct = Math.min((xp / 1000) * 100, 100);
+        document.getElementById("repProgress").style.width = pct + "%";
     }
-  });
-  onSnapshot(doc(db,"users",user.uid),(snap)=>{
-    if(snap.exists()){
-      const xp=snap.data().xp||0;
-      document.getElementById("userXP").textContent=xp;
-      document.getElementById("repLevel").textContent=snap.data().level||"Beginner";
-      const pct=Math.min(100,Math.round(xp/5000*100));
-      document.getElementById("repProgress").style.width=pct+"%";
+
+    // Wallet
+    const earnSnap = await getDoc(doc(db, "earnings", user.uid));
+    if (earnSnap.exists()) {
+        document.getElementById("walletBalance").innerText = "₹" + (earnSnap.data().balance || 0);
     }
-  });
-  const tq=query(collection(db,"trades"),where("users","array-contains",user.uid),where("status","==","active"));
-  onSnapshot(tq,(snap)=>{document.getElementById("tradeCount").textContent=snap.size;});
+
+    // Trade count
+    const tradesQ = query(collection(db, "trades"), where("users", "array-contains", user.uid));
+    onSnapshot(tradesQ, snap => {
+        document.getElementById("tradeCount").innerText = snap.size;
+    });
 });
-window.openWithdrawModal=function(){document.getElementById("withdrawModal").classList.add("show");};
-window.closeWithdrawModal=function(){document.getElementById("withdrawModal").classList.remove("show");};
-window.submitWithdraw=async function(){
-  const amt=document.getElementById("withdrawAmount").value;
-  const upi=document.getElementById("upiId").value;
-  if(!amt||!upi){alert("Please fill all fields");return;}
-  alert("Withdrawal request submitted!");
-  closeWithdrawModal();
+
+window.openWithdrawModal = function() { document.getElementById("withdrawModal").classList.add("show"); };
+window.closeWithdrawModal = function() { document.getElementById("withdrawModal").classList.remove("show"); };
+window.submitWithdraw = async function() {
+    const user = auth.currentUser;
+    const amount = Number(document.getElementById("withdrawAmount").value);
+    const upiId = document.getElementById("upiId").value.trim();
+    if (!amount || !upiId) { alert("Please fill all fields"); return; }
+    await addDoc(collection(db, "withdrawRequests"), {
+        tutorId: user.uid, amount, upiId, status: "pending", createdAt: serverTimestamp()
+    });
+    alert("Withdrawal request submitted!");
+    closeWithdrawModal();
 };
 </script>
-</body></html>
+</body>
+</html>

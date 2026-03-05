@@ -91,9 +91,24 @@ cursor:pointer;
 .form-grid{grid-template-columns:1fr;}
 }
 </style>
+
+<style id="mob">
+.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+@media(max-width:768px){
+.mobile-back-btn{display:flex;}
+.container{padding:70px 14px 30px;}
+.card{padding:24px 16px;}
+h1{font-size:1.4rem;}
+.form-grid{grid-template-columns:1fr !important;}
+input,textarea,select{font-size:16px !important;}
+button{padding:16px;}
+}
+</style>
 </head>
 
 <body>
+<a class="mobile-back-btn" href="profile.html" title="Back">&#8592;</a>
 
 <div class="container">
 <div class="card">

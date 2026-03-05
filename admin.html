@@ -1,426 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Admin Panel - SkillSwap</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body{
-  background:#0f172a;
-  color:white;
-  font-family:Inter;
-  padding:40px;
+:root{--bg:#09090b;--card:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.08);--primary:#6366f1;--accent:#a855f7;--success:#10b981;--danger:#ef4444;--text:#fff;--muted:#a1a1aa;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(circle at 10% 20%,rgba(99,102,241,0.08) 0%,transparent 25%),radial-gradient(circle at 90% 80%,rgba(168,85,247,0.08) 0%,transparent 25%);}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.page-header{display:flex;align-items:center;gap:16px;margin-bottom:36px;}
+.page-header h1{font-size:1.8rem;font-weight:700;}
+.page-header .icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.analytics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:40px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;position:relative;overflow:hidden;backdrop-filter:blur(10px);}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));}
+.stat .label{font-size:0.78rem;color:var(--muted);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
+.stat .value{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.section{margin-bottom:50px;}
+.section-title{font-size:1.1rem;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.search-wrap{margin-bottom:16px;}
+.search-wrap input{width:100%;max-width:360px;padding:12px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;outline:none;transition:0.2s;}
+.search-wrap input:focus{border-color:var(--primary);}
+.search-wrap input::placeholder{color:var(--muted);}
+/* Table → Card layout on mobile */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table thead{background:rgba(255,255,255,0.04);}
+.data-table th{padding:12px 16px;font-size:0.8rem;font-weight:600;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{padding:14px 16px;font-size:0.88rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+button{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.82rem;transition:0.15s;}
+button:hover{filter:brightness(1.1);}
+.add{background:var(--success);color:white;}
+.deduct{background:var(--danger);color:white;}
+.set{background:var(--primary);color:white;}
+.approve{background:var(--success);color:white;}
+.reject{background:var(--danger);color:white;}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.status-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;text-transform:uppercase;}
+.status-pending{background:rgba(245,158,11,0.15);color:#f59e0b;}
+.status-approved{background:rgba(16,185,129,0.15);color:#10b981;}
+.status-rejected{background:rgba(239,68,68,0.15);color:#ef4444;}
+/* MOBILE BACK */
+.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+@media(max-width:768px){
+.mobile-back-btn{display:flex;}
+.container{padding:70px 14px 30px;}
+.page-header h1{font-size:1.3rem;}
+.analytics{grid-template-columns:1fr 1fr;gap:12px;}
+.stat{padding:16px 14px;}
+.stat .value{font-size:1.4rem;}
+.search-wrap input{max-width:100%;}
+.data-table{display:block;}
+.data-table thead{display:none;}
+.data-table tbody{display:block;}
+.data-table tr{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+.data-table td{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.85rem;}
+.data-table td:last-child{border-bottom:none;}
+.data-table td::before{content:attr(data-label);font-size:0.75rem;color:var(--muted);font-weight:600;flex-shrink:0;margin-right:12px;}
+.action-btns{flex-wrap:wrap;}
+button{padding:8px 12px;font-size:0.8rem;}
 }
-
-h1{margin-bottom:30px;}
-
-.section{margin-bottom:60px;}
-
-.analytics{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px;
-  margin-bottom:40px;
-}
-
-.stat{
-  background:#1e293b;
-  padding:20px;
-  border-radius:15px;
-  text-align:center;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-}
-
-th,td{
-  padding:12px;
-  text-align:left;
-}
-
-th{
-  background:#1e293b;
-}
-
-tr{
-  background:#111827;
-  border-bottom:1px solid #1e293b;
-}
-
-button{
-  padding:6px 12px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  margin-right:5px;
-  font-weight:600;
-}
-
-.add{background:#10b981;color:white;}
-.deduct{background:#ef4444;color:white;}
-.set{background:#6366f1;color:white;}
-.approve{background:#10b981;color:white;}
-.reject{background:#ef4444;color:white;}
-
-input{
-  padding:8px;
-  border-radius:8px;
-  border:none;
-  margin-bottom:15px;
-  width:300px;
-}
-
-/* ===== MOBILE BOTTOM NAV ===== */
-.mobile-bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15,15,18,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 9999;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-}
-.mbn-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: #71717a;
-  text-decoration: none;
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-  flex: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-.mbn-item i { font-size: 1.15rem; }
-.mbn-item:hover, .mbn-item.active {
-  color: #6366f1;
-  background: rgba(99,102,241,0.1);
-}
-@media (max-width: 768px) {
-  .mobile-bottom-nav { display: flex; }
-  body { padding-bottom: 70px; }
-}
-
-@media (max-width: 768px) {
-  .mobile-bottom-nav { display: none !important; }
-  body { padding-bottom: 0 !important; }
-}
-
-/* Touch friendly buttons globally */
-@media (max-width: 768px) {
-  button, .btn, a.btn, .btn-action, .btn-primary, .btn-secondary, .btn-submit, .btn-hire, .btn-request, .btn-search {
-    min-height: 44px;
-  }
-  input, select, textarea {
-    font-size: 16px !important; /* prevent iOS zoom */
-  }
+@media(max-width:400px){
+.analytics{grid-template-columns:1fr;}
 }
 </style>
 </head>
-
 <body>
 
-<h1>Admin Dashboard</h1>
+<a class="mobile-back-btn" href="dashboard.html" title="Back">&#8592;</a>
 
-<!-- ================= ANALYTICS ================= -->
+<div class="container">
+    <div class="page-header">
+        <div class="icon">🛡️</div>
+        <h1>Admin Dashboard</h1>
+    </div>
 
-<div class="analytics">
-  <div class="stat">
-    <h3>Total Platform Revenue</h3>
-    <p id="totalRevenue">₹0</p>
-  </div>
-  <div class="stat">
-    <h3>Total Paid to Tutors</h3>
-    <p id="totalPaid">₹0</p>
-  </div>
-  <div class="stat">
-    <h3>Total Users</h3>
-    <p id="totalUsers">0</p>
-  </div>
-  <div class="stat">
-    <h3>Pending Withdrawals</h3>
-    <p id="pendingWithdraw">₹0</p>
-  </div>
-</div>
+    <div class="analytics">
+        <div class="stat"><div class="label">Platform Revenue</div><div class="value" id="totalRevenue">₹0</div></div>
+        <div class="stat"><div class="label">Paid to Tutors</div><div class="value" id="totalPaid">₹0</div></div>
+        <div class="stat"><div class="label">Total Users</div><div class="value" id="totalUsers">0</div></div>
+        <div class="stat"><div class="label">Pending Withdrawals</div><div class="value" id="pendingWithdraw">₹0</div></div>
+    </div>
 
-<!-- ================= WALLET ================= -->
+    <div class="section">
+        <div class="section-title">💰 User Wallet Management</div>
+        <div class="search-wrap">
+            <input type="text" id="searchUser" placeholder="🔍 Search by email..." oninput="filterUsers()">
+        </div>
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead><tr><th>User</th><th>Balance</th><th>Total Earned</th><th>Actions</th></tr></thead>
+                    <tbody id="walletTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<div class="section">
-<h2>💰 User Wallet Management</h2>
-
-<input type="text" id="searchUser" placeholder="Search by email..." oninput="filterUsers()">
-
-<table>
-  <thead>
-    <tr>
-      <th>User</th>
-      <th>Balance</th>
-      <th>Total Earned</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="walletTable"></tbody>
-</table>
-</div>
-
-<!-- ================= WITHDRAW ================= -->
-
-<div class="section">
-<h2>🏦 Withdrawal Requests</h2>
-
-<table>
-  <thead>
-    <tr>
-      <th>Tutor</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="withdrawTable"></tbody>
-</table>
+    <div class="section">
+        <div class="section-title">🏦 Withdrawal Requests</div>
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead><tr><th>Tutor</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="withdrawTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
-
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import { 
-  getFirestore,
-  collection,
-  onSnapshot,
-  doc,
-  getDoc,
-  updateDoc,
-  setDoc,
-  increment
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore,collection,onSnapshot,doc,getDoc,updateDoc,setDoc,increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
  authDomain: "skillswapp-35e86.firebaseapp.com",
  projectId: "skillswapp-35e86"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 let allUsers = [];
 
-/* ================= ANALYTICS ================= */
-
-let totalRevenue = 0;
-let totalPaid = 0;
-
 onSnapshot(collection(db,"earnings"), snapshot => {
-
-  totalPaid = 0;
-  totalRevenue = 0;
-
-  snapshot.forEach(docSnap=>{
-    const data = docSnap.data();
-    totalPaid += data.totalEarned || 0;
-  });
-
+  let totalPaid=0,totalRevenue=0;
+  snapshot.forEach(d=>{ totalPaid += d.data().totalEarned||0; });
   totalRevenue = totalPaid * 0.10;
-
-  document.getElementById("totalPaid").innerText = "₹" + totalPaid;
-  document.getElementById("totalRevenue").innerText = "₹" + totalRevenue;
+  document.getElementById("totalPaid").innerText = "₹"+totalPaid;
+  document.getElementById("totalRevenue").innerText = "₹"+totalRevenue;
 });
-
-onSnapshot(collection(db,"users"), snapshot=>{
-  document.getElementById("totalUsers").innerText = snapshot.size;
-});
-
+onSnapshot(collection(db,"users"), snapshot=>{ document.getElementById("totalUsers").innerText = snapshot.size; });
 onSnapshot(collection(db,"withdrawRequests"), snapshot=>{
-  let pending = 0;
-  snapshot.forEach(docSnap=>{
-    const data = docSnap.data();
-    if(data.status==="pending"){
-      pending += data.amount;
-    }
-  });
-  document.getElementById("pendingWithdraw").innerText = "₹" + pending;
+  let pending=0;
+  snapshot.forEach(d=>{ if(d.data().status==="pending") pending+=d.data().amount; });
+  document.getElementById("pendingWithdraw").innerText = "₹"+pending;
 });
-
-/* ================= WALLET ================= */
 
 const walletTable = document.getElementById("walletTable");
-
 onSnapshot(collection(db,"earnings"), async snapshot => {
-
-  walletTable.innerHTML="";
-  allUsers = [];
-
+  walletTable.innerHTML=""; allUsers=[];
   for(const docSnap of snapshot.docs){
-
-    const data = docSnap.data();
-    const uid = docSnap.id;
-
-    const userSnap = await getDoc(doc(db,"users",uid));
-
-    let name="Unknown";
-    let email="Not Found";
-
-    if(userSnap.exists()){
-      name = userSnap.data().name || "No Name";
-      email = userSnap.data().email || "No Email";
-    }
-
-    allUsers.push({
-      uid,
-      name,
-      email,
-      balance:data.balance||0,
-      totalEarned:data.totalEarned||0
-    });
+    const data=docSnap.data(), uid=docSnap.id;
+    const userSnap=await getDoc(doc(db,"users",uid));
+    let name="Unknown",email="Not Found";
+    if(userSnap.exists()){ name=userSnap.data().name||"No Name"; email=userSnap.data().email||"No Email"; }
+    allUsers.push({uid,name,email,balance:data.balance||0,totalEarned:data.totalEarned||0});
   }
-
   renderUsers(allUsers);
 });
 
 function renderUsers(users){
-
   walletTable.innerHTML="";
-
-  users.forEach(user=>{
-
-    walletTable.innerHTML += `
-      <tr>
-        <td>
-          <strong>${user.name}</strong><br>
-          <small>${user.email}</small><br>
-          <small style="color:#94a3b8;">${user.uid}</small>
-        </td>
-        <td>₹${user.balance}</td>
-        <td>₹${user.totalEarned}</td>
-        <td>
-          <button class="add" onclick="addMoney('${user.uid}')">+ Add</button>
-          <button class="deduct" onclick="deductMoney('${user.uid}')">- Deduct</button>
-          <button class="set" onclick="setBalance('${user.uid}')">Set</button>
-        </td>
-      </tr>
-    `;
+  users.forEach(u=>{
+    walletTable.innerHTML += `<tr>
+      <td data-label="User"><div><strong>${u.name}</strong><br><small style="color:var(--muted)">${u.email}</small></div></td>
+      <td data-label="Balance">₹${u.balance}</td>
+      <td data-label="Total Earned">₹${u.totalEarned}</td>
+      <td data-label="Actions"><div class="action-btns">
+        <button class="add" onclick="addMoney('${u.uid}')">+ Add</button>
+        <button class="deduct" onclick="deductMoney('${u.uid}')">- Deduct</button>
+        <button class="set" onclick="setBalance('${u.uid}')">Set</button>
+      </div></td></tr>`;
   });
 }
 
 window.filterUsers = function(){
-
-  const search = document.getElementById("searchUser").value.toLowerCase();
-
-  const filtered = allUsers.filter(user =>
-    user.email.toLowerCase().includes(search)
-  );
-
-  renderUsers(filtered);
+  const s=document.getElementById("searchUser").value.toLowerCase();
+  renderUsers(allUsers.filter(u=>u.email.toLowerCase().includes(s)));
 };
-
-/* ================= ADMIN ACTIONS ================= */
-
-window.addMoney = async function(uid){
-  const amount = Number(prompt("Add amount:"));
-  if(!amount) return;
-
-  await updateDoc(doc(db,"earnings",uid),{
-    balance: increment(amount),
-    totalEarned: increment(amount)
-  });
-};
-
-window.deductMoney = async function(uid){
-  const amount = Number(prompt("Deduct amount:"));
-  if(!amount) return;
-
-  await updateDoc(doc(db,"earnings",uid),{
-    balance: increment(-amount)
-  });
-};
-
-window.setBalance = async function(uid){
-  const amount = Number(prompt("Set new balance:"));
-  if(amount<0) return;
-
-  await setDoc(doc(db,"earnings",uid),{
-    balance:amount
-  },{merge:true});
-};
-
-/* ================= WITHDRAW ================= */
+window.addMoney = async function(uid){ const a=Number(prompt("Add amount:")); if(!a) return; await updateDoc(doc(db,"earnings",uid),{balance:increment(a),totalEarned:increment(a)}); };
+window.deductMoney = async function(uid){ const a=Number(prompt("Deduct amount:")); if(!a) return; await updateDoc(doc(db,"earnings",uid),{balance:increment(-a)}); };
+window.setBalance = async function(uid){ const a=Number(prompt("Set new balance:")); if(a<0) return; await setDoc(doc(db,"earnings",uid),{balance:a},{merge:true}); };
 
 const withdrawTable = document.getElementById("withdrawTable");
-
 onSnapshot(collection(db,"withdrawRequests"), async snapshot => {
-
   withdrawTable.innerHTML="";
-
   for(const docSnap of snapshot.docs){
-
-    const data = docSnap.data();
-    const userSnap = await getDoc(doc(db,"users",data.tutorId));
-
-    let name="Unknown";
-    if(userSnap.exists()){
-      name=userSnap.data().name;
-    }
-
-    withdrawTable.innerHTML += `
-      <tr>
-        <td>${name}</td>
-        <td>₹${data.amount}</td>
-        <td>${data.status}</td>
-        <td>
-          ${data.status==="pending" ? `
-            <button class="approve"
-              onclick="approveWithdraw('${docSnap.id}','${data.tutorId}',${data.amount})">
-              Approve
-            </button>
-            <button class="reject"
-              onclick="rejectWithdraw('${docSnap.id}')">
-              Reject
-            </button>
-          ` : ""}
-        </td>
-      </tr>
-    `;
+    const data=docSnap.data();
+    const userSnap=await getDoc(doc(db,"users",data.tutorId));
+    let name="Unknown"; if(userSnap.exists()) name=userSnap.data().name;
+    const statusClass=`status-${data.status}`;
+    withdrawTable.innerHTML += `<tr>
+      <td data-label="Tutor">${name}</td>
+      <td data-label="Amount">₹${data.amount}</td>
+      <td data-label="Status"><span class="status-badge ${statusClass}">${data.status}</span></td>
+      <td data-label="Actions"><div class="action-btns">${data.status==="pending"?`
+        <button class="approve" onclick="approveWithdraw('${docSnap.id}','${data.tutorId}',${data.amount})">Approve</button>
+        <button class="reject" onclick="rejectWithdraw('${docSnap.id}')">Reject</button>`:""}</div></td></tr>`;
   }
 });
 
 window.approveWithdraw = async function(id,tutorId,amount){
-
-  await updateDoc(doc(db,"withdrawRequests",id),{
-    status:"approved"
-  });
-
-  await updateDoc(doc(db,"earnings",tutorId),{
-    balance: increment(-amount)
-  });
-
+  await updateDoc(doc(db,"withdrawRequests",id),{status:"approved"});
+  await updateDoc(doc(db,"earnings",tutorId),{balance:increment(-amount)});
   alert("Approved. Pay tutor manually.");
 };
-
-window.rejectWithdraw = async function(id){
-
-  await updateDoc(doc(db,"withdrawRequests",id),{
-    status:"rejected"
-  });
-};
-
+window.rejectWithdraw = async function(id){ await updateDoc(doc(db,"withdrawRequests",id),{status:"rejected"}); };
 </script>
-
 </body>
 </html>
