@@ -860,7 +860,7 @@
                 <small>Share the room code to invite</small>
               </div>
               <!-- FIXED: Added muted to ensure autoplay works in Chrome -->
-              <video id="remote-video" autoplay playsinline muted></video>
+              <video id="remote-video" autoplay playsinline></video>
               <div class="tile-name" id="remote-name" style="display:none">
                 <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
                 <span id="remote-name-text">Peer</span>
@@ -1225,7 +1225,12 @@ async function _joinerCreateAnswer(db, roomId) {
 
 /* ── BUILD RTCPeerConnection ── */
 function _buildPC() {
-  const p = new RTCPeerConnection({ iceServers: ICE_SERVERS, iceCandidatePoolSize: 10 });
+  const p = new RTCPeerConnection({
+  iceServers: ICE_SERVERS,
+  iceCandidatePoolSize: 10,
+  bundlePolicy: "max-bundle",
+  rtcpMuxPolicy: "require"
+});
   p.onconnectionstatechange = () => {
     console.log('RTC connection state:', p.connectionState);
     if (p.connectionState === 'connected') {
@@ -1235,40 +1240,53 @@ function _buildPC() {
       resetRemoteTile(); stopTimer();
     }
   };
-  p.oniceconnectionstatechange = () => {
-    console.log('ICE state:', p.iceConnectionState);
-    if (p.iceConnectionState === 'failed') {
-      p.restartIce();
-    }
-  };
+ if (p.iceConnectionState === "failed") {
+  console.log("ICE FAILED - restarting");
+  p.restartIce();
+}
+
+if (p.iceConnectionState === "disconnected") {
+  console.log("ICE DISCONNECTED - waiting");
+}
   return p;
 }
+p.ontrack = (event) => {
+  console.log("Track received:", event.track.kind);
+
+  let stream = event.streams[0];
+
+  if (!stream) {
+    stream = new MediaStream();
+    stream.addTrack(event.track);
+  }
+
+  renderRemoteStream(stream);
+};
 
 /* ── RENDER REMOTE STREAM ── */
 function renderRemoteStream(stream) {
-  if (!stream || !stream.getTracks().length) return;
-  console.log('Rendering remote stream, tracks:', stream.getTracks().map(t=>t.kind+':'+t.enabled));
+  if (!stream) return;
 
-  const rv  = document.getElementById('remote-video');
-  const wo  = document.getElementById('waiting-overlay');
-  const rn  = document.getElementById('remote-name');
-  const rt  = document.getElementById('remote-tile');
+  console.log("Rendering remote stream:", stream);
 
-  rt.style.display = '';
-  document.getElementById('video-area').className = 'video-area dual';
+  const rv = document.getElementById("remote-video");
+  const wo = document.getElementById("waiting-overlay");
+  const rn = document.getElementById("remote-name");
+  const rt = document.getElementById("remote-tile");
 
-  // Detach completely first (fixes black screen on Chrome)
-  rv.pause();
-  rv.srcObject = null;
-  setTimeout(() => {
-    rv.srcObject = stream;
-    rv.muted = true; // Ensure muted for autoplay policy compliance
-    const playP = rv.play();
-    if (playP) playP.catch(() => { rv.muted = true; rv.play().catch(()=>{}); });
-    if (wo) wo.classList.add('hidden');
-    if (rn) rn.style.display = '';
-    showToast('🟢 Peer connected');
-  }, 50);
+  rt.style.display = "";
+  document.getElementById("video-area").className = "video-area dual";
+
+  rv.srcObject = stream;
+
+  rv.onloadedmetadata = () => {
+    rv.play().catch(() => {});
+  };
+
+  if (wo) wo.classList.add("hidden");
+  if (rn) rn.style.display = "";
+
+  showToast("🟢 Peer connected");
 }
 
 /* ── MIC / CAM ── */
