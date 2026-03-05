@@ -286,7 +286,7 @@
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .lp-header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+        .lp-header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
     .lp-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 6px; border-radius: 6px; line-height: 1; }
     .lp-close:hover { color: var(--text); background: rgba(255,255,255,.06); }
 
@@ -560,7 +560,7 @@
     }
     .invite-card-cp.sent { align-self: flex-end; }
     .invite-card-cp .ic-title { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; color: var(--accent); }
-    .invite-card-cp .ic-body  { font-size: 12px; color: var(--sub); }
+        .invite-card-cp .ic-body  { font-size: 12px; color: var(--sub); }
     .invite-card-cp .ic-code  { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,0,0,.3); border: 1px solid var(--border); padding: 5px 8px; border-radius: 6px; color: var(--text); word-break: break-all; }
     .invite-card-cp .ic-join  { height: 32px; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .invite-card-cp .ic-join:hover { opacity: .88; }
@@ -859,7 +859,8 @@
                 <p>Waiting for peer…</p>
                 <small>Share the room code to invite</small>
               </div>
-              <video id="remote-video" autoplay playsinline></video>
+              <!-- FIXED: Added muted to ensure autoplay works in Chrome -->
+              <video id="remote-video" autoplay playsinline muted></video>
               <div class="tile-name" id="remote-name" style="display:none">
                 <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
                 <span id="remote-name-text">Peer</span>
@@ -1261,7 +1262,7 @@ function renderRemoteStream(stream) {
   rv.srcObject = null;
   setTimeout(() => {
     rv.srcObject = stream;
-    rv.muted = false;
+    rv.muted = true; // Ensure muted for autoplay policy compliance
     const playP = rv.play();
     if (playP) playP.catch(() => { rv.muted = true; rv.play().catch(()=>{}); });
     if (wo) wo.classList.add('hidden');
