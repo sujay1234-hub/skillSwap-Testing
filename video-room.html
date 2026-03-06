@@ -1012,7 +1012,7 @@ body { padding-bottom: 0 !important; }
                 <small>Share the room code to invite</small>
               </div>
               <!-- FIXED: Added muted to ensure autoplay works in Chrome -->
-              <video id="remote-video" autoplay playsinline></video>
+              <video id="remote-video" autoplay playsinline muted></video>
               <div class="tile-name" id="remote-name" style="display:none">
                 <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
                 <span id="remote-name-text">Peer</span>
@@ -1402,16 +1402,12 @@ if (p.iceConnectionState === "disconnected") {
 }
   return p;
 }
-p.ontrack = (event) => {
-  console.log("Track received:", event.track.kind);
-
-  let stream = event.streams[0];
-
-  if (!stream) {
-    stream = new MediaStream();
-    stream.addTrack(event.track);
-  }
-
+pc.ontrack = (e) => {
+  const stream = (e.streams && e.streams[0]) ? e.streams[0] : (() => {
+    const s = new MediaStream();
+    s.addTrack(e.track);
+    return s;
+  })();
   renderRemoteStream(stream);
 };
 
@@ -1439,6 +1435,8 @@ function renderRemoteStream(stream) {
   if (rn) rn.style.display = "";
 
   showToast("🟢 Peer connected");
+  rv.muted = false;
+rv.play().catch(()=>{});
 }
 
 /* ── MIC / CAM ── */
@@ -1575,13 +1573,21 @@ function startTimer() {
 function stopTimer() { clearInterval(timerInt); }
 
 /* ── TOAST ── */
-let _tt;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 3000);
-}
+let _tt = null;
 
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  if (!t) return;
+
+  t.textContent = msg;
+  t.classList.add("show");
+
+  if (_tt) clearTimeout(_tt);
+
+  _tt = setTimeout(() => {
+    t.classList.remove("show");
+  }, 2500);
+}
 /* ── stubs overridden by Firebase module ── */
 window.sendChatMsg    = () => showToast('Log in to send messages.');
 window.sendChatMsgMob = () => showToast('Log in to send messages.');
