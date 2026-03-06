@@ -1012,7 +1012,7 @@ body { padding-bottom: 0 !important; }
                 <small>Share the room code to invite</small>
               </div>
               <!-- FIXED: Added muted to ensure autoplay works in Chrome -->
-              <video id="remote-video" autoplay playsinline muted></video>
+              <video id="remote-video" autoplay playsinline></video>
               <div class="tile-name" id="remote-name" style="display:none">
                 <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
                 <span id="remote-name-text">Peer</span>
@@ -1214,7 +1214,10 @@ function stopPreview() {
 /* ── GET MEDIA ── */
 async function getMedia() {
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio: true });
+    localStream = await navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+});
     document.getElementById('local-video').srcObject = localStream;
     return true;
   } catch(err) {
@@ -1403,7 +1406,10 @@ if (p.iceConnectionState === "disconnected") {
 }
   return p;
 }
-
+p.ontrack = (event) => {
+  const stream = event.streams[0];
+  renderRemoteStream(stream);
+};
 
 /* ── RENDER REMOTE STREAM ── */
 function renderRemoteStream(stream) {
@@ -1430,7 +1436,13 @@ function renderRemoteStream(stream) {
 
   showToast("🟢 Peer connected");
   rv.muted = false;
-rv.play().catch(()=>{});
+rv.muted = false;
+rv.playsInline = true;
+rv.autoplay = true;
+
+rv.play().catch(() => {
+  console.log("User interaction required for mobile autoplay");
+});
 }
 
 /* ── MIC / CAM ── */
