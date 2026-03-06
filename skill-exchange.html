@@ -560,6 +560,148 @@
       .sheet { border-radius: 22px; max-width: 520px; }
     }
   </style>
+<style id="ss-universal-responsive">
+/* ══════════════════════════════════════════
+   UNIVERSAL RESPONSIVE FIXES — SkillSwap
+   Applied to all pages for consistent UX
+══════════════════════════════════════════ */
+
+/* Safe area support */
+:root {
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sat: env(safe-area-inset-top, 0px);
+}
+
+/* Remove legacy floating back buttons */
+.mobile-back-btn { display: none !important; }
+
+/* ── Smooth scrolling & selection ── */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+/* ── Universal input fixes for mobile ── */
+input, textarea, select {
+  font-size: 16px !important; /* Prevents iOS zoom */
+  -webkit-appearance: none;
+  border-radius: 10px;
+}
+
+/* ── Focus ring ── */
+input:focus, textarea:focus, select:focus, button:focus-visible {
+  outline: none;
+}
+
+/* ── Prevent horizontal overflow ── */
+body { overflow-x: hidden; }
+img, video { max-width: 100%; }
+
+/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
+.ss-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(9,9,11,0.97);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 10px 4px;
+  padding-bottom: calc(10px + var(--sab));
+  z-index: 500;
+}
+.ss-mobile-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.ss-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  color: #71717a;
+  font-size: 0.62rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: color 0.2s, background 0.2s;
+  text-decoration: none;
+  min-width: 52px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.ss-nav-item i { font-size: 1.2rem; }
+.ss-nav-item.active { color: #6366f1; }
+.ss-nav-item.active i { color: #6366f1; }
+
+/* ── Universal Mobile Header ── */
+.ss-mobile-header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  padding-top: calc(14px + var(--sat));
+  background: rgba(9,9,11,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.ss-mob-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex; align-items: center; gap: 8px;
+}
+.ss-mob-btn {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.04);
+  color: #a1a1aa;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem;
+  text-decoration: none; transition: background 0.2s;
+}
+.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+
+@media (max-width: 768px) {
+  .ss-mobile-nav { display: block; }
+  .ss-mobile-header { display: flex; }
+
+  /* Extra bottom padding so content not hidden behind nav */
+  body { padding-bottom: calc(70px + var(--sab)) !important; }
+
+  /* Hide desktop sidebars on mobile */
+  .sidebar { transform: translateX(-100%) !important; }
+  .sidebar.open { transform: translateX(0) !important; }
+  .main { margin-left: 0 !important; }
+
+  /* Bigger tap targets */
+  button, .btn-primary, .btn-secondary, a[role=button] {
+    min-height: 44px;
+  }
+
+  /* Container full padding on mobile */
+  .container { padding-left: 16px !important; padding-right: 16px !important; }
+
+  /* Card padding on mobile */
+  .card, .panel, .settings-card { padding: 18px 16px !important; }
+}
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr !important; }
+  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
+  h1 { font-size: 1.5rem !important; }
+}
+</style>
 </head>
 <body>
 

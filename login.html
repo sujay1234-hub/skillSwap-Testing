@@ -1,463 +1,985 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SkillSwap</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.4);
-            --accent: #a855f7;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 30%);
-        }
-
-        .login-wrapper {
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 48px 40px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .brand-logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 1.8rem;
-            box-shadow: 0 10px 25px var(--primary-glow);
-        }
-
-        .brand h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .brand p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 16px 16px 16px 48px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            color: white;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-
-        .input-wrapper input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .input-wrapper input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 10px 20px var(--primary-glow);
-            margin-bottom: 12px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px var(--primary-glow);
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.03);
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary img {
-            width: 20px;
-            height: 20px;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 28px 0;
-            gap: 16px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .divider span {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 28px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .footer-text a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .footer-text a:hover {
-            text-decoration: underline;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #18181b;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 36px 24px;
-            }
-            .brand h1 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
-
-<style id="mob-extra">
-@media(max-width:480px){
-.login-card{padding:30px 18px !important;border-radius:18px;}
-.brand h1{font-size:1.4rem;}
-.input-wrapper input{font-size:16px !important;}
-.btn-primary,.btn-secondary{padding:14px;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="SkillSwap — The student-powered marketplace where you trade skills, not money.">
+<meta name="theme-color" content="#050507">
+<title>SkillSwap — Trade Skills, Not Money.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --bg:#050507;--bg2:#0c0c10;--bg3:#121218;--card:rgba(255,255,255,0.035);--card-h:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.18);
+  --p:#7c6af7;--p2:#a78bfa;--p3:rgba(124,106,247,0.18);
+  --a:#f472b6;--a2:#fb7185;
+  --cyan:#22d3ee;--green:#34d399;--amber:#fbbf24;--red:#f87171;
+  --txt:#f4f4f5;--muted:#71717a;--muted2:#a1a1aa;
+  --glow:rgba(124,106,247,0.35);
+  --fh:'Cabinet Grotesk',sans-serif;
+  --fb:'Instrument Sans',sans-serif;
 }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--p) transparent}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--p);border-radius:99px}
+body{font-family:var(--fb);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;line-height:1.6}
+.bg-mesh{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(124,106,247,0.2),transparent),radial-gradient(ellipse 70% 50% at 90% 70%,rgba(244,114,182,0.12),transparent),radial-gradient(ellipse 60% 40% at 10% 80%,rgba(34,211,238,0.08),transparent),var(--bg)}
+.orb{position:fixed;border-radius:50%;filter:blur(130px);z-index:-1;animation:orbF 24s ease-in-out infinite}
+.o1{width:700px;height:700px;top:-300px;left:-250px;background:var(--p);opacity:.1}
+.o2{width:600px;height:600px;bottom:-250px;right:-200px;background:var(--a);opacity:.08;animation-delay:-12s}
+.o3{width:400px;height:400px;top:40%;left:40%;background:var(--cyan);opacity:.05;animation-delay:-6s}
+@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,50px) scale(1.06)}}
+.grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
+.grad{background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.74rem;font-weight:600;letter-spacing:.04em}
+.bp{background:var(--p3);border:1px solid rgba(124,106,247,.25);color:var(--p2)}
+.bg-g{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.ba{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.br{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:13px 4%;background:rgba(5,5,7,.85);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);font-family:var(--fh);font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 4px 14px var(--glow)}
+.nav-c{display:flex;gap:2px;list-style:none}
+.nav-c a{text-decoration:none;color:var(--muted);font-size:.85rem;font-weight:500;padding:8px 14px;border-radius:12px;transition:all .2s}
+.nav-c a:hover{color:var(--txt);background:var(--card)}
+.nav-r{display:flex;align-items:center;gap:8px}
+.ibtn{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:all .2s;font-size:.9rem;position:relative;font-family:var(--fb)}
+.ibtn:hover{color:var(--txt);border-color:var(--border-h)}
+.ibtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg)}
+.btn-ghost{padding:8px 18px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--txt);text-decoration:none;font-weight:600;font-size:.84rem;transition:all .2s;cursor:pointer;font-family:var(--fb)}
+.btn-ghost:hover{background:var(--card);border-color:var(--border-h)}
+.btn-cta{padding:9px 20px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:var(--fb);transition:all .3s;box-shadow:0 4px 16px var(--glow)}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--glow)}
+.upill{display:none;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:4px 12px 4px 4px;border-radius:99px;cursor:pointer;transition:all .25s}
+.upill:hover{border-color:var(--p);background:rgba(124,106,247,.08);box-shadow:0 0 0 3px rgba(124,106,247,.12)}
+.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(124,106,247,.4)}
+.upill:hover{border-color:var(--border-h)}
+.upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p);display:none}
+.upill span{font-size:.82rem;font-weight:600;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbtn{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
+
+/* MOBILE MENU */
+.mmenu{display:none;position:fixed;inset:0;background:rgba(5,5,7,.97);backdrop-filter:blur(20px);z-index:1100;flex-direction:column;justify-content:center;align-items:center;gap:6px;opacity:0;pointer-events:none;transition:opacity .3s}
+.mmenu.open{opacity:1;pointer-events:all}
+.mclose{position:absolute;top:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 12px;cursor:pointer;font-size:1rem;transition:.2s;font-family:var(--fb)}
+.mclose:hover{background:var(--red);border-color:var(--red)}
+.mmenu a{color:var(--txt);font-family:var(--fh);font-size:1.6rem;font-weight:800;text-decoration:none;padding:10px 28px;border-radius:18px;transition:all .2s;letter-spacing:-.5px}
+.mmenu a:hover{background:var(--card);color:var(--p2)}
+.mauth{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+
+/* HERO */
+.hero{text-align:center;padding:96px 5% 80px;max-width:1200px;margin:0 auto}
+.hero h1{font-family:var(--fh);font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;letter-spacing:-2px;margin:20px 0 22px;animation:fadeUp .6s .1s ease both}
+.hero h1 em{font-style:normal;position:relative}
+.hero h1 em::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;animation:slideR .8s .5s ease both;transform-origin:left}
+@keyframes slideR{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero-ey{animation:fadeUp .6s ease both}
+.hero-sub{font-size:1.12rem;color:var(--muted2);max-width:600px;margin:0 auto 44px;line-height:1.8;animation:fadeUp .6s .2s ease both}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
+.bh{padding:15px 32px;border-radius:18px;font-size:1rem;font-weight:700;font-family:var(--fh);text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .3s;letter-spacing:-.2px}
+.bh-fill{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;box-shadow:0 8px 32px -4px var(--glow)}
+.bh-fill:hover{transform:translateY(-3px);box-shadow:0 18px 44px -4px var(--glow)}
+.bh-line{background:var(--card);border:1px solid var(--border);color:var(--txt)}
+.bh-line:hover{background:var(--card-h);border-color:var(--border-h);transform:translateY(-2px)}
+.hstats{display:flex;justify-content:center;gap:52px;flex-wrap:wrap;margin-top:64px;animation:fadeUp .6s .4s ease both}
+.snum{font-family:var(--fh);font-size:2.2rem;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--p2),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.slbl{font-size:.8rem;color:var(--muted);margin-top:2px;font-weight:500}
+
+/* SECTION */
+.sec{padding:80px 5% 100px;max-width:1440px;margin:0 auto}
+.stag{display:block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p2);margin-bottom:10px}
+.stitle{font-family:var(--fh);font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-1px;margin-bottom:12px}
+.ssub{color:var(--muted2);font-size:1.02rem;max-width:520px;line-height:1.75}
+.shead{text-align:center;margin-bottom:60px}
+.shead .ssub{margin:0 auto}
+
+/* FEATURE CARDS */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:26px;padding:30px 26px;cursor:pointer;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.19,1,.22,1),box-shadow .35s,border-color .35s,background .35s}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--a));transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.19,1,.22,1)}
+.fc:hover{transform:translateY(-6px);border-color:var(--border-h);background:var(--card-h);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.fc:hover::before{transform:scaleX(1)}
+.fi{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:18px;transition:transform .3s}
+.fc:hover .fi{transform:scale(1.1) rotate(8deg)}
+.fc h3{font-family:var(--fh);font-size:1.1rem;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+.fc>p{color:var(--muted2);font-size:.9rem;line-height:1.7}
+.farr{position:absolute;top:22px;right:22px;color:var(--muted);font-size:.8rem;transition:all .3s}
+.fc:hover .farr{color:var(--p2);transform:translate(2px,-2px)}
+.fcta{display:inline-flex;align-items:center;gap:7px;margin-top:16px;padding:9px 14px;border-radius:12px;background:rgba(124,106,247,.1);color:var(--p2);text-decoration:none;font-size:.84rem;font-weight:600;border:1px solid rgba(124,106,247,.2);transition:all .25s}
+.fcta:hover{background:var(--p);color:#fff;border-color:var(--p);transform:translateX(3px)}
+
+/* FAB */
+.cfab{position:fixed;bottom:24px;right:24px;z-index:700;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.15rem;box-shadow:0 8px 28px var(--glow);transition:transform .3s,box-shadow .3s}
+.cfab:hover{transform:translateY(-4px) scale(1.08);box-shadow:0 16px 44px var(--glow)}
+.cfab::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--p);opacity:.3;animation:rip 2.5s ease-out infinite}
+@keyframes rip{0%{transform:scale(1);opacity:.3}100%{transform:scale(1.7);opacity:0}}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0,0,0,.2)}
+.fti{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:40px}
+.fbrand{max-width:260px}
+.fbrand .logo{margin-bottom:14px;display:inline-flex}
+.fbrand p{color:var(--muted);font-size:.86rem;line-height:1.7}
+.fcol h5{font-family:var(--fh);font-weight:800;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.fcol a{display:block;color:var(--muted2);text-decoration:none;font-size:.88rem;margin-bottom:10px;transition:color .2s}
+.fcol a:hover{color:var(--txt)}
+.ftbot{max-width:1200px;margin:36px auto 0;padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ftbot p{color:var(--muted);font-size:.82rem}
+.fsoc{display:flex;gap:10px}
+.fsoc a{width:32px;height:32px;border-radius:9px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.82rem;text-decoration:none;transition:all .2s}
+.fsoc a:hover{color:var(--p2);border-color:var(--p)}
+
+/* ════ SETTINGS PANEL ════ */
+.sbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1050}
+.sbg.open{display:block}
+.spanel{position:fixed;top:0;right:-100%;bottom:0;width:min(500px,100vw);z-index:1060;background:var(--bg2);border-left:1px solid var(--border);overflow:hidden;transition:right .45s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
+.spanel.open{right:0}
+.sph{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.sphl{display:flex;align-items:center;gap:12px}
+.sphic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff}
+.sph h3{font-family:var(--fh);font-size:1.1rem;font-weight:900;letter-spacing:-.3px}
+.sph span{font-size:.78rem;color:var(--muted)}
+.sclose{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:.2s;font-size:.9rem;font-family:var(--fb)}
+.sclose:hover{color:var(--txt);border-color:var(--border-h)}
+.stabs{display:flex;padding:12px 24px 0;border-bottom:1px solid var(--border);gap:4px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.stabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:.83rem;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;border-radius:12px 12px 0 0}
+.stab:hover{color:var(--txt);background:var(--card)}
+.stab.active{color:var(--p2);border-bottom-color:var(--p);background:none}
+.sbody{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:6px}
+.ssec{background:var(--bg3);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:4px}
+.sst{padding:14px 20px 11px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--p2);border-bottom:1px solid var(--border)}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .2s}
+.sr:last-child{border-bottom:none}
+.sr:hover{background:rgba(255,255,255,.02)}
+.srl{flex:1;min-width:0}
+.slb{font-size:.89rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sde{font-size:.77rem;color:var(--muted);margin-top:2px;line-height:1.5}
+.sval{font-size:.82rem;color:var(--p2);font-weight:600;white-space:nowrap}
+.tog{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog .sl{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.08);border-radius:99px;transition:.3s;border:1px solid var(--border)}
+.tog .sl::before{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;bottom:3px;left:3px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.tog input:checked+.sl{background:var(--p);border-color:var(--p)}
+.tog input:checked+.sl::before{transform:translateX(20px)}
+.ssel{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:8px 32px 8px 12px;font-family:var(--fb);font-size:.84rem;cursor:pointer;transition:.2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.ssel:hover{border-color:var(--border-h)}
+.ssel option{background:#1a1a22}
+.sinp{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:9px 13px;font-family:var(--fb);font-size:.87rem;width:100%;outline:none;transition:border-color .2s}
+.sinp:focus{border-color:var(--p)}
+.sinp::placeholder{color:var(--muted)}
+.stxt{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:10px 13px;font-family:var(--fb);font-size:.87rem;width:100%;outline:none;transition:border-color .2s;resize:vertical;min-height:80px;line-height:1.6}
+.stxt:focus{border-color:var(--p)}
+.savarea{padding:18px 20px;display:flex;align-items:center;gap:16px}
+.sav{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:1.5rem;font-weight:900;color:#fff;border:3px solid var(--p);flex-shrink:0;overflow:hidden}
+.savbtns{display:flex;flex-direction:column;gap:6px}
+.bsm{background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:12px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);display:inline-flex;align-items:center;gap:6px}
+.bsm:hover{color:var(--txt);border-color:var(--border-h)}
+.swrow{display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .25s}
+.sw.active{border-color:#fff;transform:scale(1.18)}
+.sw:hover{transform:scale(1.12)}
+.sktags{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
+.skt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--p3);border:1px solid rgba(124,106,247,.2);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--p2);cursor:pointer;transition:all .2s}
+.skt:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.addsk{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--card);border:1px dashed var(--border-h);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--fb)}
+.addsk:hover{color:var(--p2);border-color:var(--p)}
+.xpwrap{padding:16px 20px}
+.xpinfo{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.xplv{font-family:var(--fh);font-weight:800;font-size:.95rem}
+.xppt{font-size:.8rem;color:var(--muted)}
+.xptrack{height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.xpmil{display:flex;justify-content:space-between;margin-top:8px}
+.xpmil span{font-size:.7rem;color:var(--muted)}
+.ssgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.sscell{background:var(--bg3);padding:16px 20px}
+.sscell .val{font-family:var(--fh);font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,var(--p2),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sscell .lbl{font-size:.77rem;color:var(--muted);margin-top:2px}
+.actlist{padding:8px 0}
+.acti{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);transition:background .2s;cursor:pointer}
+.acti:last-child{border-bottom:none}
+.acti:hover{background:rgba(255,255,255,.02)}
+.actic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.actb p{font-size:.84rem;color:var(--muted2);line-height:1.5}
+.actb p b{color:var(--txt);font-weight:600}
+.actt{font-size:.74rem;color:var(--muted);margin-top:3px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
+.ccard{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;transition:all .2s;cursor:pointer}
+.ccard:hover{border-color:var(--border-h);background:var(--card)}
+.ccard .icon{font-size:1.2rem}
+.ccard .name{font-size:.84rem;font-weight:600}
+.ccard .status{font-size:.74rem}
+.conn{color:var(--green)}
+.noconn{color:var(--muted)}
+.dagrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:16px 20px}
+.dbtn{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 4px;text-align:center;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.dbtn.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.dbtn:hover{border-color:var(--border-h);color:var(--txt)}
+.dinit{display:block;font-size:.7rem;margin-bottom:4px;font-weight:800;letter-spacing:.05em}
+.dcirc{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:.64rem;transition:background .2s}
+.dbtn.on .dcirc{background:var(--p);color:#fff}
+.starrow{display:flex;gap:6px;padding:16px 20px;align-items:center}
+.star{font-size:1.4rem;cursor:pointer;transition:transform .15s,color .15s;color:var(--muted)}
+.star:hover,.star.lit{color:var(--amber);transform:scale(1.15)}
+.tchips{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
+.tchip{padding:7px 14px;border-radius:99px;background:var(--card);border:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s;font-family:var(--fb)}
+.tchip.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.tchip:hover{border-color:var(--border-h);color:var(--txt)}
+.dzwrap{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:18px;overflow:hidden;margin-bottom:20px}
+.dztitle{padding:14px 20px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);border-bottom:1px solid rgba(248,113,113,.12)}
+.dzrow{padding:14px 20px;border-bottom:1px solid rgba(248,113,113,.08);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dzrow:last-child{border-bottom:none}
+.dzinfo .slb{font-size:.88rem}
+.dzinfo .sde{font-size:.77rem;color:var(--muted)}
+.bdang{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red);border-radius:12px;padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);white-space:nowrap}
+.bdang:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.ssavebar{padding:16px 24px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.bsave{width:100%;padding:13px;border-radius:18px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;font-family:var(--fh);font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s;box-shadow:0 4px 18px var(--glow);letter-spacing:-.2px}
+.bsave:hover{transform:translateY(-2px);box-shadow:0 10px 32px var(--glow)}
+
+/* NOTIFICATION PANEL */
+.npanel{position:fixed;top:62px;right:18px;width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;z-index:850;box-shadow:0 24px 64px rgba(0,0,0,.55);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-10px) scale(.97);transition:all .25s cubic-bezier(.22,1,.36,1)}
+.npanel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.nph{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+.nph h4{font-family:var(--fh);font-weight:900;font-size:.95rem;letter-spacing:-.2px}
+.npacts{display:flex;gap:8px}
+.npbtn{background:none;border:none;color:var(--muted);font-size:.76rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:color .2s;padding:2px 6px}
+.npbtn:hover{color:var(--p2)}
+.nlist{max-height:340px;overflow-y:auto}
+.ni{display:flex;gap:11px;padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;position:relative}
+.ni:last-child{border-bottom:none}
+.ni:hover{background:var(--card)}
+.ni.unread::before{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:5px;height:5px;background:var(--p);border-radius:50%}
+.nic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.nib{flex:1}
+.nib p{font-size:.83rem;color:var(--muted2);line-height:1.5}
+.nib p b{color:var(--txt);font-weight:600}
+.ntime{font-size:.73rem;color:var(--muted);margin-top:3px}
+.npft{padding:12px 18px;border-top:1px solid var(--border);text-align:center}
+.npft a{color:var(--p2);font-size:.82rem;font-weight:600;text-decoration:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success .tic{color:var(--green)}
+.toast.info .tic{color:var(--p2)}
+.toast.error .tic{color:var(--red)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .nav-c,.nav-desk-only{display:none!important}
+  .mbtn{display:flex!important}
+  .mmenu{display:flex!important}
+  .mob-ibtn{padding:7px 9px;font-size:.82rem;border-radius:10px}
+  .mob-icons{display:none;align-items:center;gap:6px}
+  .hero{padding:70px 5% 60px}
+  .hero h1{letter-spacing:-1px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .bh{justify-content:center}
+  .hstats{gap:28px}
+  .snum{font-size:1.75rem}
+  .fgrid{grid-template-columns:1fr}
+  .fc{padding:24px 20px}
+  .fti{flex-direction:column;gap:28px}
+  .fcol{display:none}
+  .ftbot{flex-direction:column;align-items:center;text-align:center;gap:16px}
+  .npanel{right:8px;left:8px;width:auto;top:68px}
+  .cgrid{grid-template-columns:1fr}
+  .ssgrid{grid-template-columns:1fr 1fr}
+  .dagrid{gap:4px}
+}
+@media(min-width:769px) and (max-width:1100px){.fgrid{grid-template-columns:repeat(2,1fr)}}
+</style>
+<style id="ss-universal-responsive">
+/* ══════════════════════════════════════════
+   UNIVERSAL RESPONSIVE FIXES — SkillSwap
+   Applied to all pages for consistent UX
+══════════════════════════════════════════ */
+
+/* Safe area support */
+:root {
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sat: env(safe-area-inset-top, 0px);
+}
+
+/* Remove legacy floating back buttons */
+.mobile-back-btn { display: none !important; }
+
+/* ── Smooth scrolling & selection ── */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+/* ── Universal input fixes for mobile ── */
+input, textarea, select {
+  font-size: 16px !important; /* Prevents iOS zoom */
+  -webkit-appearance: none;
+  border-radius: 10px;
+}
+
+/* ── Focus ring ── */
+input:focus, textarea:focus, select:focus, button:focus-visible {
+  outline: none;
+}
+
+/* ── Prevent horizontal overflow ── */
+body { overflow-x: hidden; }
+img, video { max-width: 100%; }
+
+/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
+.ss-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(9,9,11,0.97);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 10px 4px;
+  padding-bottom: calc(10px + var(--sab));
+  z-index: 500;
+}
+.ss-mobile-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.ss-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  color: #71717a;
+  font-size: 0.62rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: color 0.2s, background 0.2s;
+  text-decoration: none;
+  min-width: 52px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.ss-nav-item i { font-size: 1.2rem; }
+.ss-nav-item.active { color: #6366f1; }
+.ss-nav-item.active i { color: #6366f1; }
+
+/* ── Universal Mobile Header ── */
+.ss-mobile-header {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  padding-top: calc(14px + var(--sat));
+  background: rgba(9,9,11,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.ss-mob-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex; align-items: center; gap: 8px;
+}
+.ss-mob-btn {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.04);
+  color: #a1a1aa;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem;
+  text-decoration: none; transition: background 0.2s;
+}
+.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+
+@media (max-width: 768px) {
+  .ss-mobile-nav { display: block; }
+  .ss-mobile-header { display: flex; }
+
+  /* Extra bottom padding so content not hidden behind nav */
+  body { padding-bottom: calc(70px + var(--sab)) !important; }
+
+  /* Hide desktop sidebars on mobile */
+  .sidebar { transform: translateX(-100%) !important; }
+  .sidebar.open { transform: translateX(0) !important; }
+  .main { margin-left: 0 !important; }
+
+  /* Bigger tap targets */
+  button, .btn-primary, .btn-secondary, a[role=button] {
+    min-height: 44px;
+  }
+
+  /* Container full padding on mobile */
+  .container { padding-left: 16px !important; padding-right: 16px !important; }
+
+  /* Card padding on mobile */
+  .card, .panel, .settings-card { padding: 18px 16px !important; }
+}
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr !important; }
+  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
+  h1 { font-size: 1.5rem !important; }
+}
+</style>
+<style id="ss-per-page-responsive">
+/* Landing page mobile */
+@media (max-width: 768px) {
+  nav { padding: 12px 16px !important; }
+  .nav-c { display: none !important; }
+  .hero-title { font-size: 2.2rem !important; line-height: 1.15 !important; }
+  .hero-sub { font-size: 0.95rem !important; }
+  .hero-actions { flex-direction: column !important; gap: 10px !important; }
+  .hero-actions a, .hero-actions button { width: 100% !important; text-align: center; justify-content: center !important; }
+  .features-grid, .how-grid, .stats-grid { grid-template-columns: 1fr !important; }
+  .testimonials-grid { grid-template-columns: 1fr !important; }
+  section { padding: 40px 16px !important; }
+  .hero { padding: 60px 16px 40px !important; }
+}
+body { padding-bottom: 0 !important; }
 </style>
 </head>
 <body>
-<a class="mobile-back-btn" href="index.html" title="Back">&#8592;</a>
+<div class="bg-mesh"></div>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="grid-bg"></div>
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <!-- Brand Header -->
-        <div class="brand">
-            <div class="brand-logo">
-                <i class="fa-solid fa-bolt" style="color: white;"></i>
-            </div>
-            <h1>Welcome Back</h1>
-            <p>Sign in to continue to SkillSwap</p>
-        </div>
+<a href="chat.html" class="cfab" title="Chat"><i class="fa-solid fa-comments"></i></a>
 
-        <!-- Google Login -->
-        <button class="btn-secondary" onclick="googleLogin()">
-            <svg width="20" height="20" viewBox="0 0 24 24">
-                <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Continue with Google
-        </button>
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check tic" id="tic"></i>
+  <span id="tmsg">Saved!</span>
+</div>
 
-        <!-- Divider -->
-        <div class="divider">
-            <span>or continue with email</span>
-        </div>
+<!-- MOBILE MENU -->
+<div class="mmenu" id="mmenu">
+  <button class="mclose" onclick="closeMob()"><i class="fa-solid fa-xmark"></i></button>
+  <a href="explore.html" onclick="closeMob()">Explore</a>
+  <a href="leaderboard.html" onclick="closeMob()">Leaderboard</a>
+  <a href="dashboard.html" onclick="closeMob()">Dashboard</a>
+  <a href="trades.html" onclick="closeMob()">My Trades</a>
+  <a href="trade-requests.html" onclick="closeMob()">Requests</a>
+  <a href="about.html" onclick="closeMob()">About</a>
+  <div class="mauth">
+    <a href="login.html" class="btn-ghost" onclick="closeMob()">Log In</a>
+    <a href="login.html" class="btn-cta" onclick="closeMob()">Sign Up Free</a>
+  </div>
+</div>
 
-        <!-- Email/Password Form -->
-        <form onsubmit="event.preventDefault(); login();">
-            <div class="form-group">
-                <label>Email Address</label>
-                <div class="input-wrapper">
-                    <i class="fa-regular fa-envelope"></i>
-                    <input id="email" type="email" placeholder="Enter your email" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Password</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock"></i>
-                    <input id="password" type="password" placeholder="Enter your password" required>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-primary">
-                <i class="fa-solid fa-arrow-right"></i> Sign In
-            </button>
-        </form>
-
-        <div class="footer-text">
-            Don't have an account? <a href="#" onclick="showSignupToast()">Sign up</a>
-        </div>
+<!-- NOTIFICATION PANEL -->
+<div class="npanel" id="npanel">
+  <div class="nph">
+    <h4>Notifications <span class="pill br" style="font-size:.68rem;padding:3px 9px" id="ucnt">2 new</span></h4>
+    <div class="npacts">
+      <button class="npbtn" onclick="markAllRead()">Mark all read</button>
+      <button class="npbtn" onclick="toggleNotif()"><i class="fa-solid fa-xmark"></i></button>
     </div>
+  </div>
+  <div class="nlist">
+    <div class="ni unread">
+      <div class="nic" style="background:rgba(124,106,247,.14);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div>
+      <div class="nib"><p><b>Arjun Singh</b> accepted your Python ↔ UI/UX swap request.</p><div class="ntime">2 min ago</div></div>
+    </div>
+    <div class="ni unread">
+      <div class="nic" style="background:rgba(52,211,153,.14);color:var(--green)"><i class="fa-solid fa-star"></i></div>
+      <div class="nib"><p><b>Priya Mehta</b> left you a ⭐⭐⭐⭐⭐ review for your React session.</p><div class="ntime">1 hour ago</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(251,191,36,.12);color:var(--amber)"><i class="fa-solid fa-trophy"></i></div>
+      <div class="nib"><p>You reached <b>Level 6 — Advanced</b>! New badge unlocked 🎖️</p><div class="ntime">Yesterday</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(34,211,238,.12);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+      <div class="nib"><p><b>₹450 credited</b> to your wallet from Rohan's session payment.</p><div class="ntime">2 days ago</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(248,113,113,.12);color:var(--red)"><i class="fa-solid fa-clock"></i></div>
+      <div class="nib"><p>Session with <b>Neha Sharma</b> starts in 30 minutes!</p><div class="ntime">3 days ago</div></div>
+    </div>
+  </div>
+  <div class="npft"><a href="notifications.html">View all notifications →</a></div>
 </div>
 
-<!-- Toast for demo -->
-<div id="toast" class="toast">
-    <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i>
-    <span id="toastMsg">Message</span>
+<!-- SETTINGS BACKDROP -->
+<div class="sbg" id="sbg" onclick="closeSettings()"></div>
+
+<!-- SETTINGS PANEL -->
+<div class="spanel" id="spanel">
+  <div class="sph">
+    <div class="sphl">
+      <div class="sphic"><i class="fa-solid fa-sliders"></i></div>
+      <div><h3>Account Settings</h3><span>Manage profile &amp; preferences</span></div>
+    </div>
+    <button class="sclose" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="stabs" id="stabs">
+    <button class="stab active" onclick="stab(0,this)"><i class="fa-solid fa-user" style="margin-right:5px"></i>Profile</button>
+    <button class="stab" onclick="stab(1,this)"><i class="fa-solid fa-chart-line" style="margin-right:5px"></i>Stats</button>
+    <button class="stab" onclick="stab(2,this)"><i class="fa-solid fa-bell" style="margin-right:5px"></i>Alerts</button>
+    <button class="stab" onclick="stab(3,this)"><i class="fa-solid fa-palette" style="margin-right:5px"></i>Look</button>
+    <button class="stab" onclick="stab(4,this)"><i class="fa-solid fa-shield-halved" style="margin-right:5px"></i>Privacy</button>
+    <button class="stab" onclick="stab(5,this)"><i class="fa-solid fa-calendar" style="margin-right:5px"></i>Schedule</button>
+    <button class="stab" onclick="stab(6,this)"><i class="fa-solid fa-link" style="margin-right:5px"></i>Connect</button>
+    <button class="stab" onclick="stab(7,this)"><i class="fa-solid fa-circle-exclamation" style="margin-right:5px;color:var(--red)"></i>Account</button>
+  </div>
+  <div class="sbody">
+
+    <!-- TAB 0: PROFILE -->
+    <div class="stc" id="t0">
+      <div class="ssec">
+        <div class="sst">Profile Photo</div>
+        <div class="savarea">
+          <div class="sav" id="sav">S</div>
+          <div class="savbtns">
+            <button class="bsm"><i class="fa-solid fa-upload"></i> Upload Photo</button>
+            <button class="bsm" onclick="rmAv()"><i class="fa-solid fa-trash"></i> Remove</button>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="pill bp" style="margin-bottom:6px">Level 6</div>
+            <div style="font-size:.75rem;color:var(--muted)">Advanced 🟣</div>
+          </div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Basic Information</div>
+        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:11px">
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Display Name</div><input id="sinp-name" class="sinp" type="text" placeholder="Your full name"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Username</div><input id="sinp-username" class="sinp" type="text" placeholder="@username"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Email Address</div><input id="sinp-email" class="sinp" type="email" placeholder="you@example.com"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Phone</div><input id="sinp-phone" class="sinp" type="tel" placeholder="+91 98765 43210"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Bio</div><textarea id="sinp-bio" class="stxt" placeholder="Tell others what you teach and what you want to learn..."></textarea></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">College / University</div><input class="sinp" type="text" placeholder="Your institution"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">City</div><input class="sinp" type="text" placeholder="Mumbai"></div>
+            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">State</div><input class="sinp" type="text" placeholder="Maharashtra"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Skills I Teach</div>
+        <div class="sktags">
+          <span class="skt">React <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt">Python <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt">UI/UX Design <i class="fa-solid fa-xmark"></i></span>
+          <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Skills I Want to Learn</div>
+        <div class="sktags">
+          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Video Editing <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Photography <i class="fa-solid fa-xmark"></i></span>
+          <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Tutoring Preferences</div>
+        <div class="sr"><div class="srl"><div class="slb">Hourly Rate (₹)</div><div class="sde">Your default rate for paid sessions</div></div><input class="sinp" type="number" value="400" style="width:90px;text-align:center"></div>
+        <div class="sr"><div class="srl"><div class="slb">Session Duration</div><div class="sde">Default session length</div></div><select class="ssel"><option>30 min</option><option selected>60 min</option><option>90 min</option><option>2 hours</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Open to Free Swaps</div><div class="sde">Allow skill exchange without payment</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Accept Instant Bookings</div><div class="sde">Allow sessions without approval</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+    </div>
+
+    <!-- TAB 1: STATS -->
+    <div class="stc" id="t1" style="display:none">
+      <div class="ssec">
+        <div class="sst">XP Progress</div>
+        <div class="xpwrap">
+          <div class="xpinfo"><span class="xplv">Level 6 — Advanced 🟣</span><span class="xppt">2,340 / 3,000 XP</span></div>
+          <div class="xptrack"><div class="xpfill" id="xpf" style="width:0%"></div></div>
+          <div class="xpmil"><span>Lvl 5</span><span>Next: Expert 🔴</span></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Your Numbers</div>
+        <div class="ssgrid">
+          <div class="sscell"><div class="val">47</div><div class="lbl">Trades Done</div></div>
+          <div class="sscell"><div class="val">₹8.4K</div><div class="lbl">Total Earned</div></div>
+          <div class="sscell"><div class="val">4.9★</div><div class="lbl">Avg Rating</div></div>
+          <div class="sscell"><div class="val">#12</div><div class="lbl">Leaderboard</div></div>
+          <div class="sscell"><div class="val">124h</div><div class="lbl">Hours Taught</div></div>
+          <div class="sscell"><div class="val">18</div><div class="lbl">Badges</div></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Recent Activity</div>
+        <div class="actlist">
+          <div class="acti"><div class="actic" style="background:rgba(52,211,153,.12);color:var(--green)"><i class="fa-solid fa-check"></i></div><div class="actb"><p>Completed <b>Python Basics</b> session with Arjun</p><div class="actt">Today, 3:00 PM</div></div><span class="pill bg-g" style="margin-left:auto;flex-shrink:0">+120 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-star"></i></div><div class="actb"><p>5-star review from <b>Priya Mehta</b></p><div class="actt">Today, 11:30 AM</div></div><span class="pill ba" style="margin-left:auto;flex-shrink:0">+50 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="actb"><p><b>₹450 credited</b> for UI/UX session</p><div class="actt">Yesterday</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Paid</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><div class="actb"><p>New swap request from <b>Rohan Kumar</b></p><div class="actt">2 days ago</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Pending</span></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Rate Your Last Session</div>
+        <div class="starrow" id="starrow">
+          <i class="fa-solid fa-star star" onclick="rate(1)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(2)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(3)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(4)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(5)"></i>
+          <span style="margin-left:10px;font-size:.84rem;color:var(--muted)" id="slbl">Tap to rate</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: NOTIFICATIONS -->
+    <div class="stc" id="t2" style="display:none">
+      <div class="ssec">
+        <div class="sst">Push Notifications</div>
+        <div class="sr"><div class="srl"><div class="slb">Trade Requests</div><div class="sde">New swap requests</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Messages</div><div class="sde">New direct messages</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Session Reminders</div><div class="sde">30 min before sessions</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">XP &amp; Badges</div><div class="sde">Level-up achievements</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Payment Alerts</div><div class="sde">Receive or send money</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Reviews Received</div><div class="sde">When someone rates you</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Leaderboard Changes</div><div class="sde">When your rank changes</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Platform Updates</div><div class="sde">New features &amp; news</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Email Notifications</div>
+        <div class="sr"><div class="srl"><div class="slb">Weekly Digest</div><div class="sde">Activity summary each week</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Monthly Report</div><div class="sde">Earnings &amp; growth report</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Promotional Emails</div><div class="sde">Tips, events &amp; offers</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Email Frequency</div></div><select class="ssel"><option>Daily</option><option selected>Weekly</option><option>Monthly</option><option>Never</option></select></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Quiet Hours</div>
+        <div class="sr"><div class="srl"><div class="slb">Enable Quiet Hours</div><div class="sde">Mute all notifications</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">From</div></div><input class="sinp" type="time" value="22:00" style="width:110px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Until</div></div><input class="sinp" type="time" value="08:00" style="width:110px"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: APPEARANCE -->
+    <div class="stc" id="t3" style="display:none">
+      <div class="ssec">
+        <div class="sst">Accent Colour</div>
+        <div class="swrow">
+          <div class="sw active" style="background:linear-gradient(135deg,#7c6af7,#f472b6)" onclick="applyTh('#7c6af7','#a78bfa','#f472b6','#fb7185','rgba(124,106,247,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#06b6d4,#7c6af7)" onclick="applyTh('#06b6d4','#22d3ee','#7c6af7','#a78bfa','rgba(6,182,212,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#10b981,#06b6d4)" onclick="applyTh('#10b981','#34d399','#06b6d4','#22d3ee','rgba(16,185,129,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="applyTh('#f59e0b','#fbbf24','#ef4444','#f87171','rgba(245,158,11,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#ec4899,#f97316)" onclick="applyTh('#ec4899','#f472b6','#f97316','#fb923c','rgba(236,72,153,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)" onclick="applyTh('#3b82f6','#60a5fa','#06b6d4','#22d3ee','rgba(59,130,246,.35)',this)"></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Interface</div>
+        <div class="sr"><div class="srl"><div class="slb">Reduce Motion</div><div class="sde">Disable animations</div></div><label class="tog"><input type="checkbox" id="motog" onchange="applyMot(this)"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Compact Mode</div><div class="sde">Tighter spacing</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show Online Status</div><div class="sde">Visible to others</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Font Size</div></div><select class="ssel"><option>Small</option><option selected>Medium</option><option>Large</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Language</div></div><select class="ssel"><option selected>English</option><option>हिन्दी</option><option>தமிழ்</option><option>Español</option><option>Français</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Currency</div></div><select class="ssel"><option selected>₹ INR</option><option>$ USD</option><option>€ EUR</option><option>£ GBP</option></select></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PRIVACY -->
+    <div class="stc" id="t4" style="display:none">
+      <div class="ssec">
+        <div class="sst">Profile Visibility</div>
+        <div class="sr"><div class="srl"><div class="slb">Public Profile</div><div class="sde">Anyone can view your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show on Leaderboard</div><div class="sde">Display your rank publicly</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show Earnings</div><div class="sde">Display earnings on profile</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Searchable by Email</div><div class="sde">Let others find you</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show College Name</div><div class="sde">Visible on your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Security</div>
+        <div class="sr"><div class="srl"><div class="slb">Two-Factor Authentication</div><div class="sde">SMS or authenticator app</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Login Alerts</div><div class="sde">Email on new device login</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Change Password</div></div><button class="bsm">Update →</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Active Sessions</div><div class="sde">2 devices currently logged in</div></div><button class="bsm">Manage →</button></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Data &amp; Privacy</div>
+        <div class="sr"><div class="srl"><div class="slb">Download My Data</div><div class="sde">Export as JSON</div></div><button class="bsm"><i class="fa-solid fa-download"></i> Export</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Personalised Recommendations</div><div class="sde">Use activity to suggest skills</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Analytics Tracking</div><div class="sde">Help improve SkillSwap</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SCHEDULE -->
+    <div class="stc" id="t5" style="display:none">
+      <div class="ssec">
+        <div class="sst">Available Days</div>
+        <div class="dagrid">
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">MON</span><div class="dcirc">M</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">TUE</span><div class="dcirc">T</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">WED</span><div class="dcirc">W</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">THU</span><div class="dcirc">T</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">FRI</span><div class="dcirc">F</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SAT</span><div class="dcirc">S</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SUN</span><div class="dcirc">S</div></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Preferred Session Times</div>
+        <div class="tchips">
+          <button class="tchip on" onclick="this.classList.toggle('on')">Morning (6–9 AM)</button>
+          <button class="tchip on" onclick="this.classList.toggle('on')">Afternoon (12–3 PM)</button>
+          <button class="tchip"    onclick="this.classList.toggle('on')">Evening (5–8 PM)</button>
+          <button class="tchip on" onclick="this.classList.toggle('on')">Night (8–11 PM)</button>
+          <button class="tchip"    onclick="this.classList.toggle('on')">Late Night (11 PM+)</button>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Booking Settings</div>
+        <div class="sr"><div class="srl"><div class="slb">Timezone</div></div><select class="ssel"><option selected>IST (UTC+5:30)</option><option>UTC</option><option>EST</option><option>PST</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Buffer Between Sessions</div></div><select class="ssel"><option>None</option><option selected>15 min</option><option>30 min</option><option>1 hour</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Max Sessions Per Day</div></div><select class="ssel"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>Unlimited</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Vacation Mode</div><div class="sde">Pause all new booking requests</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+    </div>
+
+    <!-- TAB 6: CONNECTED -->
+    <div class="stc" id="t6" style="display:none">
+      <div class="ssec">
+        <div class="sst">Social Logins</div>
+        <div class="cgrid">
+          <div class="ccard" onclick="toast('Google account connected!','success')"><div class="icon" style="color:#ea4335"><i class="fa-brands fa-google"></i></div><div class="name">Google</div><div class="status conn"><i class="fa-solid fa-circle-check" style="font-size:.7rem;margin-right:4px"></i>Connected</div></div>
+          <div class="ccard" onclick="toast('Linking GitHub...','info')"><div class="icon" style="color:var(--txt)"><i class="fa-brands fa-github"></i></div><div class="name">GitHub</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
+          <div class="ccard" onclick="toast('Linking LinkedIn...','info')"><div class="icon" style="color:#0a66c2"><i class="fa-brands fa-linkedin"></i></div><div class="name">LinkedIn</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
+          <div class="ccard" onclick="toast('Linking Discord...','info')"><div class="icon" style="color:#5865f2"><i class="fa-brands fa-discord"></i></div><div class="name">Discord</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Payment Methods</div>
+        <div class="sr"><div class="srl"><div class="slb">UPI ID</div><div class="sde">For instant payouts</div></div><input class="sinp" type="text" placeholder="yourname@upi" style="width:150px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Bank Account</div><div class="sde">For larger withdrawals</div></div><button class="bsm">Add Bank →</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Wallet Balance</div></div><span class="sval">₹ 1,240.00</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Auto-Withdraw</div><div class="sde">When balance ≥ ₹500</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Integrations</div>
+        <div class="sr"><div class="srl"><div class="slb">Google Calendar</div><div class="sde">Sync sessions automatically</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Zoom</div><div class="sde">Auto-generate meeting links</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">WhatsApp Alerts</div><div class="sde">Session reminders via WhatsApp</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+    </div>
+
+    <!-- TAB 7: ACCOUNT -->
+    <div class="stc" id="t7" style="display:none">
+      <div class="ssec">
+        <div class="sst">Account Status</div>
+        <div class="sr"><div class="srl"><div class="slb">Account Type</div></div><span class="pill bp">Student Free</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Member Since</div></div><span class="sval">Jan 2025</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Upgrade to Pro</div><div class="sde">Priority matching &amp; analytics</div></div><button class="btn-cta" style="font-size:.79rem;padding:7px 14px">Upgrade ✦</button></div>
+      </div>
+      <div style="height:6px"></div>
+      <div class="dzwrap">
+        <div class="dztitle">⚠ Danger Zone</div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Log Out Everywhere</div><div class="sde">Sign out from all devices</div></div><button class="bdang" onclick="toast('Logged out from all devices','info')">Log Out All</button></div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Suspend Account</div><div class="sde">Temporarily disable profile</div></div><button class="bdang" onclick="toast('Account suspended','error')">Suspend</button></div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Delete Account</div><div class="sde">Permanently removes all data</div></div><button class="bdang" onclick="if(confirm('This is permanent. Continue?'))toast('Deletion request submitted','error')">Delete Forever</button></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="ssavebar"><button class="bsave" onclick="saveSet()"><i class="fa-solid fa-floppy-disk" style="margin-right:9px"></i>Save All Changes</button></div>
 </div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
+  <ul class="nav-c">
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="leaderboard.html">Leaderboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="trades.html">Trades</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-r">
+    <!-- Desktop: notification + settings -->
+    <button class="ibtn nav-desk-only" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
+    <button class="ibtn nav-desk-only" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
+    <!-- Auth buttons (logged out) -->
+    <div id="abtns" style="display:flex;gap:8px">
+      <a href="login.html" class="btn-ghost">Log In</a>
+      <a href="login.html" class="btn-cta">Sign Up Free</a>
+    </div>
+    <!-- User pill (logged in) -->
+    <div id="upill" class="upill" onclick="openSettings()" title="Account Settings">
+      <div class="uav" id="uav">S</div>
+      <img id="uph" src="" alt="You">
+      <span id="unm">Student</span>
+      <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:var(--muted);margin-left:2px"></i>
+    </div>
+    <!-- Mobile: icon row shown when logged in -->
+    <div class="mob-icons" id="mob-icons" style="display:none">
+      <button class="ibtn mob-ibtn" onclick="toggleNotif()" title="Notifications"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot2"></span></button>
+      <button class="ibtn mob-ibtn" onclick="openSettings()" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+    </div>
+    <!-- Hamburger (always visible on mobile) -->
+    <button class="mbtn ibtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+<section class="hero">
+  <div class="hero-ey"><span class="pill bp"><i class="fa-solid fa-bolt"></i>&nbsp;#1 Student Skill Exchange Platform</span></div>
+  <h1>Trade Skills,<br><em class="grad">Not Money.</em></h1>
+  <p class="hero-sub">A student-powered marketplace to exchange knowledge, teach what you know, and earn by helping peers grow — together.</p>
+  <div class="hero-btns" id="hbtns">
+    <a href="login.html" class="bh bh-fill"><i class="fa-solid fa-rocket"></i>Get Started Free</a>
+    <a href="#features" class="bh bh-line"><i class="fa-solid fa-compass"></i>Explore Skills</a>
+  </div>
+  <div class="hstats">
+    <div><div class="snum">10K+</div><div class="slbl">Active Students</div></div>
+    <div><div class="snum">5K+</div><div class="slbl">Skills Exchanged</div></div>
+    <div><div class="snum">4.9★</div><div class="slbl">Platform Rating</div></div>
+  </div>
+</section>
+
+<section id="features" class="sec">
+  <div class="shead reveal">
+    <span class="stag">Platform Features</span>
+    <h2 class="stitle">Why Choose <span class="grad">SkillSwap?</span></h2>
+    <p class="ssub">Everything you need to grow your skills, build your reputation, and earn real money.</p>
+  </div>
+  <div class="fgrid">
+    <div class="fc reveal" onclick="location.href='skill-exchange.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><h3>Skill Exchange</h3><p>Teach a skill, learn a skill — completely free. Peer-to-peer knowledge barter with zero money exchanged.</p></div>
+    <div class="fc reveal" onclick="location.href='paid-help.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-indian-rupee-sign"></i></div><h3>Paid Tutoring</h3><p>Earn ₹300–₹1,000+ per hour teaching verified students in your area of expertise.</p></div>
+    <div class="fc reveal" onclick="location.href='reputation.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-trophy"></i></div><h3>Reputation System</h3><p>Earn XP, unlock badges, and climb from Beginner 🟢 to Expert 🟣 as you teach and trade.</p></div>
+    <div class="fc reveal" onclick="location.href='leaderboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(52,211,153,.1);color:var(--green)"><i class="fa-solid fa-chart-line"></i></div><h3>Leaderboard</h3><p>Top helpers ranked by ratings and completed trades. Get recognised and build your standing.</p></div>
+    <div class="fc reveal" onclick="location.href='chat.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-comments"></i></div><h3>Real-Time Chat</h3><p>Secure instant messaging powered by Firebase. Discuss details before committing to a session.</p></div>
+    <div class="fc reveal" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(96,165,250,.1);color:#60a5fa"><i class="fa-solid fa-chalkboard-user"></i></div><h3>Skill Room</h3><p>Private learning space with video calls, live coding, shared notes, and real-time collaboration.</p><a href="skill-room.html" class="fcta" onclick="event.stopPropagation()"><i class="fa-solid fa-door-open"></i>Enter Room</a></div>
+    <div class="fc reveal" onclick="location.href='dashboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(248,113,113,.1);color:var(--red)"><i class="fa-solid fa-chart-pie"></i></div><h3>Analytics Dashboard</h3><p>Track earnings, XP progress, session history, and active trades in one unified dashboard.</p></div>
+    <div class="fc reveal" onclick="location.href='explore.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Skill Discovery</h3><p>Browse hundreds of skills — coding, design, languages, music, finance — all student-taught.</p></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="fti">
+    <div class="fbrand">
+      <a class="logo" href="index.html"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
+      <p>A student-powered skill exchange platform. Teach what you know, learn what you need — no money required.</p>
+    </div>
+    <div class="fcol"><h5>Platform</h5><a href="explore.html">Explore Skills</a><a href="leaderboard.html">Leaderboard</a><a href="dashboard.html">Dashboard</a><a href="trades.html">My Trades</a></div>
+    <div class="fcol"><h5>Company</h5><a href="about.html">About Us</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Press Kit</a></div>
+    <div class="fcol"><h5>Support</h5><a href="#">Help Centre</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Contact Us</a></div>
+  </div>
+  <div class="ftbot">
+    <p>© 2025 SkillSwap. Built for students, by students. 🚀</p>
+    <div class="fsoc">
+      <a href="#" title="X"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a href="#" title="Discord"><i class="fa-brands fa-discord"></i></a>
+    </div>
+  </div>
+</footer>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-        createUserWithEmailAndPassword,
-        signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-        authDomain: "skillswapp-35e86.firebaseapp.com",
-        projectId: "skillswapp-35e86",
-        storageBucket: "skillswapp-35e86.appspot.com",
-        messagingSenderId: "668466292157",
-        appId: "1:668466292157:web:9be85414fc752b67779ed4"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Show toast message
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        document.getElementById("toastMsg").innerText = msg;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 3000);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswapp-35e86.firebaseapp.com",projectId:"skillswapp-35e86",storageBucket:"skillswapp-35e86.appspot.com",messagingSenderId:"668466292157",appId:"1:668466292157:web:9be85414fc752b67779ed4"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+// Expose auth globally so non-module scripts can access it
+window._auth=auth;window._db=db;
+onAuthStateChanged(auth,u=>{
+  const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn"),sb=document.getElementById("sbtn");
+  if(u){
+    ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";
+    const mi=document.getElementById("mob-icons");if(mi)mi.style.display="flex";
+    const uph=document.getElementById("uph"),uav=document.getElementById("uav");
+    const name=u.displayName||u.email||"Student";
+    const initial=(u.displayName||u.email||"S").charAt(0).toUpperCase();
+    if(u.photoURL){uph.src=u.photoURL;uph.style.display="block";if(uav)uav.style.display="none";}
+    else{if(uav){uav.textContent=initial;uav.style.display="flex";}uph.style.display="none";}
+    document.getElementById("unm").textContent=name.split(" ")[0];
+    document.getElementById("sav").textContent=initial;
+    document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;
+  }
+  else{ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";const mi=document.getElementById("mob-icons");if(mi)mi.style.display="none";}
+});
+window.logout=()=>signOut(auth).then(()=>location.reload()).catch(console.error);
+window._openSettingsData=async function(){
+  const u=auth.currentUser;
+  if(!u)return;
+  document.getElementById("sinp-name").value=u.displayName||"";
+  document.getElementById("sinp-email").value=u.email||"";
+  try{
+    const snap=await getDoc(doc(db,"users",u.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      document.getElementById("sinp-username").value=d.username||("@"+(u.displayName||u.email.split("@")[0]).toLowerCase().replace(/\s+/g,"_"));
+      document.getElementById("sinp-phone").value=d.phone||"";
+      if(document.getElementById("sinp-bio"))document.getElementById("sinp-bio").value=d.bio||"";
     }
-
-    // Sign Up Function
-    window.signup = async function() {
-        try {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-
-            if(!email || !password) {
-                showToast("Please fill in all fields");
-                return;
-            }
-
-            const userCred = await createUserWithEmailAndPassword(auth, email, password);
-            
-            // Create user document
-            await setDoc(doc(db, "users", userCred.user.uid), {
-                name: email.split('@')[0],
-                email: email,
-                photoURL: "",
-                xp: 0,
-                level: "Beginner",
-                createdAt: new Date()
-            });
-
-            showToast("Account created successfully!");
-            setTimeout(() => window.location.href = "choose-role.html", 1500);
-
-        } catch (error) {
-            console.error(error);
-            showToast(error.message);
-        }
-    };
-
-    // Login Function
-    window.login = async function() {
-        try {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-
-            if(!email || !password) {
-                showToast("Please fill in all fields");
-                return;
-            }
-
-            await signInWithEmailAndPassword(auth, email, password);
-            showToast("Login successful!");
-            setTimeout(() => window.location.href = "choose-role.html", 1500);
-
-        } catch (error) {
-            console.error(error);
-            showToast("Invalid email or password");
-        }
-    };
-
-    // Google Login Function
-    window.googleLogin = async function() {
-        try {
-            const provider = new GoogleAuthProvider();
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-
-            // Save/update user data
-            await setDoc(doc(db, "users", user.uid), {
-                name: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL,
-                xp: 0,
-                level: "Beginner",
-                updatedAt: new Date()
-            }, { merge: true });
-
-            showToast("Welcome back, " + user.displayName + "!");
-            setTimeout(() => window.location.href = "index.html", 1500);
-
-        } catch (error) {
-            console.error(error);
-            showToast("Google login failed");
-        }
-    };
-
-    // Show signup toast (redirect to actual signup if needed)
-    window.showSignupToast = function() {
-        showToast("Switching to Sign Up mode...");
-        
-        // Change button text dynamically
-        const btn = document.querySelector('.btn-primary');
-        const footerText = document.querySelector('.footer-text');
-        
-        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
-        btn.onclick = signup;
-        footerText.innerHTML = 'Already have an account? <a href="#" onclick="location.reload()">Sign in</a>';
-    };
+  }catch(e){console.error(e);}
+};
+window._saveSettings=async function(){
+  const u=auth.currentUser;
+  if(!u){window.toast("Not logged in","error");return;}
+  const name=document.getElementById("sinp-name").value.trim();
+  const phone=document.getElementById("sinp-phone").value.trim();
+  const bio=document.getElementById("sinp-bio")?document.getElementById("sinp-bio").value.trim():"";
+  const username=document.getElementById("sinp-username").value.trim();
+  try{
+    await setDoc(doc(db,"users",u.uid),{name,phone,bio,username,updatedAt:new Date()},{merge:true});
+    await updateProfile(u,{displayName:name});
+    document.getElementById("unm").textContent=name||u.email||"Student";
+    document.getElementById("sav").textContent=(name||u.email||"S").charAt(0).toUpperCase();
+    window.toast("Settings saved successfully ✓","success");
+    window.closeSettings();
+  }catch(e){window.toast("Save failed: "+e.message,"error");}
+};
 </script>
-
+<script>
+function openMob(){document.getElementById("mmenu").classList.add("open");document.body.style.overflow="hidden"}
+function closeMob(){document.getElementById("mmenu").classList.remove("open");document.body.style.overflow=""}
+function openSettings(){
+  document.getElementById("spanel").classList.add("open");
+  document.getElementById("sbg").classList.add("open");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>{document.getElementById("xpf").style.width="78%"},350);
+  if(window._openSettingsData) window._openSettingsData();
+}
+function closeSettings(){document.getElementById("spanel").classList.remove("open");document.getElementById("sbg").classList.remove("open");document.body.style.overflow=""}
+function stab(n,el){document.querySelectorAll(".stc").forEach(t=>{t.style.display="none"});const t=document.getElementById("t"+n);t.style.display="flex";t.style.flexDirection="column";document.querySelectorAll(".stab").forEach(t=>t.classList.remove("active"));el.classList.add("active");if(n===1)setTimeout(()=>{document.getElementById("xpf").style.width="78%"},200)}
+let nOpen=false;
+function toggleNotif(){nOpen=!nOpen;document.getElementById("npanel").classList.toggle("open",nOpen)}
+function markAllRead(){document.querySelectorAll(".ni.unread").forEach(i=>i.classList.remove("unread"));document.getElementById("ndot").style.display="none";document.getElementById("ucnt").style.display="none";toast("All notifications marked as read","success")}
+document.addEventListener("click",e=>{const p=document.getElementById("npanel"),b=document.getElementById("nbtn");if(nOpen&&!p.contains(e.target)&&b&&!b.contains(e.target)){nOpen=false;p.classList.remove("open")}});
+function applyTh(p,p2,a,a2,glow,el){const r=document.documentElement;r.style.setProperty("--p",p);r.style.setProperty("--p2",p2);r.style.setProperty("--a",a);r.style.setProperty("--a2",a2);r.style.setProperty("--glow",glow);r.style.setProperty("--p3",h2a(p,.15));document.querySelectorAll(".sw").forEach(s=>s.classList.remove("active"));el.classList.add("active")}
+function h2a(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`}
+function applyMot(cb){let s=document.getElementById("nm");if(cb.checked){if(!s){s=document.createElement("style");s.id="nm";s.textContent="*,*::before,*::after{animation:none!important;transition:none!important}";document.head.appendChild(s)}}else{if(s)s.remove()}}
+function rmAv(){document.getElementById("sav").textContent="S"}
+function rate(n){document.querySelectorAll("#starrow .star").forEach((s,i)=>s.classList.toggle("lit",i<n));const L=["","Poor","Fair","Good","Great","Excellent!"];document.getElementById("slbl").textContent=L[n]+" ("+n+"/5)"}
+let ttimer;
+function toast(msg,type="success"){clearTimeout(ttimer);const t=document.getElementById("toast"),icons={success:"fa-circle-check",info:"fa-circle-info",error:"fa-circle-xmark"};t.className="toast "+type;document.getElementById("tic").className="fa-solid "+icons[type]+" tic";document.getElementById("tmsg").textContent=msg;t.classList.add("show");ttimer=setTimeout(()=>t.classList.remove("show"),3000)}
+window.toast=toast;
+function saveSet(){
+  if(window._saveSettings) window._saveSettings();
+  else toast("Auth not ready","error");
+}
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll(".reveal").forEach((el,i)=>{el.style.transitionDelay=((i%4)*.08)+"s";io.observe(el)});
+document.querySelectorAll(".fc[role='button']").forEach(c=>c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();c.click()}}));
+</script>
 </body>
 </html>
