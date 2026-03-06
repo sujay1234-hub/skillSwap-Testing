@@ -54,9 +54,11 @@ nav{position:sticky;top:0;z-index:800;display:flex;align-items:center;justify-co
 .btn-ghost:hover{background:var(--card);border-color:var(--border-h)}
 .btn-cta{padding:9px 20px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:var(--fb);transition:all .3s;box-shadow:0 4px 16px var(--glow)}
 .btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--glow)}
-.upill{display:none;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);padding:4px 14px 4px 4px;border-radius:99px;cursor:pointer;transition:all .2s}
+.upill{display:none;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:4px 12px 4px 4px;border-radius:99px;cursor:pointer;transition:all .25s}
+.upill:hover{border-color:var(--p);background:rgba(124,106,247,.08);box-shadow:0 0 0 3px rgba(124,106,247,.12)}
+.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(124,106,247,.4)}
 .upill:hover{border-color:var(--border-h)}
-.upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p)}
+.upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p);display:none}
 .upill span{font-size:.82rem;font-weight:600;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mbtn{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
 
@@ -273,9 +275,11 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .reveal.visible{opacity:1;transform:translateY(0)}
 
 @media(max-width:768px){
-  .nav-c,.ibtn:not(.mbtn){display:none!important}
+  .nav-c,.nav-desk-only{display:none!important}
   .mbtn{display:flex!important}
   .mmenu{display:flex!important}
+  .mob-ibtn{padding:7px 9px;font-size:.82rem;border-radius:10px}
+  .mob-icons{display:none;align-items:center;gap:6px}
   .hero{padding:70px 5% 60px}
   .hero h1{letter-spacing:-1px}
   .hero-btns{flex-direction:column;align-items:stretch}
@@ -648,17 +652,27 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
     <li><a href="about.html">About</a></li>
   </ul>
   <div class="nav-r">
-    <button class="ibtn" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
-    <button class="ibtn" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
+    <!-- Desktop: notification + settings -->
+    <button class="ibtn nav-desk-only" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
+    <button class="ibtn nav-desk-only" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
+    <!-- Auth buttons (logged out) -->
     <div id="abtns" style="display:flex;gap:8px">
       <a href="login.html" class="btn-ghost">Log In</a>
       <a href="login.html" class="btn-cta">Sign Up Free</a>
     </div>
-    <div id="upill" class="upill">
+    <!-- User pill (logged in) -->
+    <div id="upill" class="upill" onclick="openSettings()" title="Account Settings">
+      <div class="uav" id="uav">S</div>
       <img id="uph" src="" alt="You">
       <span id="unm">Student</span>
-      <i class="fa-solid fa-right-from-bracket" onclick="logout()" title="Log out" style="color:var(--muted);padding:4px;cursor:pointer;font-size:.8rem;transition:color .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'"></i>
+      <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:var(--muted);margin-left:2px"></i>
     </div>
+    <!-- Mobile: icon row shown when logged in -->
+    <div class="mob-icons" id="mob-icons" style="display:none">
+      <button class="ibtn mob-ibtn" onclick="toggleNotif()" title="Notifications"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot2"></span></button>
+      <button class="ibtn mob-ibtn" onclick="openSettings()" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+    </div>
+    <!-- Hamburger (always visible on mobile) -->
     <button class="mbtn ibtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
   </div>
 </nav>
@@ -730,8 +744,19 @@ const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 window._auth=auth;window._db=db;
 onAuthStateChanged(auth,u=>{
   const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn"),sb=document.getElementById("sbtn");
-  if(u){ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";document.getElementById("uph").src=u.photoURL||"";document.getElementById("unm").textContent=u.displayName||u.email||"Student";document.getElementById("sav").textContent=(u.displayName||u.email||"S").charAt(0).toUpperCase();document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;}
-  else{ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";}
+  if(u){
+    ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";
+    const mi=document.getElementById("mob-icons");if(mi)mi.style.display="flex";
+    const uph=document.getElementById("uph"),uav=document.getElementById("uav");
+    const name=u.displayName||u.email||"Student";
+    const initial=(u.displayName||u.email||"S").charAt(0).toUpperCase();
+    if(u.photoURL){uph.src=u.photoURL;uph.style.display="block";if(uav)uav.style.display="none";}
+    else{if(uav){uav.textContent=initial;uav.style.display="flex";}uph.style.display="none";}
+    document.getElementById("unm").textContent=name.split(" ")[0];
+    document.getElementById("sav").textContent=initial;
+    document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;
+  }
+  else{ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";const mi=document.getElementById("mob-icons");if(mi)mi.style.display="none";}
 });
 window.logout=()=>signOut(auth).then(()=>location.reload()).catch(console.error);
 window._openSettingsData=async function(){
