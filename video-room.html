@@ -1376,10 +1376,9 @@ async function _joinerCreateAnswer(db, roomId) {
 }
 
 /* ── BUILD RTCPeerConnection ── */
-function _buildPC() {
-  const p = new RTCPeerConnection({
+const p = new RTCPeerConnection({
   iceServers: ICE_SERVERS,
-  iceCandidatePoolSize: 10,
+  iceTransportPolicy: "all",
   bundlePolicy: "max-bundle",
   rtcpMuxPolicy: "require"
 });
@@ -1402,14 +1401,7 @@ if (p.iceConnectionState === "disconnected") {
 }
   return p;
 }
-pc.ontrack = (e) => {
-  const stream = (e.streams && e.streams[0]) ? e.streams[0] : (() => {
-    const s = new MediaStream();
-    s.addTrack(e.track);
-    return s;
-  })();
-  renderRemoteStream(stream);
-};
+
 
 /* ── RENDER REMOTE STREAM ── */
 function renderRemoteStream(stream) {
