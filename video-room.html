@@ -1376,6 +1376,7 @@ async function _joinerCreateAnswer(db, roomId) {
 }
 
 /* ── BUILD RTCPeerConnection ── */
+function _buildPC() {
 const p = new RTCPeerConnection({
   iceServers: ICE_SERVERS,
   iceTransportPolicy: "all",
@@ -1391,10 +1392,11 @@ const p = new RTCPeerConnection({
       resetRemoteTile(); stopTimer();
     }
   };
- if (p.iceConnectionState === "failed") {
-  console.log("ICE FAILED - restarting");
-  p.restartIce();
-}
+p.oniceconnectionstatechange = () => {
+  if (p.iceConnectionState === "failed") {
+    p.restartIce();
+  }
+};
 
 if (p.iceConnectionState === "disconnected") {
   console.log("ICE DISCONNECTED - waiting");
