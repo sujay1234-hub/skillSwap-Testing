@@ -1,208 +1,1545 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Admin Panel - SkillSwap</title>
+<title>SkillSwap — Admin Control Center</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--bg:#09090b;--card:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.08);--primary:#6366f1;--accent:#a855f7;--success:#10b981;--danger:#ef4444;--text:#fff;--muted:#a1a1aa;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(circle at 10% 20%,rgba(99,102,241,0.08) 0%,transparent 25%),radial-gradient(circle at 90% 80%,rgba(168,85,247,0.08) 0%,transparent 25%);}
-.container{max-width:1100px;margin:0 auto;padding:40px 20px;}
-.page-header{display:flex;align-items:center;gap:16px;margin-bottom:36px;}
-.page-header h1{font-size:1.8rem;font-weight:700;}
-.page-header .icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
-.analytics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:40px;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;position:relative;overflow:hidden;backdrop-filter:blur(10px);}
-.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));}
-.stat .label{font-size:0.78rem;color:var(--muted);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
-.stat .value{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.section{margin-bottom:50px;}
-.section-title{font-size:1.1rem;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
-.search-wrap{margin-bottom:16px;}
-.search-wrap input{width:100%;max-width:360px;padding:12px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;outline:none;transition:0.2s;}
-.search-wrap input:focus{border-color:var(--primary);}
-.search-wrap input::placeholder{color:var(--muted);}
-/* Table → Card layout on mobile */
-.data-table{width:100%;border-collapse:collapse;}
-.data-table thead{background:rgba(255,255,255,0.04);}
-.data-table th{padding:12px 16px;font-size:0.8rem;font-weight:600;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
-.data-table td{padding:14px 16px;font-size:0.88rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
-.data-table tr:hover td{background:rgba(255,255,255,0.02);}
-.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
-.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-button{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.82rem;transition:0.15s;}
-button:hover{filter:brightness(1.1);}
-.add{background:var(--success);color:white;}
-.deduct{background:var(--danger);color:white;}
-.set{background:var(--primary);color:white;}
-.approve{background:var(--success);color:white;}
-.reject{background:var(--danger);color:white;}
-.action-btns{display:flex;gap:6px;flex-wrap:wrap;}
-.status-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;text-transform:uppercase;}
-.status-pending{background:rgba(245,158,11,0.15);color:#f59e0b;}
-.status-approved{background:rgba(16,185,129,0.15);color:#10b981;}
-.status-rejected{background:rgba(239,68,68,0.15);color:#ef4444;}
-/* MOBILE BACK */
-.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
-@media(max-width:768px){
-.mobile-back-btn{display:flex;}
-.container{padding:70px 14px 30px;}
-.page-header h1{font-size:1.3rem;}
-.analytics{grid-template-columns:1fr 1fr;gap:12px;}
-.stat{padding:16px 14px;}
-.stat .value{font-size:1.4rem;}
-.search-wrap input{max-width:100%;}
-.data-table{display:block;}
-.data-table thead{display:none;}
-.data-table tbody{display:block;}
-.data-table tr{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
-.data-table td{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.85rem;}
-.data-table td:last-child{border-bottom:none;}
-.data-table td::before{content:attr(data-label);font-size:0.75rem;color:var(--muted);font-weight:600;flex-shrink:0;margin-right:12px;}
-.action-btns{flex-wrap:wrap;}
-button{padding:8px 12px;font-size:0.8rem;}
+:root {
+  --bg: #06080f;
+  --bg2: #0c0f1a;
+  --bg3: #111527;
+  --card: rgba(255,255,255,0.035);
+  --card-hover: rgba(255,255,255,0.055);
+  --border: rgba(255,255,255,0.07);
+  --border-light: rgba(255,255,255,0.12);
+  --primary: #4f8eff;
+  --primary-glow: rgba(79,142,255,0.25);
+  --cyan: #22d3ee;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --violet: #8b5cf6;
+  --text: #f0f4ff;
+  --muted: #6b7280;
+  --muted2: #9ca3af;
 }
-@media(max-width:400px){
-.analytics{grid-template-columns:1fr;}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 240px;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--violet));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+.logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; }
+.logo-badge {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  background: rgba(79,142,255,0.15);
+  color: var(--primary);
+  border: 1px solid rgba(79,142,255,0.3);
+  padding: 2px 6px; border-radius: 4px;
+}
+.nav-section { padding: 18px 12px 0; flex: 1; overflow-y: auto; }
+.nav-label { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+.nav-label:first-child { margin-top: 0; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted2);
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+}
+.nav-item:hover { color: var(--text); background: var(--card); }
+.nav-item.active { color: var(--text); background: rgba(79,142,255,0.12); border-color: rgba(79,142,255,0.2); }
+.nav-item .nav-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; font-size: 0.75rem; background: rgba(255,255,255,0.05); flex-shrink: 0; }
+.nav-item.active .nav-icon { background: rgba(79,142,255,0.2); color: var(--primary); }
+.nav-item .badge { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 0.65rem; background: rgba(244,63,94,0.2); color: var(--rose); padding: 1px 6px; border-radius: 10px; }
+.sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border); }
+.admin-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--card); }
+.admin-avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,var(--primary),var(--violet)); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.admin-name { font-size: 0.82rem; font-weight: 600; }
+.admin-role { font-size: 0.68rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+/* ─── MAIN CONTENT ─── */
+.main {
+  margin-left: 240px;
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(6,8,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+.topbar-sub { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 8px var(--emerald); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.live-text { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--emerald); }
+.refresh-btn {
+  width: 34px; height: 34px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { color: var(--text); border-color: var(--primary); }
+.hamburger {
+  display: none;
+  width: 34px; height: 34px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* ─── SECTIONS ─── */
+.section { display: none; padding: 28px 32px; }
+.section.active { display: block; }
+
+/* ─── ANALYTICS GRID ─── */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: all 0.2s;
+}
+.stat-card:hover { background: var(--card-hover); border-color: var(--border-light); transform: translateY(-1px); }
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  border-radius: 2px 2px 0 0;
+}
+.stat-card.blue::after { background: linear-gradient(90deg,var(--primary),var(--cyan)); }
+.stat-card.green::after { background: linear-gradient(90deg,var(--emerald),var(--cyan)); }
+.stat-card.amber::after { background: linear-gradient(90deg,var(--amber),#f97316); }
+.stat-card.rose::after { background: linear-gradient(90deg,var(--rose),var(--violet)); }
+.stat-card.violet::after { background: linear-gradient(90deg,var(--violet),var(--primary)); }
+.stat-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; margin-bottom: 14px; }
+.stat-card.blue .stat-icon { background: rgba(79,142,255,0.15); color: var(--primary); }
+.stat-card.green .stat-icon { background: rgba(16,185,129,0.15); color: var(--emerald); }
+.stat-card.amber .stat-icon { background: rgba(245,158,11,0.15); color: var(--amber); }
+.stat-card.rose .stat-icon { background: rgba(244,63,94,0.15); color: var(--rose); }
+.stat-card.violet .stat-icon { background: rgba(139,92,246,0.15); color: var(--violet); }
+.stat-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+/* ─── CARD CONTAINER ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.card-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+.card-count { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); background: var(--bg3); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); }
+.card-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+/* ─── SEARCH/FILTER BAR ─── */
+.filter-bar {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+}
+.search-input-wrap { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+.search-input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: var(--muted); }
+.filter-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  outline: none;
+  transition: 0.2s;
+}
+.filter-input:focus { border-color: var(--primary); }
+.filter-input::placeholder { color: var(--muted); }
+.filter-select {
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ─── TABLE ─── */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 11px 18px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: left;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+}
+tbody td {
+  padding: 13px 18px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.035);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ─── USER AVATAR ─── */
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Syne', sans-serif;
+}
+.user-name { font-weight: 600; font-size: 0.87rem; line-height: 1.2; }
+.user-email { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+/* ─── BADGES ─── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'DM Mono', monospace;
+}
+.badge-pending { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+.badge-approved, .badge-active { background: rgba(16,185,129,0.12); color: var(--emerald); border: 1px solid rgba(16,185,129,0.25); }
+.badge-rejected, .badge-banned { background: rgba(244,63,94,0.12); color: var(--rose); border: 1px solid rgba(244,63,94,0.25); }
+.badge-tutor { background: rgba(139,92,246,0.12); color: var(--violet); border: 1px solid rgba(139,92,246,0.25); }
+.badge-learner { background: rgba(79,142,255,0.12); color: var(--primary); border: 1px solid rgba(79,142,255,0.25); }
+.badge-completed { background: rgba(34,211,238,0.12); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); }
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* ─── ACTION BUTTONS ─── */
+.action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.75rem;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: rgba(79,142,255,0.2); color: var(--primary); border: 1px solid rgba(79,142,255,0.3); }
+.btn-success { background: rgba(16,185,129,0.2); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
+.btn-danger { background: rgba(244,63,94,0.2); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
+.btn-amber { background: rgba(245,158,11,0.2); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.btn-violet { background: rgba(139,92,246,0.2); color: var(--violet); border: 1px solid rgba(139,92,246,0.3); }
+.btn-ghost { background: rgba(255,255,255,0.05); color: var(--muted2); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--border-light); }
+.btn-sm { padding: 4px 9px; font-size: 0.7rem; }
+
+/* ─── MONEY DISPLAY ─── */
+.money { font-family: 'DM Mono', monospace; font-weight: 500; }
+.money.pos { color: var(--emerald); }
+.money.neg { color: var(--rose); }
+.money.neutral { color: var(--text); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  animation: modalIn 0.25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-header {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; }
+.modal-close {
+  margin-left: auto;
+  width: 30px; height: 30px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  transition: 0.15s;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 22px 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ─── PROFILE MODAL ─── */
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: var(--bg3);
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+.profile-avatar-lg {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 800;
+  font-family: 'Syne', sans-serif;
+}
+.profile-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
+.profile-email { font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.profile-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.info-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.info-item-label { font-size: 0.67rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-family: 'DM Mono', monospace; }
+.info-item-value { font-size: 0.88rem; font-weight: 600; }
+
+/* ─── FORM ─── */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--muted2); margin-bottom: 6px; }
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: 0.2s;
+}
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,142,255,0.1); }
+
+/* ─── EMPTY STATE ─── */
+.empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-state i { font-size: 2rem; margin-bottom: 12px; display: block; opacity: 0.4; }
+.empty-state p { font-size: 0.85rem; }
+
+/* ─── LOADING ─── */
+.loading-row td { text-align: center; padding: 30px !important; color: var(--muted); font-size: 0.85rem; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── ACTIVITY LOG ─── */
+.log-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.035);
+}
+.log-item:last-child { border-bottom: none; }
+.log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.log-content { flex: 1; }
+.log-text { font-size: 0.83rem; line-height: 1.5; }
+.log-meta { font-size: 0.7rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+/* ─── OVERVIEW GRID ─── */
+.overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* ─── TOAST ─── */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--bg2);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.83rem;
+  min-width: 240px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: toastIn 0.3s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+}
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.toast.success { border-left: 3px solid var(--emerald); }
+.toast.error { border-left: 3px solid var(--rose); }
+.toast.info { border-left: 3px solid var(--primary); }
+.toast i { font-size: 0.9rem; }
+.toast.success i { color: var(--emerald); }
+.toast.error i { color: var(--rose); }
+.toast.info i { color: var(--primary); }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .overview-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .topbar { padding: 14px 16px; }
+  .section { padding: 20px 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hamburger { display: flex; }
+  .filter-bar { padding: 12px 16px; }
+  thead th, tbody td { padding: 10px 12px; }
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99; display: none; }
+  .sidebar-overlay.open { display: block; }
+}
+@media(max-width:480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<a class="mobile-back-btn" href="dashboard.html" title="Back">&#8592;</a>
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<div class="container">
-    <div class="page-header">
-        <div class="icon">🛡️</div>
-        <h1>Admin Dashboard</h1>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">SkillSwap</span>
+    <span class="logo-badge">ADMIN</span>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <div class="nav-icon"><i class="fas fa-chart-pie"></i></div>
+      Dashboard
     </div>
 
-    <div class="analytics">
-        <div class="stat"><div class="label">Platform Revenue</div><div class="value" id="totalRevenue">₹0</div></div>
-        <div class="stat"><div class="label">Paid to Tutors</div><div class="value" id="totalPaid">₹0</div></div>
-        <div class="stat"><div class="label">Total Users</div><div class="value" id="totalUsers">0</div></div>
-        <div class="stat"><div class="label">Pending Withdrawals</div><div class="value" id="pendingWithdraw">₹0</div></div>
+    <div class="nav-label">Users</div>
+    <div class="nav-item" onclick="showSection('users')">
+      <div class="nav-icon"><i class="fas fa-users"></i></div>
+      All Users
+    </div>
+    <div class="nav-item" onclick="showSection('tutors')">
+      <div class="nav-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+      Tutors
     </div>
 
-    <div class="section">
-        <div class="section-title">💰 User Wallet Management</div>
-        <div class="search-wrap">
-            <input type="text" id="searchUser" placeholder="🔍 Search by email..." oninput="filterUsers()">
-        </div>
-        <div class="table-wrap">
-            <div class="table-scroll">
-                <table class="data-table">
-                    <thead><tr><th>User</th><th>Balance</th><th>Total Earned</th><th>Actions</th></tr></thead>
-                    <tbody id="walletTable"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="nav-label">Finance</div>
+    <div class="nav-item" onclick="showSection('wallets')">
+      <div class="nav-icon"><i class="fas fa-wallet"></i></div>
+      Wallets
+    </div>
+    <div class="nav-item" onclick="showSection('withdrawals')">
+      <div class="nav-icon"><i class="fas fa-money-bill-transfer"></i></div>
+      Withdrawals
+      <span class="badge" id="pendingBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('transactions')">
+      <div class="nav-icon"><i class="fas fa-receipt"></i></div>
+      Transactions
     </div>
 
-    <div class="section">
-        <div class="section-title">🏦 Withdrawal Requests</div>
-        <div class="table-wrap">
-            <div class="table-scroll">
-                <table class="data-table">
-                    <thead><tr><th>Tutor</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="withdrawTable"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="nav-label">Platform</div>
+    <div class="nav-item" onclick="showSection('sessions')">
+      <div class="nav-icon"><i class="fas fa-video"></i></div>
+      Sessions
     </div>
+    <div class="nav-item" onclick="showSection('skills')">
+      <div class="nav-icon"><i class="fas fa-graduation-cap"></i></div>
+      Skills / Listings
+    </div>
+    <div class="nav-item" onclick="showSection('reviews')">
+      <div class="nav-icon"><i class="fas fa-star"></i></div>
+      Reviews
+    </div>
+    <div class="nav-item" onclick="showSection('reports')">
+      <div class="nav-icon"><i class="fas fa-flag"></i></div>
+      Reports
+    </div>
+
+    <div class="nav-label">System</div>
+    <div class="nav-item" onclick="showSection('activity')">
+      <div class="nav-icon"><i class="fas fa-clock-rotate-left"></i></div>
+      Activity Log
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="admin-chip">
+      <div class="admin-avatar">A</div>
+      <div>
+        <div class="admin-name">Admin</div>
+        <div class="admin-role">superadmin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="nav-icon" style="background:rgba(79,142,255,0.15);color:var(--primary)"><i class="fas fa-user"></i></div>
+      <span class="modal-title">User Profile</span>
+      <button class="modal-close" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="userModalBody"></div>
+    <div class="modal-footer" id="userModalFooter"></div>
+  </div>
 </div>
+
+<div class="modal-overlay" id="walletModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="nav-icon" style="background:rgba(16,185,129,0.15);color:var(--emerald)"><i class="fas fa-wallet"></i></div>
+      <span class="modal-title" id="walletModalTitle">Edit Wallet</span>
+      <button class="modal-close" onclick="closeModal('walletModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="walletModalBody"></div>
+    <div class="modal-footer" id="walletModalFooter"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-sub" id="topbarSub">Overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <span class="live-text">LIVE</span>
+      <button class="refresh-btn" onclick="refreshAll()" title="Refresh"><i class="fas fa-rotate-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <div class="section active" id="sec-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+        <div class="stat-label">Platform Revenue</div>
+        <div class="stat-value" id="dash-revenue">₹0</div>
+        <div class="stat-sub">10% of total earned</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+        <div class="stat-label">Paid to Tutors</div>
+        <div class="stat-value" id="dash-paid">₹0</div>
+        <div class="stat-sub">Total earnings</div>
+      </div>
+      <div class="stat-card violet">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value" id="dash-users">0</div>
+        <div class="stat-sub">Registered accounts</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-label">Pending Withdrawals</div>
+        <div class="stat-value" id="dash-pending">₹0</div>
+        <div class="stat-sub">Awaiting approval</div>
+      </div>
+      <div class="stat-card rose">
+        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+        <div class="stat-label">Total Wallet Balance</div>
+        <div class="stat-value" id="dash-walletTotal">₹0</div>
+        <div class="stat-sub">Across all users</div>
+      </div>
+    </div>
+
+    <div class="overview-grid">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-flag" style="color:var(--rose)"></i>
+          <span class="card-title">Pending Withdrawal Requests</span>
+        </div>
+        <div style="padding:0 4px">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr>
+              <th style="padding:10px 18px;font-size:0.7rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;text-transform:uppercase">Tutor</th>
+              <th style="padding:10px 18px;font-size:0.7rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;text-transform:uppercase">Amount</th>
+              <th style="padding:10px 18px;font-size:0.7rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;text-transform:uppercase">Action</th>
+            </tr></thead>
+            <tbody id="dash-withdrawTable"><tr class="loading-row"><td colspan="3"><span class="spinner"></span>Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-clock-rotate-left" style="color:var(--cyan)"></i>
+          <span class="card-title">Recent Activity</span>
+        </div>
+        <div style="padding:14px 22px" id="activityFeed">
+          <div class="empty-state"><i class="fas fa-clock"></i><p>No activity yet</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ALL USERS ═══════════════ -->
+  <div class="section" id="sec-users">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-users" style="color:var(--primary)"></i>
+        <span class="card-title">All Users</span>
+        <span class="card-count" id="usersCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="usersSearch" placeholder="Search name or email..." oninput="filterTable('usersSearch','usersBody',usersData,'name','email')">
+        </div>
+        <select class="filter-select" id="usersRoleFilter" onchange="filterTable('usersSearch','usersBody',usersData,'name','email')">
+          <option value="">All Roles</option>
+          <option value="tutor">Tutor</option>
+          <option value="learner">Learner</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Balance</th>
+            <th>Total Earned</th>
+            <th>Sessions</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="usersBody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading users...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TUTORS ═══════════════ -->
+  <div class="section" id="sec-tutors">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chalkboard-teacher" style="color:var(--violet)"></i>
+        <span class="card-title">Tutors</span>
+        <span class="card-count" id="tutorsCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="tutorsSearch" placeholder="Search tutors..." oninput="filterTutors()">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Tutor</th>
+            <th>Skills Offered</th>
+            <th>Rating</th>
+            <th>Total Sessions</th>
+            <th>Total Earned</th>
+            <th>Balance</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="tutorsBody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading tutors...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ WALLETS ═══════════════ -->
+  <div class="section" id="sec-wallets">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-wallet" style="color:var(--emerald)"></i>
+        <span class="card-title">User Wallet Management</span>
+        <span class="card-count" id="walletsCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="walletsSearch" placeholder="Search by email..." oninput="filterWallets()">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>User</th>
+            <th>Balance</th>
+            <th>Total Earned</th>
+            <th>Withdrawals</th>
+            <th>Wallet Actions</th>
+          </tr></thead>
+          <tbody id="walletsBody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span>Loading wallets...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ WITHDRAWALS ═══════════════ -->
+  <div class="section" id="sec-withdrawals">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-money-bill-transfer" style="color:var(--amber)"></i>
+        <span class="card-title">Withdrawal Requests</span>
+        <span class="card-count" id="withdrawCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="withdrawFilter" onchange="renderWithdrawals()">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Tutor</th>
+            <th>Amount</th>
+            <th>Payment Info</th>
+            <th>Requested</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="withdrawBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading requests...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TRANSACTIONS ═══════════════ -->
+  <div class="section" id="sec-transactions">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-receipt" style="color:var(--cyan)"></i>
+        <span class="card-title">Transaction History</span>
+        <span class="card-count" id="txCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="txSearch" placeholder="Search transactions...">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>ID</th>
+            <th>From</th>
+            <th>To / Description</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Date</th>
+          </tr></thead>
+          <tbody id="txBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading transactions...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SESSIONS ═══════════════ -->
+  <div class="section" id="sec-sessions">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-video" style="color:var(--primary)"></i>
+        <span class="card-title">All Sessions</span>
+        <span class="card-count" id="sessionsCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="sessionsSearch" placeholder="Search sessions...">
+        </div>
+        <select class="filter-select" id="sessionsFilter" onchange="renderSessions()">
+          <option value="all">All Statuses</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Tutor</th>
+            <th>Learner</th>
+            <th>Skill</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="sessionsBody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span>Loading sessions...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SKILLS ═══════════════ -->
+  <div class="section" id="sec-skills">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-graduation-cap" style="color:var(--violet)"></i>
+        <span class="card-title">Skill Listings</span>
+        <span class="card-count" id="skillsCount">0</span>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="skillsSearch" placeholder="Search skills...">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Skill</th>
+            <th>Tutor</th>
+            <th>Price / hr</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="skillsBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading skills...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ REVIEWS ═══════════════ -->
+  <div class="section" id="sec-reviews">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-star" style="color:var(--amber)"></i>
+        <span class="card-title">Reviews & Ratings</span>
+        <span class="card-count" id="reviewsCount">0</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Reviewer</th>
+            <th>Tutor</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="reviewsBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading reviews...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ REPORTS ═══════════════ -->
+  <div class="section" id="sec-reports">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-flag" style="color:var(--rose)"></i>
+        <span class="card-title">User Reports</span>
+        <span class="card-count" id="reportsCount">0</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Reporter</th>
+            <th>Reported User</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="reportsBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading reports...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ACTIVITY LOG ═══════════════ -->
+  <div class="section" id="sec-activity">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-clock-rotate-left" style="color:var(--cyan)"></i>
+        <span class="card-title">Platform Activity Log</span>
+      </div>
+      <div style="padding:0 22px" id="activityLogBody">
+        <div class="empty-state"><i class="fas fa-clock"></i><p>No activity logged</p></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore,collection,onSnapshot,doc,getDoc,updateDoc,setDoc,increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getFirestore, collection, onSnapshot, doc,
+  getDoc, getDocs, updateDoc, setDoc, addDoc, deleteDoc,
+  increment, query, orderBy, limit, where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
- authDomain: "skillswapp-35e86.firebaseapp.com",
- projectId: "skillswapp-35e86"
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86"
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-let allUsers = [];
 
-onSnapshot(collection(db,"earnings"), snapshot => {
-  let totalPaid=0,totalRevenue=0;
-  snapshot.forEach(d=>{ totalPaid += d.data().totalEarned||0; });
-  totalRevenue = totalPaid * 0.10;
-  document.getElementById("totalPaid").innerText = "₹"+totalPaid;
-  document.getElementById("totalRevenue").innerText = "₹"+totalRevenue;
-});
-onSnapshot(collection(db,"users"), snapshot=>{ document.getElementById("totalUsers").innerText = snapshot.size; });
-onSnapshot(collection(db,"withdrawRequests"), snapshot=>{
-  let pending=0;
-  snapshot.forEach(d=>{ if(d.data().status==="pending") pending+=d.data().amount; });
-  document.getElementById("pendingWithdraw").innerText = "₹"+pending;
-});
+// ─── STATE ───
+window.usersData = [];
+window.earningsMap = {};
+window.withdrawalsData = [];
+window.sessionsData = [];
+window.skillsData = [];
+window.reviewsData = [];
+window.reportsData = [];
+window.transactionsData = [];
+window.activityLog = [];
 
-const walletTable = document.getElementById("walletTable");
-onSnapshot(collection(db,"earnings"), async snapshot => {
-  walletTable.innerHTML=""; allUsers=[];
-  for(const docSnap of snapshot.docs){
-    const data=docSnap.data(), uid=docSnap.id;
-    const userSnap=await getDoc(doc(db,"users",uid));
-    let name="Unknown",email="Not Found";
-    if(userSnap.exists()){ name=userSnap.data().name||"No Name"; email=userSnap.data().email||"No Email"; }
-    allUsers.push({uid,name,email,balance:data.balance||0,totalEarned:data.totalEarned||0});
-  }
-  renderUsers(allUsers);
-});
-
-function renderUsers(users){
-  walletTable.innerHTML="";
-  users.forEach(u=>{
-    walletTable.innerHTML += `<tr>
-      <td data-label="User"><div><strong>${u.name}</strong><br><small style="color:var(--muted)">${u.email}</small></div></td>
-      <td data-label="Balance">₹${u.balance}</td>
-      <td data-label="Total Earned">₹${u.totalEarned}</td>
-      <td data-label="Actions"><div class="action-btns">
-        <button class="add" onclick="addMoney('${u.uid}')">+ Add</button>
-        <button class="deduct" onclick="deductMoney('${u.uid}')">- Deduct</button>
-        <button class="set" onclick="setBalance('${u.uid}')">Set</button>
-      </div></td></tr>`;
-  });
+// ─── HELPERS ───
+function avatarColor(name="") {
+  const colors = ['#4f8eff','#8b5cf6','#10b981','#f59e0b','#f43f5e','#22d3ee','#ec4899'];
+  return colors[name.charCodeAt(0) % colors.length] || '#4f8eff';
+}
+function initials(name="") {
+  return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+}
+function avatar(name, size=34) {
+  const c = avatarColor(name), i = initials(name);
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${c}20;color:${c};border:1px solid ${c}40">${i}</div>`;
+}
+function userCell(name, email) {
+  return `<div class="user-cell">${avatar(name)}<div><div class="user-name">${name||'Unknown'}</div><div class="user-email">${email||''}</div></div></div>`;
+}
+function fmtDate(ts) {
+  if (!ts) return '—';
+  try { const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'}); } catch{return '—';}
+}
+function stars(n=0) {
+  return '★'.repeat(Math.min(5,Math.round(n))) + '☆'.repeat(Math.max(0,5-Math.round(n)));
+}
+window.showToast = function(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  const icons = {success:'fa-circle-check',error:'fa-circle-xmark',info:'fa-circle-info'};
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type]||'fa-circle-info'}"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  t.onclick = ()=>t.remove();
+  setTimeout(()=>t.remove(), 4000);
+}
+function logActivity(text, color='var(--primary)') {
+  window.activityLog.unshift({text, color, time: new Date().toLocaleTimeString()});
+  if(window.activityLog.length > 50) window.activityLog.pop();
+  renderActivityLog();
+}
+function renderActivityLog() {
+  const el = document.getElementById('activityLogBody');
+  const feed = document.getElementById('activityFeed');
+  if(!window.activityLog.length) return;
+  const html = window.activityLog.slice(0,20).map(a=>`
+    <div class="log-item">
+      <div class="log-dot" style="background:${a.color}"></div>
+      <div class="log-content">
+        <div class="log-text">${a.text}</div>
+        <div class="log-meta">${a.time}</div>
+      </div>
+    </div>`).join('');
+  el.innerHTML = html;
+  if(feed) feed.innerHTML = window.activityLog.slice(0,6).map(a=>`
+    <div class="log-item">
+      <div class="log-dot" style="background:${a.color}"></div>
+      <div class="log-content">
+        <div class="log-text">${a.text}</div>
+        <div class="log-meta">${a.time}</div>
+      </div>
+    </div>`).join('');
 }
 
-window.filterUsers = function(){
-  const s=document.getElementById("searchUser").value.toLowerCase();
-  renderUsers(allUsers.filter(u=>u.email.toLowerCase().includes(s)));
-};
-window.addMoney = async function(uid){ const a=Number(prompt("Add amount:")); if(!a) return; await updateDoc(doc(db,"earnings",uid),{balance:increment(a),totalEarned:increment(a)}); };
-window.deductMoney = async function(uid){ const a=Number(prompt("Deduct amount:")); if(!a) return; await updateDoc(doc(db,"earnings",uid),{balance:increment(-a)}); };
-window.setBalance = async function(uid){ const a=Number(prompt("Set new balance:")); if(a<0) return; await setDoc(doc(db,"earnings",uid),{balance:a},{merge:true}); };
+// ─── NAV ───
+window.showSection = function(name) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  event?.currentTarget?.classList.add('active');
+  const titles = {dashboard:'Dashboard',users:'All Users',tutors:'Tutors',wallets:'Wallet Management',withdrawals:'Withdrawals',transactions:'Transactions',sessions:'Sessions',skills:'Skill Listings',reviews:'Reviews',reports:'Reports',activity:'Activity Log'};
+  document.getElementById('topbarTitle').textContent = titles[name]||name;
+  document.getElementById('topbarSub').textContent = 'SkillSwap Admin';
+  closeSidebar();
+}
+window.openSidebar = function() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); }
+window.closeSidebar = function() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); }
 
-const withdrawTable = document.getElementById("withdrawTable");
-onSnapshot(collection(db,"withdrawRequests"), async snapshot => {
-  withdrawTable.innerHTML="";
-  for(const docSnap of snapshot.docs){
-    const data=docSnap.data();
-    const userSnap=await getDoc(doc(db,"users",data.tutorId));
-    let name="Unknown"; if(userSnap.exists()) name=userSnap.data().name;
-    const statusClass=`status-${data.status}`;
-    withdrawTable.innerHTML += `<tr>
-      <td data-label="Tutor">${name}</td>
-      <td data-label="Amount">₹${data.amount}</td>
-      <td data-label="Status"><span class="status-badge ${statusClass}">${data.status}</span></td>
-      <td data-label="Actions"><div class="action-btns">${data.status==="pending"?`
-        <button class="approve" onclick="approveWithdraw('${docSnap.id}','${data.tutorId}',${data.amount})">Approve</button>
-        <button class="reject" onclick="rejectWithdraw('${docSnap.id}')">Reject</button>`:""}</div></td></tr>`;
-  }
+// ─── MODAL ───
+window.openUserModal = function(uid) {
+  const u = window.usersData.find(x=>x.uid===uid);
+  if(!u) return;
+  const e = window.earningsMap[uid]||{};
+  const color = avatarColor(u.name);
+  document.getElementById('userModalBody').innerHTML = `
+    <div class="profile-hero">
+      <div class="profile-avatar-lg" style="background:${color}20;color:${color};border:1px solid ${color}40">${initials(u.name)}</div>
+      <div>
+        <div class="profile-name">${u.name||'No Name'}</div>
+        <div class="profile-email">${u.email||'—'}</div>
+        <div class="profile-badges">
+          <span class="badge badge-${u.role||'learner'}">${u.role||'learner'}</span>
+          <span class="badge badge-active">Active</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-item-label">UID</div><div class="info-item-value" style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted2)">${uid}</div></div>
+      <div class="info-item"><div class="info-item-label">Phone</div><div class="info-item-value">${u.phone||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Joined</div><div class="info-item-value">${fmtDate(u.createdAt)||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Last Active</div><div class="info-item-value">${fmtDate(u.lastActive)||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Balance</div><div class="info-item-value" style="color:var(--emerald)">₹${e.balance||0}</div></div>
+      <div class="info-item"><div class="info-item-label">Total Earned</div><div class="info-item-value">₹${e.totalEarned||0}</div></div>
+      <div class="info-item"><div class="info-item-label">Skills Listed</div><div class="info-item-value">${(window.skillsData.filter(s=>s.tutorId===uid)).length}</div></div>
+      <div class="info-item"><div class="info-item-label">Sessions</div><div class="info-item-value">${(window.sessionsData.filter(s=>s.tutorId===uid||s.learnerId===uid)).length}</div></div>
+    </div>
+    ${u.bio?`<div class="info-item" style="margin-bottom:10px"><div class="info-item-label">Bio</div><div class="info-item-value" style="font-size:0.82rem;font-weight:400;white-space:normal">${u.bio}</div></div>`:''}
+  `;
+  document.getElementById('userModalFooter').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal('userModal')"><i class="fas fa-times"></i> Close</button>
+    <button class="btn btn-amber" onclick="closeModal('userModal');showSection('wallets');setTimeout(()=>{document.getElementById('walletsSearch').value='${u.email}';filterWallets();},200)"><i class="fas fa-wallet"></i> Manage Wallet</button>
+    <button class="btn btn-danger" onclick="banUser('${uid}','${u.name}')"><i class="fas fa-ban"></i> Ban User</button>
+  `;
+  document.getElementById('userModal').classList.add('open');
+}
+
+// ─── USERS ───
+onSnapshot(collection(db,'users'), async snapshot => {
+  window.usersData = [];
+  snapshot.forEach(d => { window.usersData.push({uid:d.id,...d.data()}); });
+  document.getElementById('dash-users').textContent = snapshot.size;
+  document.getElementById('usersCount').textContent = snapshot.size;
+  renderUsers();
+  renderTutors();
+  logActivity(`Users synced — ${snapshot.size} total`,'var(--primary)');
 });
 
-window.approveWithdraw = async function(id,tutorId,amount){
-  await updateDoc(doc(db,"withdrawRequests",id),{status:"approved"});
-  await updateDoc(doc(db,"earnings",tutorId),{balance:increment(-amount)});
-  alert("Approved. Pay tutor manually.");
-};
-window.rejectWithdraw = async function(id){ await updateDoc(doc(db,"withdrawRequests",id),{status:"rejected"}); };
+function renderUsers() {
+  const q = document.getElementById('usersSearch')?.value.toLowerCase()||'';
+  const role = document.getElementById('usersRoleFilter')?.value||'';
+  let data = window.usersData.filter(u=>{
+    const match = !q || (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    const rm = !role || (u.role||'learner')===role;
+    return match && rm;
+  });
+  const tbody = document.getElementById('usersBody');
+  if(!data.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>`; return; }
+  tbody.innerHTML = data.map(u=>{
+    const e = window.earningsMap[u.uid]||{};
+    const sessions = window.sessionsData.filter(s=>s.tutorId===u.uid||s.learnerId===u.uid).length;
+    return `<tr>
+      <td>${userCell(u.name,u.email)}</td>
+      <td><span class="badge badge-${u.role||'learner'}">${u.role||'learner'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted2)">${fmtDate(u.createdAt)}</td>
+      <td><span class="money ${(e.balance||0)>0?'pos':'neutral'}">₹${e.balance||0}</span></td>
+      <td><span class="money neutral">₹${e.totalEarned||0}</span></td>
+      <td style="font-family:'DM Mono',monospace">${sessions}</td>
+      <td><div class="action-row">
+        <button class="btn btn-primary btn-sm" onclick="openUserModal('${u.uid}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn btn-ghost btn-sm" onclick="openWalletModal('${u.uid}')"><i class="fas fa-wallet"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.filterTable = function() { renderUsers(); }
+
+function renderTutors() {
+  const tutors = window.usersData.filter(u=>u.role==='tutor');
+  document.getElementById('tutorsCount').textContent = tutors.length;
+  const tbody = document.getElementById('tutorsBody');
+  if(!tutors.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fas fa-chalkboard-teacher"></i><p>No tutors yet</p></div></td></tr>`; return; }
+  const q = document.getElementById('tutorsSearch')?.value.toLowerCase()||'';
+  const filtered = tutors.filter(u=>!q||(u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
+  tbody.innerHTML = filtered.map(u=>{
+    const e = window.earningsMap[u.uid]||{};
+    const mySkills = window.skillsData.filter(s=>s.tutorId===u.uid);
+    const mySessions = window.sessionsData.filter(s=>s.tutorId===u.uid);
+    const reviews = window.reviewsData.filter(r=>r.tutorId===u.uid);
+    const avg = reviews.length ? (reviews.reduce((a,r)=>a+(r.rating||0),0)/reviews.length).toFixed(1) : '—';
+    return `<tr>
+      <td>${userCell(u.name,u.email)}</td>
+      <td style="max-width:160px;white-space:normal;font-size:0.78rem;color:var(--muted2)">${mySkills.slice(0,3).map(s=>s.title||s.skill).join(', ')||'—'}</td>
+      <td><span style="color:var(--amber)">${avg!=='—'?'★'+avg:'—'}</span></td>
+      <td style="font-family:'DM Mono',monospace">${mySessions.length}</td>
+      <td><span class="money pos">₹${e.totalEarned||0}</span></td>
+      <td><span class="money ${(e.balance||0)>0?'pos':'neutral'}">₹${e.balance||0}</span></td>
+      <td><div class="action-row">
+        <button class="btn btn-primary btn-sm" onclick="openUserModal('${u.uid}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn btn-ghost btn-sm" onclick="openWalletModal('${u.uid}')"><i class="fas fa-wallet"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.filterTutors = function() { renderTutors(); }
+
+// ─── EARNINGS / WALLETS ───
+onSnapshot(collection(db,'earnings'), snapshot => {
+  let totalPaid=0, totalBalance=0;
+  snapshot.forEach(d => {
+    window.earningsMap[d.id] = d.data();
+    totalPaid += d.data().totalEarned||0;
+    totalBalance += d.data().balance||0;
+  });
+  document.getElementById('dash-paid').textContent = '₹'+totalPaid;
+  document.getElementById('dash-revenue').textContent = '₹'+Math.round(totalPaid*0.10);
+  document.getElementById('dash-walletTotal').textContent = '₹'+totalBalance;
+  document.getElementById('walletsCount').textContent = snapshot.size;
+  renderWallets(); renderUsers(); renderTutors();
+});
+
+function renderWallets() {
+  const q = document.getElementById('walletsSearch')?.value.toLowerCase()||'';
+  const tbody = document.getElementById('walletsBody');
+  let data = Object.entries(window.earningsMap).map(([uid,e])=>{
+    const u = window.usersData.find(x=>x.uid===uid)||{};
+    return {...u,...e,uid};
+  }).filter(u=>!q||(u.email||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q));
+  if(!data.length) { tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-wallet"></i><p>No wallets</p></div></td></tr>`; return; }
+  const withdrawsFor = uid => window.withdrawalsData.filter(w=>w.tutorId===uid&&w.status==='approved').reduce((a,w)=>a+(w.amount||0),0);
+  tbody.innerHTML = data.map(u=>`<tr>
+    <td>${userCell(u.name,u.email)}</td>
+    <td><span class="money ${(u.balance||0)>0?'pos':'neutral'}">₹${u.balance||0}</span></td>
+    <td><span class="money neutral">₹${u.totalEarned||0}</span></td>
+    <td><span class="money neg">₹${withdrawsFor(u.uid)}</span></td>
+    <td><div class="action-row">
+      <button class="btn btn-success btn-sm" onclick="walletAction('${u.uid}','add')"><i class="fas fa-plus"></i> Add</button>
+      <button class="btn btn-danger btn-sm" onclick="walletAction('${u.uid}','deduct')"><i class="fas fa-minus"></i> Deduct</button>
+      <button class="btn btn-primary btn-sm" onclick="walletAction('${u.uid}','set')"><i class="fas fa-pen"></i> Set</button>
+    </div></td>
+  </tr>`).join('');
+}
+window.filterWallets = function() { renderWallets(); }
+
+window.openWalletModal = function(uid) {
+  const e = window.earningsMap[uid]||{};
+  const u = window.usersData.find(x=>x.uid===uid)||{};
+  document.getElementById('walletModalTitle').textContent = `Wallet — ${u.name||uid}`;
+  document.getElementById('walletModalBody').innerHTML = `
+    <div class="info-grid" style="margin-bottom:16px">
+      <div class="info-item"><div class="info-item-label">Current Balance</div><div class="info-item-value" style="color:var(--emerald)">₹${e.balance||0}</div></div>
+      <div class="info-item"><div class="info-item-label">Total Earned</div><div class="info-item-value">₹${e.totalEarned||0}</div></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Action</label>
+      <select class="form-input" id="wAction">
+        <option value="add">➕ Add Money</option>
+        <option value="deduct">➖ Deduct Money</option>
+        <option value="set">✏️ Set Balance</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount (₹)</label>
+      <input class="form-input" id="wAmount" type="number" placeholder="Enter amount..." min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reason (optional)</label>
+      <input class="form-input" id="wReason" placeholder="e.g. Bonus, Correction...">
+    </div>
+  `;
+  document.getElementById('walletModalFooter').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal('walletModal')">Cancel</button>
+    <button class="btn btn-success" onclick="executeWallet('${uid}')"><i class="fas fa-check"></i> Apply</button>
+  `;
+  document.getElementById('walletModal').classList.add('open');
+}
+window.walletAction = function(uid, action) {
+  openWalletModal(uid);
+  setTimeout(()=>{ const el=document.getElementById('wAction'); if(el) el.value=action; },100);
+}
+window.executeWallet = async function(uid) {
+  const action = document.getElementById('wAction').value;
+  const amount = Number(document.getElementById('wAmount').value);
+  const reason = document.getElementById('wReason').value||'Admin adjustment';
+  if(!amount || amount<0) { showToast('Enter a valid amount','error'); return; }
+  const ref = doc(db,'earnings',uid);
+  try {
+    const snap = await getDoc(ref);
+    if(!snap.exists()) await setDoc(ref,{balance:0,totalEarned:0});
+    if(action==='add') await updateDoc(ref,{balance:increment(amount),totalEarned:increment(amount)});
+    else if(action==='deduct') await updateDoc(ref,{balance:increment(-amount)});
+    else await setDoc(ref,{balance:amount},{merge:true});
+    const u = window.usersData.find(x=>x.uid===uid)||{};
+    showToast(`Wallet updated for ${u.name||uid}`,'success');
+    logActivity(`💰 Wallet ${action}: ₹${amount} for ${u.name||uid} — ${reason}`,'var(--emerald)');
+    closeModal('walletModal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ─── WITHDRAWALS ───
+onSnapshot(collection(db,'withdrawRequests'), async snapshot => {
+  window.withdrawalsData = [];
+  let pending = 0;
+  for(const d of snapshot.docs) {
+    const data = d.data();
+    const uSnap = await getDoc(doc(db,'users',data.tutorId||''));
+    const name = uSnap.exists() ? uSnap.data().name : 'Unknown';
+    const email = uSnap.exists() ? uSnap.data().email : '';
+    window.withdrawalsData.push({id:d.id,name,email,...data});
+    if(data.status==='pending') pending += data.amount||0;
+  }
+  document.getElementById('dash-pending').textContent = '₹'+pending;
+  document.getElementById('pendingBadge').textContent = window.withdrawalsData.filter(w=>w.status==='pending').length;
+  document.getElementById('withdrawCount').textContent = snapshot.size;
+  renderWithdrawals();
+  renderDashWithdrawals();
+});
+window.renderWithdrawals = function() {
+  const filter = document.getElementById('withdrawFilter')?.value||'all';
+  const data = filter==='all' ? window.withdrawalsData : window.withdrawalsData.filter(w=>w.status===filter);
+  const tbody = document.getElementById('withdrawBody');
+  if(!data.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-money-bill-transfer"></i><p>No requests</p></div></td></tr>`; return; }
+  tbody.innerHTML = data.map(w=>`<tr>
+    <td>${userCell(w.name,w.email)}</td>
+    <td><span class="money pos">₹${w.amount||0}</span></td>
+    <td style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted2)">${w.upi||w.account||w.paymentInfo||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(w.requestedAt||w.createdAt)}</td>
+    <td><span class="badge badge-${w.status}">${w.status}</span></td>
+    <td><div class="action-row">${w.status==='pending'?`
+      <button class="btn btn-success btn-sm" onclick="approveW('${w.id}','${w.tutorId||''}',${w.amount||0},'${w.name}')"><i class="fas fa-check"></i> Approve</button>
+      <button class="btn btn-danger btn-sm" onclick="rejectW('${w.id}','${w.name}')"><i class="fas fa-times"></i> Reject</button>
+    `:'<span style="color:var(--muted);font-size:0.75rem">No actions</span>'}</div></td>
+  </tr>`).join('');
+}
+function renderDashWithdrawals() {
+  const pending = window.withdrawalsData.filter(w=>w.status==='pending');
+  const tbody = document.getElementById('dash-withdrawTable');
+  if(!pending.length) { tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem">No pending withdrawals ✓</td></tr>`; return; }
+  tbody.innerHTML = pending.map(w=>`<tr>
+    <td style="padding:10px 18px;font-size:0.83rem">${userCell(w.name,w.email)}</td>
+    <td style="padding:10px 18px;font-family:'DM Mono',monospace;color:var(--emerald)">₹${w.amount||0}</td>
+    <td style="padding:10px 18px"><div class="action-row">
+      <button class="btn btn-success btn-sm" onclick="approveW('${w.id}','${w.tutorId||''}',${w.amount||0},'${w.name}')"><i class="fas fa-check"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="rejectW('${w.id}','${w.name}')"><i class="fas fa-times"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+window.approveW = async function(id,tutorId,amount,name) {
+  if(!confirm(`Approve ₹${amount} withdrawal for ${name}?`)) return;
+  try {
+    await updateDoc(doc(db,'withdrawRequests',id),{status:'approved'});
+    if(tutorId) await updateDoc(doc(db,'earnings',tutorId),{balance:increment(-amount)});
+    showToast(`Approved ₹${amount} for ${name}. Pay manually.`,'success');
+    logActivity(`✅ Withdrawal approved: ₹${amount} for ${name}`,'var(--emerald)');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+window.rejectW = async function(id,name) {
+  if(!confirm(`Reject withdrawal request for ${name}?`)) return;
+  try {
+    await updateDoc(doc(db,'withdrawRequests',id),{status:'rejected'});
+    showToast(`Rejected withdrawal for ${name}`,'info');
+    logActivity(`❌ Withdrawal rejected for ${name}`,'var(--rose)');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ─── SESSIONS ───
+onSnapshot(collection(db,'sessions'), snapshot => {
+  window.sessionsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('sessionsCount').textContent = snapshot.size;
+  renderSessions(); renderUsers(); renderTutors();
+});
+window.renderSessions = function() {
+  const filter = document.getElementById('sessionsFilter')?.value||'all';
+  const q = document.getElementById('sessionsSearch')?.value.toLowerCase()||'';
+  let data = window.sessionsData;
+  if(filter!=='all') data = data.filter(s=>s.status===filter);
+  if(q) data = data.filter(s=>(s.skill||'').toLowerCase().includes(q)||(s.tutorName||'').toLowerCase().includes(q)||(s.learnerName||'').toLowerCase().includes(q));
+  const tbody = document.getElementById('sessionsBody');
+  if(!data.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fas fa-video"></i><p>No sessions</p></div></td></tr>`; return; }
+  tbody.innerHTML = data.map(s=>{
+    const tName = s.tutorName || (window.usersData.find(u=>u.uid===s.tutorId)||{}).name || 'Unknown';
+    const lName = s.learnerName || (window.usersData.find(u=>u.uid===s.learnerId)||{}).name || 'Unknown';
+    return `<tr>
+      <td>${userCell(tName,'')}</td>
+      <td>${userCell(lName,'')}</td>
+      <td style="font-size:0.82rem">${s.skill||s.title||'—'}</td>
+      <td><span class="money pos">₹${s.amount||s.price||0}</span></td>
+      <td><span class="badge badge-${s.status||'pending'}">${s.status||'pending'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(s.createdAt||s.date)}</td>
+      <td><div class="action-row">
+        ${s.status!=='cancelled'?`<button class="btn btn-danger btn-sm" onclick="cancelSession('${s.id}')"><i class="fas fa-ban"></i></button>`:''}
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.cancelSession = async function(id) {
+  if(!confirm('Cancel this session?')) return;
+  try { await updateDoc(doc(db,'sessions',id),{status:'cancelled'}); showToast('Session cancelled','info'); logActivity(`🚫 Session ${id} cancelled`,'var(--rose)'); }
+  catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ─── SKILLS ───
+onSnapshot(collection(db,'skillListings'), snapshot => {
+  window.skillsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('skillsCount').textContent = snapshot.size;
+  renderSkills();
+});
+// also try 'skills' collection
+onSnapshot(collection(db,'skills'), snapshot => {
+  if(snapshot.size > 0) {
+    const existing = new Set(window.skillsData.map(s=>s.id));
+    snapshot.docs.forEach(d=>{if(!existing.has(d.id)) window.skillsData.push({id:d.id,...d.data()});});
+    document.getElementById('skillsCount').textContent = window.skillsData.length;
+    renderSkills();
+  }
+});
+function renderSkills() {
+  const q = document.getElementById('skillsSearch')?.value.toLowerCase()||'';
+  let data = window.skillsData.filter(s=>!q||(s.title||s.skill||'').toLowerCase().includes(q)||(s.category||'').toLowerCase().includes(q));
+  const tbody = document.getElementById('skillsBody');
+  if(!data.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-graduation-cap"></i><p>No skill listings</p></div></td></tr>`; return; }
+  tbody.innerHTML = data.map(s=>{
+    const tutorName = (window.usersData.find(u=>u.uid===s.tutorId)||{}).name||'Unknown';
+    return `<tr>
+      <td><div style="font-weight:600;font-size:0.88rem">${s.title||s.skill||'—'}</div></td>
+      <td>${userCell(tutorName,'')}</td>
+      <td><span class="money neutral">₹${s.price||s.hourlyRate||0}/hr</span></td>
+      <td style="color:var(--muted2);font-size:0.8rem">${s.category||'—'}</td>
+      <td><span class="badge badge-${s.status||'active'}">${s.status||'active'}</span></td>
+      <td><div class="action-row">
+        ${s.status!=='suspended'?`<button class="btn btn-amber btn-sm" onclick="toggleSkill('${s.id}','suspend')"><i class="fas fa-pause"></i> Suspend</button>`:`<button class="btn btn-success btn-sm" onclick="toggleSkill('${s.id}','restore')"><i class="fas fa-play"></i> Restore</button>`}
+        <button class="btn btn-danger btn-sm" onclick="deleteSkill('${s.id}')"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.toggleSkill = async function(id,action) {
+  const col = window.skillsData.find(s=>s.id===id)?.collection||'skillListings';
+  try { await updateDoc(doc(db,'skillListings',id),{status:action==='suspend'?'suspended':'active'}); showToast(`Skill ${action}d`,'info'); } catch{}
+  try { await updateDoc(doc(db,'skills',id),{status:action==='suspend'?'suspended':'active'}); showToast(`Skill ${action}d`,'info'); } catch{}
+}
+window.deleteSkill = async function(id) {
+  if(!confirm('Delete this skill listing? This cannot be undone.')) return;
+  try { await deleteDoc(doc(db,'skillListings',id)); showToast('Skill deleted','success'); logActivity(`🗑️ Skill listing deleted`,'var(--rose)'); } catch{}
+  try { await deleteDoc(doc(db,'skills',id)); } catch{}
+}
+
+// ─── REVIEWS ───
+onSnapshot(collection(db,'reviews'), snapshot => {
+  window.reviewsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('reviewsCount').textContent = snapshot.size;
+  renderReviews();
+});
+function renderReviews() {
+  const tbody = document.getElementById('reviewsBody');
+  if(!window.reviewsData.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-star"></i><p>No reviews</p></div></td></tr>`; return; }
+  tbody.innerHTML = window.reviewsData.map(r=>{
+    const reviewer = (window.usersData.find(u=>u.uid===r.reviewerId)||{}).name||r.reviewerName||'Unknown';
+    const tutor = (window.usersData.find(u=>u.uid===r.tutorId)||{}).name||r.tutorName||'Unknown';
+    return `<tr>
+      <td>${userCell(reviewer,'')}</td>
+      <td>${userCell(tutor,'')}</td>
+      <td><span style="color:var(--amber);font-size:0.85rem">${stars(r.rating)}</span> <span style="font-family:'DM Mono',monospace;font-size:0.72rem">${r.rating||0}/5</span></td>
+      <td style="max-width:200px;white-space:normal;font-size:0.8rem;color:var(--muted2)">${r.comment||r.review||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(r.createdAt)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+window.deleteReview = async function(id) {
+  if(!confirm('Delete this review?')) return;
+  try { await deleteDoc(doc(db,'reviews',id)); showToast('Review deleted','success'); logActivity('🗑️ Review deleted','var(--rose)'); }
+  catch(e) { showToast('Error','error'); }
+}
+
+// ─── REPORTS ───
+onSnapshot(collection(db,'reports'), snapshot => {
+  window.reportsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('reportsCount').textContent = snapshot.size;
+  renderReports();
+});
+function renderReports() {
+  const tbody = document.getElementById('reportsBody');
+  if(!window.reportsData.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-flag"></i><p>No reports</p></div></td></tr>`; return; }
+  tbody.innerHTML = window.reportsData.map(r=>{
+    const reporter = (window.usersData.find(u=>u.uid===r.reporterId)||{}).name||'Unknown';
+    const reported = (window.usersData.find(u=>u.uid===r.reportedId)||{}).name||r.reportedName||'Unknown';
+    return `<tr>
+      <td>${userCell(reporter,'')}</td>
+      <td>${userCell(reported,'')}</td>
+      <td style="max-width:160px;white-space:normal;font-size:0.8rem;color:var(--muted2)">${r.reason||r.type||'—'}</td>
+      <td><span class="badge badge-${r.status||'pending'}">${r.status||'pending'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(r.createdAt)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-success btn-sm" onclick="resolveReport('${r.id}')"><i class="fas fa-check"></i> Resolve</button>
+        <button class="btn btn-danger btn-sm" onclick="banUser('${r.reportedId}','${reported}')"><i class="fas fa-ban"></i> Ban</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.resolveReport = async function(id) {
+  try { await updateDoc(doc(db,'reports',id),{status:'resolved'}); showToast('Report resolved','success'); logActivity('✅ Report resolved','var(--emerald)'); }
+  catch(e) { showToast('Error','error'); }
+}
+
+// ─── TRANSACTIONS ───
+onSnapshot(collection(db,'transactions'), snapshot => {
+  window.transactionsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  document.getElementById('txCount').textContent = snapshot.size;
+  renderTransactions();
+});
+function renderTransactions() {
+  const tbody = document.getElementById('txBody');
+  if(!window.transactionsData.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-receipt"></i><p>No transactions</p></div></td></tr>`; return; }
+  tbody.innerHTML = window.transactionsData.map(t=>{
+    const fromUser = (window.usersData.find(u=>u.uid===t.fromId||u.uid===t.userId)||{}).name||t.fromName||'System';
+    const toUser = (window.usersData.find(u=>u.uid===t.toId)||{}).name||t.toName||t.description||'—';
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted)">${t.id.slice(0,8)}...</td>
+      <td>${userCell(fromUser,'')}</td>
+      <td style="font-size:0.82rem;color:var(--muted2)">${toUser}</td>
+      <td><span class="money ${(t.amount||0)>0?'pos':'neg'}">₹${Math.abs(t.amount||0)}</span></td>
+      <td><span class="badge badge-${t.type==='credit'?'approved':t.type==='debit'?'rejected':'pending'}">${t.type||'tx'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(t.createdAt)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── BAN USER ───
+window.banUser = async function(uid, name) {
+  if(!uid||uid==='undefined') { showToast('Invalid user','error'); return; }
+  if(!confirm(`Ban user ${name}? They will be marked as banned.`)) return;
+  try {
+    await updateDoc(doc(db,'users',uid),{status:'banned',bannedAt:new Date()});
+    showToast(`User ${name} banned`,'success');
+    logActivity(`🚫 User banned: ${name}`,'var(--rose)');
+    closeModal('userModal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ─── REFRESH ───
+window.refreshAll = function() {
+  showToast('Data refreshing (live)...','info');
+}
+
+// ─── INIT ───
+logActivity('🛡️ Admin panel loaded','var(--primary)');
 </script>
 </body>
 </html>

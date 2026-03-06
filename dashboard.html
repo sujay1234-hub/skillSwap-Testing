@@ -1,536 +1,1030 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - SkillSwap</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · SkillSwap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #070710;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.15);
+      --primary: #6366f1;
+      --primary-dim: rgba(99,102,241,0.15);
+      --accent: #a855f7;
+      --gold: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --info: #38bdf8;
+      --text: #f4f4f5;
+      --muted: #71717a;
+      --glow: rgba(99,102,241,0.25);
+    }
 
-    <style>
-        :root {
-            --bg-dark: #09090b;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.3);
-            --accent: #a855f7;
-            --success: #10b981;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-        }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(99,102,241,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 100%, rgba(168,85,247,0.1) 0%, transparent 60%);
+    }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            /* Subtle Mesh Gradient */
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 20%);
-        }
+    /* ── LAYOUT ─────────────────────────────── */
+    .app { display:flex; min-height:100vh; }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.02);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
 
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
+    .sidebar-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      padding: 0 24px 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo i { -webkit-text-fill-color: var(--primary); font-size:1.2rem; }
 
-        .user-greeting h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
+    .nav-section {
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+    .nav-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px 12px 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: 0.95rem; }
+    .nav-item:hover { background: var(--surface); color: var(--text); }
+    .nav-item.active {
+      background: var(--primary-dim);
+      color: var(--primary);
+      border: 1px solid rgba(99,102,241,0.2);
+    }
+    .nav-item.active i { color: var(--primary); }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
 
-        .user-greeting p {
-            color: var(--text-muted);
-        }
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar-user:hover { background: rgba(255,255,255,0.07); }
+    .s-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .s-user-info { flex:1; min-width:0; }
+    .s-user-name { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .s-user-role { font-size: 0.75rem; color: var(--gold); }
 
-        .profile-pill {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 8px 16px;
-            border-radius: 50px;
-        }
+    /* ── MAIN ─────────────────────────────────── */
+    .main {
+      flex: 1;
+      margin-left: 240px;
+      padding: 32px 32px 80px;
+      max-width: 1200px;
+    }
 
-        .avatar {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold;
-        }
+    /* ── TOP BAR ─────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      gap: 16px;
+    }
+    .topbar-left h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .topbar-left p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 50px;
-        }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      width: 220px;
+      transition: 0.2s;
+    }
+    .search-bar:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    .search-bar i { color: var(--muted); font-size: 0.85rem; }
+    .search-bar input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--muted); }
 
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 28px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            backdrop-filter: blur(10px);
-        }
+    .icon-btn {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+      position: relative;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .icon-btn .dot {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 8px; height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+    /* ── STATS GRID ──────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      transition: 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.02));
+      pointer-events: none;
+    }
+    .kpi:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+    .kpi-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .kpi-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .kpi-trend {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 20px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .trend-up { background: rgba(16,185,129,0.12); color: var(--success); }
+    .trend-down { background: rgba(239,68,68,0.12); color: var(--danger); }
+    .kpi-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .kpi-label { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .kpi-bar { margin-top: 14px; height: 4px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+    .kpi-bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            opacity: 0;
-            transition: 0.3s;
-        }
+    /* ── CONTENT GRID ────────────────────────── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
 
-        .stat-card:hover::before { opacity: 1; }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+    }
 
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
+    .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title span { display: flex; align-items: center; gap: 8px; }
+    .panel-link {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .panel-link:hover { color: var(--accent); }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
+    /* ── ACTIVITY LIST ───────────────────────── */
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      transition: 0.2s;
+    }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item:first-child { padding-top: 0; }
+    .act-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    .act-body { flex: 1; min-width: 0; }
+    .act-title { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .act-right { text-align: right; flex-shrink: 0; }
+    .act-amount { font-size: 0.88rem; font-weight: 700; }
+    .act-time { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge-pending { background: rgba(245,158,11,0.12); color: var(--gold); }
+    .badge-done { background: rgba(16,185,129,0.12); color: var(--success); }
+    .badge-active { background: rgba(99,102,241,0.15); color: var(--primary); }
 
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+    /* ── RIGHT COLUMN ────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 20px; }
 
-        /* Wallet Specific */
-        .wallet-card .stat-value {
-            background: linear-gradient(to right, #fff, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    /* ── QUICK ACTIONS ───────────────────────── */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .qa-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .qa-btn:hover { border-color: var(--primary); background: var(--primary-dim); transform: translateY(-2px); }
+    .qa-btn i { font-size: 1.2rem; }
+    .qa-btn span { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+    .qa-btn:hover span { color: var(--text); }
 
-        .btn-action {
-            margin-top: 20px;
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            background: rgba(255,255,255,0.05);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+    /* ── REPUTATION ──────────────────────────── */
+    .rep-level {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .rep-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+    .rep-bar-bg { height: 8px; background: rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; }
+    .rep-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 8px;
+      width: 0%;
+      transition: width 1.4s cubic-bezier(.4,0,.2,1);
+    }
+    .rep-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
+    .rep-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .rep-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
 
-        .btn-action:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
+    /* ── NOTIFICATION PANEL ──────────────────── */
+    .notif-item {
+      display: flex; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .notif-text { font-size: 0.83rem; line-height: 1.4; }
+    .notif-time { font-size: 0.73rem; color: var(--muted); margin-top: 3px; }
 
-        /* Reputation Progress */
-        .progress-container {
-            margin-top: 15px;
-        }
-        .progress-bar-bg {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            width: 0%; /* JS will update this */
-            border-radius: 10px;
-            transition: width 1s ease;
-        }
-        .level-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 8px;
-        }
+    /* ── UPCOMING SESSIONS ───────────────────── */
+    .session-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .session-item:last-child { border-bottom: none; }
+    .session-time {
+      width: 50px;
+      text-align: center;
+      flex-shrink: 0;
+      background: var(--primary-dim);
+      border-radius: 10px;
+      padding: 8px 4px;
+    }
+    .session-time .s-day { font-size: 0.7rem; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+    .session-time .s-date { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--primary); line-height: 1.1; }
+    .session-body { flex: 1; min-width: 0; }
+    .session-title { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .session-partner { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .session-action {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+    .session-action:hover { opacity: 0.85; transform: scale(1.03); }
 
-        /* Recent Activity Section */
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* ── CHART ───────────────────────────────── */
+    .chart-area {
+      height: 160px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding-top: 10px;
+    }
+    .chart-bar-wrap {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .chart-bar {
+      width: 100%;
+      border-radius: 8px 8px 4px 4px;
+      background: var(--primary-dim);
+      transition: height 1.2s cubic-bezier(.4,0,.2,1), background 0.2s;
+      cursor: pointer;
+      min-height: 4px;
+    }
+    .chart-bar:hover { background: var(--primary); }
+    .chart-bar.highlight { background: linear-gradient(to top, var(--primary), var(--accent)); }
+    .chart-label { font-size: 0.7rem; color: var(--muted); }
 
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+    /* ── MODAL ───────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: #0f0f1a;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      width: 90%; max-width: 420px;
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+    .modal-overlay.show .modal-box { transform: scale(1) translateY(0); }
+    .modal-head { text-align: center; margin-bottom: 28px; }
+    .modal-head .modal-icon {
+      width: 60px; height: 60px;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 16px;
+      background: var(--primary-dim);
+      color: var(--primary);
+    }
+    .modal-head h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
+    .modal-head p { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+    .input-group { margin-bottom: 18px; }
+    .input-group label { display: block; font-size: 0.82rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+    .input-group input, .input-group select {
+      width: 100%; padding: 13px 16px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem;
+      outline: none;
+      transition: 0.2s;
+      -webkit-appearance: none;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    .input-group select option { background: #0f0f1a; }
+    .btn-primary {
+      width: 100%; padding: 14px;
+      border-radius: 12px; border: none;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: 0.25s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px var(--glow); }
+    .btn-cancel {
+      width: 100%; padding: 13px; margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-cancel:hover { background: var(--surface); color: var(--text); }
 
-        .activity-item {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    /* ── TOAST ───────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 9999;
+    }
+    .toast {
+      background: #1a1a2e;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      min-width: 260px; max-width: 340px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      animation: slideUp 0.4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast.removing { animation: slideDown 0.3s ease forwards; }
+    .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 0.88rem; font-weight: 700; }
+    .toast-msg { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    @keyframes slideUp { from { opacity:0; transform: translateY(20px) scale(0.9); } to { opacity:1; transform: translateY(0) scale(1); } }
+    @keyframes slideDown { to { opacity:0; transform: translateY(10px) scale(0.95); } }
 
-        .activity-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    /* ── MOBILE NAV ──────────────────────────── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(7,7,16,0.95);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      padding: 10px 0 env(safe-area-inset-bottom, 10px);
+      z-index: 300;
+    }
+    .mobile-nav-inner {
+      display: flex;
+      justify-content: space-around;
+    }
+    .mob-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 12px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+    .mob-nav-item i { font-size: 1.15rem; }
+    .mob-nav-item.active { color: var(--primary); }
+    .mob-nav-item .mob-dot {
+      position: absolute;
+      top: 0; right: 0;
+      width: 7px; height: 7px;
+      background: var(--danger);
+      border-radius: 50%;
+    }
 
-        .activity-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted);
-        }
+    /* ── MOBILE HEADER ───────────────────────── */
+    .mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      background: rgba(7,7,16,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .mobile-header .mob-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .mob-header-right { display: flex; align-items: center; gap: 8px; }
 
-        .activity-text h4 {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .activity-text p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+    /* ── EMPTY STATE ─────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--muted);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.3; }
+    .empty-state p { font-size: 0.88rem; }
 
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-        .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    /* ── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 1024px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .content-grid { grid-template-columns: 1fr; }
+      .right-col { display: grid; grid-template-columns: repeat(2, 1fr); }
+    }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s;
-        }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 0 0 80px; }
+      .mobile-header { display: flex; }
+      .mobile-nav { display: block; }
+      .topbar { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px; margin-bottom: 20px; }
+      .content-grid { grid-template-columns: 1fr; padding: 0 16px; gap: 16px; }
+      .right-col { display: flex; flex-direction: column; }
+      .kpi-value { font-size: 1.5rem; }
+      .search-bar { width: 160px; }
+      .sidebar-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 199;
+        display: none;
+      }
+      .sidebar-overlay.show { display: block; }
+    }
 
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-box {
-            background: #18181b;
-            border: 1px solid var(--card-border);
-            padding: 40px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 400px;
-            transform: scale(0.9);
-            transition: 0.3s;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .modal-overlay.show .modal-box {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .modal-header i {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .modal-header h2 { font-size: 1.5rem; margin-bottom: 10px; }
-        .modal-header p { color: var(--text-muted); font-size: 0.9rem; }
-
-        .input-group { margin-bottom: 20px; }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--primary-glow); }
-
-        .btn-cancel {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            background: transparent;
-            color: var(--text-muted);
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-
-        .btn-cancel:hover { background: rgba(255,255,255,0.05); color: white; }
-
-        @media (max-width: 768px) {
-            header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .profile-pill { width: 100%; justify-content: space-between; }
-        }
-    </style>
-
-<style id="mob">
-.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
-@media(max-width:768px){
-.mobile-back-btn{display:flex;}
-.container{padding:70px 16px 30px;}
-header{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:24px;}
-.user-greeting h1{font-size:1.4rem;}
-.profile-pill{width:100%;}
-.stats-grid{grid-template-columns:1fr;gap:16px;margin-bottom:32px;}
-.stat-card{padding:20px;}
-.stat-value{font-size:1.6rem;}
-.activity-item{flex-direction:column;align-items:flex-start;gap:12px;}
-.modal-box{padding:28px 20px;border-radius:18px;}
-}
-@media(max-width:480px){
-.stats-grid{grid-template-columns:1fr;}
-}
-</style>
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .kpi { padding: 16px; }
+      .quick-actions { grid-template-columns: repeat(4, 1fr); }
+      .qa-btn span { display: none; }
+      .qa-btn { padding: 14px 10px; }
+    }
+  </style>
 </head>
 <body>
-<a class="mobile-back-btn" href="index.html" title="Back">&#8592;</a>
 
-    <div class="container">
-        <header>
-            <div class="user-greeting">
-                <h1>Welcome back! 👋</h1>
-                <p>Here is your daily overview.</p>
-            </div>
-            <div class="profile-pill">
-                <div class="avatar" id="userAvatar">U</div>
-                <div>
-                    <div style="font-weight:600; font-size:0.9rem;" id="userName">User</div>
-                    <div style="font-size:0.8rem; color:#fbbf24;">⭐ <span id="userXP">0</span> XP</div>
-                </div>
-            </div>
-        </header>
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <!-- Wallet Card -->
-            <div class="stat-card wallet-card">
-                <div class="stat-icon" style="color: #fbbf24;">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <div class="stat-value" id="walletBalance">₹0</div>
-                <div class="stat-label">Wallet Balance</div>
-                <button class="btn-action" onclick="openWithdrawModal()">
-                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Withdraw Funds
-                </button>
-            </div>
-
-            <!-- Reputation Card -->
-            <div class="stat-card">
-                <div class="stat-icon" style="color: #a855f7;">
-                    <i class="fa-solid fa-medal"></i>
-                </div>
-                <div class="stat-value" id="repLevel">Beginner</div>
-                <div class="stat-label">Reputation Level</div>
-                <div class="progress-container">
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="repProgress" style="width: 10%"></div>
-                    </div>
-                    <div class="level-text">
-                        <span>Novice</span>
-                        <span>Expert</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trades Card -->
-            <!-- 🤝 ACTIVE TRADES CARD -->
-<div class="stat-card">
-
-  <div class="stat-icon" style="color:#6366f1;">
-    <i class="fa-solid fa-handshake"></i>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <i class="fa-solid fa-bolt"></i> SkillSwap
   </div>
 
-  <div class="stat-value" id="tradeCount">0</div>
-  <div class="stat-label">Active Trades</div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a class="nav-item active" href="#"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a class="nav-item" href="skill-exchange.html"><i class="fa-solid fa-arrows-rotate"></i> Skill Exchange</a>
+    <a class="nav-item" href="trades.html"><i class="fa-solid fa-handshake"></i> My Trades <span class="nav-badge" id="sidebarTradeCount">0</span></a>
+    <a class="nav-item" href="#" onclick="openModal('scheduleModal')"><i class="fa-solid fa-calendar-days"></i> Sessions</a>
+  </div>
 
-  <!-- 👀 VIEW MY TRADES BUTTON -->
-  <button onclick="location.href='trades.html'"
-  style="
-    margin-top:14px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    border:none;
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-  ">
-    📋 View My Trades
-  </button>
+  <div class="nav-section">
+    <div class="nav-label">Account</div>
+    <a class="nav-item" href="#" onclick="openModal('notifModal')"><i class="fa-solid fa-bell"></i> Notifications <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="#" onclick="openModal('withdrawModal')"><i class="fa-solid fa-wallet"></i> Wallet</a>
+    <a class="nav-item" href="setting.html"><i class="fa-solid fa-gear"></i> Settings</a>
+  </div>
 
-  <!-- ➕ FIND NEW TRADES BUTTON -->
-  <button onclick="location.href='skill-exchange.html'"
-  style="
-    margin-top:8px;
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid #333;
-    background:#18181b;
-    color:#fff;
-    cursor:pointer;
-  ">
-    ➕ Find New Trades
-  </button>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="s-avatar" id="sidebarAvatar">U</div>
+      <div class="s-user-info">
+        <div class="s-user-name" id="sidebarName">Loading…</div>
+        <div class="s-user-role">⭐ <span id="sidebarXP">0</span> XP</div>
+      </div>
+      <i class="fa-solid fa-ellipsis" style="color:var(--muted);font-size:0.85rem;"></i>
+    </div>
+  </div>
+</aside>
 
+<!-- MOBILE HEADER -->
+<div class="mobile-header">
+  <div class="mob-logo">⚡ SkillSwap</div>
+  <div class="mob-header-right">
+    <div class="icon-btn" onclick="openModal('notifModal')"><i class="fa-solid fa-bell"></i><div class="dot"></div></div>
+    <div class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
+  </div>
 </div>
 
-        <!-- Recent Activity -->
-        <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h2>
-        <div class="activity-list" id="activityList">
-            <!-- Placeholder / Empty State -->
-            <div class="activity-item">
-                <div class="activity-info">
-                    <div class="activity-icon"><i class="fa-solid fa-box-open"></i></div>
-                    <div class="activity-text">
-                        <h4>No Recent Activity</h4>
-                        <p>Start trading skills to see updates here.</p>
-                    </div>
-                </div>
-            </div>
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Good morning, <span id="topName">User</span> 👋</h1>
+      <p id="topDate">Loading date…</p>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search skills…">
+      </div>
+      <div class="icon-btn" onclick="openModal('notifModal')"><i class="fa-solid fa-bell"></i><div class="dot"></div></div>
+      <div class="icon-btn" onclick="openModal('withdrawModal')"><i class="fa-solid fa-wallet"></i></div>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="stats-row">
+    <div class="kpi">
+      <div class="kpi-top">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fa-solid fa-wallet"></i></div>
+        <span class="kpi-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +12%</span>
+      </div>
+      <div class="kpi-value" id="walletBalance" style="background:linear-gradient(90deg,#fff,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">₹0</div>
+      <div class="kpi-label">Wallet Balance</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="background:#f59e0b;width:60%"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top">
+        <div class="kpi-icon" style="background:rgba(99,102,241,0.12);color:var(--primary);"><i class="fa-solid fa-handshake"></i></div>
+        <span class="kpi-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> Active</span>
+      </div>
+      <div class="kpi-value" id="tradeCount">0</div>
+      <div class="kpi-label">Active Trades</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="tradeBar" style="background:var(--primary);width:0%"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top">
+        <div class="kpi-icon" style="background:rgba(168,85,247,0.12);color:var(--accent);"><i class="fa-solid fa-medal"></i></div>
+        <span class="kpi-trend trend-up"><i class="fa-solid fa-star"></i> Lvl</span>
+      </div>
+      <div class="kpi-value" id="repLevel" style="font-size:1.2rem;">Beginner</div>
+      <div class="kpi-label">Reputation Level</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill rep-bar-fill" id="repProgress" style="width:10%"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-top">
+        <div class="kpi-icon" style="background:rgba(16,185,129,0.12);color:var(--success);"><i class="fa-solid fa-circle-check"></i></div>
+        <span class="kpi-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +3</span>
+      </div>
+      <div class="kpi-value" id="completedTrades">0</div>
+      <div class="kpi-label">Completed Trades</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="background:var(--success);width:45%"></div></div>
+    </div>
+  </div>
+
+  <!-- MOBILE GREETING (shown below stats on mobile) -->
+  <div style="padding:0 16px 16px;display:none;" id="mobileGreeting">
+    <p style="color:var(--muted);font-size:0.85rem;" id="mobileDateText"></p>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="content-grid">
+
+    <!-- LEFT: Activity + Chart -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Quick Actions -->
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> Quick Actions</span></div>
+        <div class="quick-actions">
+          <div class="qa-btn" onclick="location.href='skill-exchange.html'">
+            <i class="fa-solid fa-plus" style="color:var(--primary);"></i>
+            <span>New Trade</span>
+          </div>
+          <div class="qa-btn" onclick="openModal('withdrawModal')">
+            <i class="fa-solid fa-arrow-up-from-bracket" style="color:var(--gold);"></i>
+            <span>Withdraw</span>
+          </div>
+          <div class="qa-btn" onclick="openModal('scheduleModal')">
+            <i class="fa-solid fa-calendar-plus" style="color:var(--success);"></i>
+            <span>Schedule</span>
+          </div>
+          <div class="qa-btn" onclick="openModal('feedbackModal')">
+            <i class="fa-solid fa-star" style="color:var(--accent);"></i>
+            <span>Rate</span>
+          </div>
         </div>
+      </div>
+
+      <!-- Earnings Chart -->
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-chart-column" style="color:var(--primary);"></i> Weekly Earnings</span>
+          <a class="panel-link" href="#">View all</a>
+        </div>
+        <div class="chart-area" id="chartArea">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--muted);"></i> Recent Activity</span>
+          <a class="panel-link" href="trades.html">See all</a>
+        </div>
+        <div id="activityList">
+          <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            <p>No recent activity yet.<br>Start trading to see updates here.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Withdraw Modal -->
+    <!-- RIGHT COL -->
+    <div class="right-col">
+
+      <!-- Reputation -->
+      <div class="panel">
+        <div class="panel-title"><span><i class="fa-solid fa-medal" style="color:var(--accent);"></i> Reputation</span></div>
+        <div class="rep-level" id="repDisplay">Beginner</div>
+        <div class="rep-sub"><span id="userXP">0</span> XP · <span id="xpToNext">1000</span> XP to next level</div>
+        <div class="rep-bar-bg"><div class="rep-bar-fill" id="repBar2"></div></div>
+        <div class="rep-labels"><span>Novice</span><span>Expert</span></div>
+        <div class="rep-badges">
+          <div class="rep-badge"><i class="fa-solid fa-fire" style="color:var(--gold);"></i> Active</div>
+          <div class="rep-badge"><i class="fa-solid fa-shield" style="color:var(--success);"></i> Verified</div>
+          <div class="rep-badge" id="tradeBadge" style="display:none;"><i class="fa-solid fa-handshake" style="color:var(--primary);"></i> Trader</div>
+        </div>
+      </div>
+
+      <!-- Upcoming Sessions -->
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-calendar-days" style="color:var(--info);"></i> Upcoming</span>
+          <a class="panel-link" href="#" onclick="openModal('scheduleModal')">+ Add</a>
+        </div>
+        <div id="sessionsList">
+          <div class="empty-state" style="padding:20px 0;">
+            <i class="fa-solid fa-calendar-xmark" style="font-size:1.8rem;"></i>
+            <p style="margin-top:8px;">No sessions scheduled</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-bell" style="color:var(--danger);"></i> Notifications</span>
+          <span class="badge badge-active">3 new</span>
+        </div>
+        <div id="notifPanel">
+          <div class="notif-item">
+            <div class="notif-dot" style="background:var(--primary);"></div>
+            <div><div class="notif-text">New trade request from <strong>Aryan K.</strong> for Python tutoring</div><div class="notif-time">2 min ago</div></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-dot" style="background:var(--success);"></div>
+            <div><div class="notif-text">Your withdrawal of <strong>₹500</strong> was approved ✅</div><div class="notif-time">1 hr ago</div></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-dot" style="background:var(--gold);"></div>
+            <div><div class="notif-text">You earned <strong>+50 XP</strong> for completing a session</div><div class="notif-time">Yesterday</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mob-nav-item active" onclick="location.href='dashboard.html'"><i class="fa-solid fa-gauge-high"></i>Home</div>
+    <div class="mob-nav-item" onclick="location.href='skill-exchange.html'"><i class="fa-solid fa-arrows-rotate"></i>Exchange</div>
+    <div class="mob-nav-item" onclick="location.href='trades.html'" style="position:relative;">
+      <i class="fa-solid fa-handshake"></i>Trades
+      <div class="mob-dot" id="mobTradeDot"></div>
+    </div>
+    <div class="mob-nav-item" onclick="openModal('notifModal')" style="position:relative;">
+      <i class="fa-solid fa-bell"></i>Alerts
+      <div class="mob-dot"></div>
+    </div>
+    <div class="mob-nav-item" onclick="openModal('withdrawModal')"><i class="fa-solid fa-wallet"></i>Wallet</div>
+    <div class="mob-nav-item" onclick="location.href='setting.html'"><i class="fa-solid fa-gear"></i>Settings</div>
+  </div>
+</nav>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- WITHDRAW MODAL -->
 <div id="withdrawModal" class="modal-overlay">
-
   <div class="modal-box">
-
-    <div class="modal-header">
-      <i class="fa-solid fa-wallet"></i>
+    <div class="modal-head">
+      <div class="modal-icon"><i class="fa-solid fa-wallet"></i></div>
       <h2>Withdraw Funds</h2>
-      <p>Enter the amount you wish to withdraw.</p>
+      <p>Request a payout to your UPI account</p>
     </div>
-
-    <!-- Amount -->
     <div class="input-group">
       <label>Amount (₹)</label>
-      <input type="number" id="withdrawAmount" placeholder="Enter amount">
+      <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1">
     </div>
-
-    <!-- UPI ID -->
     <div class="input-group">
       <label>UPI ID</label>
-      <input type="text" id="upiId" placeholder="example@upi">
+      <input type="text" id="upiId" placeholder="yourname@upi">
     </div>
-
-    <!-- Buttons -->
-    <button class="btn-primary" onclick="submitWithdraw()">
-      Withdraw Now
-    </button>
-
-    <button class="btn-cancel" onclick="closeWithdrawModal()">
-      Cancel
-    </button>
-
+    <button class="btn-primary" onclick="submitWithdraw()"><i class="fa-solid fa-arrow-up-from-bracket" style="margin-right:8px;"></i>Withdraw Now</button>
+    <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancel</button>
   </div>
 </div>
+
+<!-- SCHEDULE MODAL -->
+<div id="scheduleModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-icon" style="background:rgba(56,189,248,0.12);color:var(--info);"><i class="fa-solid fa-calendar-plus"></i></div>
+      <h2>Schedule a Session</h2>
+      <p>Book a skill-exchange session with your partner</p>
+    </div>
+    <div class="input-group">
+      <label>Session Title</label>
+      <input type="text" id="sessionTitle" placeholder="e.g. React Basics Tutoring">
+    </div>
+    <div class="input-group">
+      <label>Partner Name</label>
+      <input type="text" id="sessionPartner" placeholder="e.g. Rahul Sharma">
+    </div>
+    <div class="input-group">
+      <label>Date & Time</label>
+      <input type="datetime-local" id="sessionDate">
+    </div>
+    <button class="btn-primary" onclick="addSession()" style="background:linear-gradient(135deg,var(--info),var(--primary));"><i class="fa-solid fa-calendar-check" style="margin-right:8px;"></i>Schedule</button>
+    <button class="btn-cancel" onclick="closeModal('scheduleModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-icon" style="background:rgba(168,85,247,0.12);color:var(--accent);"><i class="fa-solid fa-star"></i></div>
+      <h2>Rate a Trade</h2>
+      <p>Share your experience with your trade partner</p>
+    </div>
+    <div class="input-group">
+      <label>Partner Name</label>
+      <input type="text" id="feedbackPartner" placeholder="Partner name">
+    </div>
+    <div class="input-group">
+      <label>Rating</label>
+      <select id="feedbackRating">
+        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+        <option value="4">⭐⭐⭐⭐ Good</option>
+        <option value="3">⭐⭐⭐ Average</option>
+        <option value="2">⭐⭐ Poor</option>
+        <option value="1">⭐ Very Poor</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Comment (optional)</label>
+      <input type="text" id="feedbackComment" placeholder="What did you enjoy?">
+    </div>
+    <button class="btn-primary" onclick="submitFeedback()" style="background:linear-gradient(135deg,var(--accent),#ec4899);"><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Submit Review</button>
+    <button class="btn-cancel" onclick="closeModal('feedbackModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- NOTIF MODAL (mobile) -->
+<div id="notifModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-icon" style="background:rgba(239,68,68,0.12);color:var(--danger);"><i class="fa-solid fa-bell"></i></div>
+      <h2>Notifications</h2>
+      <p>Your latest updates</p>
+    </div>
+    <div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--primary);"></div>
+        <div><div class="notif-text">New trade request from <strong>Aryan K.</strong> for Python tutoring</div><div class="notif-time">2 min ago</div></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--success);"></div>
+        <div><div class="notif-text">Your withdrawal of <strong>₹500</strong> was approved ✅</div><div class="notif-time">1 hr ago</div></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--gold);"></div>
+        <div><div class="notif-text">You earned <strong>+50 XP</strong> for completing a session</div><div class="notif-time">Yesterday</div></div>
+      </div>
+    </div>
+    <button class="btn-cancel" onclick="closeModal('notifModal')" style="margin-top:16px;">Dismiss All</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-    authDomain: "skillswapp-35e86.firebaseapp.com",
-    projectId: "skillswapp-35e86",
-    storageBucket: "skillswapp-35e86.appspot.com",
-    messagingSenderId: "668466292157",
-    appId: "1:668466292157:web:9be85414fc752b67779ed4"
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -538,46 +1032,236 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "login.html"; return; }
+  if (!user) { window.location.href = "login.html"; return; }
 
-    const userSnap = await getDoc(doc(db, "users", user.uid));
-    if (userSnap.exists()) {
-        const data = userSnap.data();
-        document.getElementById("userName").innerText = data.name || user.displayName || "User";
-        document.getElementById("userAvatar").innerText = (data.name || "U")[0].toUpperCase();
-        document.getElementById("userXP").innerText = data.xp || 0;
-        document.getElementById("repLevel").innerText = data.level || "Beginner";
-        const xp = data.xp || 0;
-        const pct = Math.min((xp / 1000) * 100, 100);
-        document.getElementById("repProgress").style.width = pct + "%";
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  if (userSnap.exists()) {
+    const data = userSnap.data();
+    const name = data.name || user.displayName || "User";
+    const xp = data.xp || 0;
+    const level = data.level || "Beginner";
+    const initial = name[0].toUpperCase();
+
+    // Header
+    document.getElementById("topName").innerText = name.split(" ")[0];
+    document.getElementById("sidebarName").innerText = name;
+    document.getElementById("sidebarAvatar").innerText = initial;
+    document.getElementById("sidebarXP").innerText = xp;
+    document.getElementById("userXP").innerText = xp;
+    document.getElementById("repLevel").innerText = level;
+    document.getElementById("repDisplay").innerText = level;
+
+    // Progress
+    const pct = Math.min((xp / 1000) * 100, 100);
+    const toNext = Math.max(1000 - xp, 0);
+    document.getElementById("xpToNext").innerText = toNext;
+    setTimeout(() => {
+      document.getElementById("repProgress").style.width = pct + "%";
+      document.getElementById("repBar2").style.width = pct + "%";
+    }, 300);
+
+    if (xp > 0) document.getElementById("tradeBadge").style.display = "flex";
+  }
+
+  // Wallet
+  const earnSnap = await getDoc(doc(db, "earnings", user.uid));
+  if (earnSnap.exists()) {
+    document.getElementById("walletBalance").innerText = "₹" + (earnSnap.data().balance || 0);
+  }
+
+  // Trade count + activity
+  const tradesQ = query(collection(db, "trades"), where("users", "array-contains", user.uid));
+  onSnapshot(tradesQ, snap => {
+    const count = snap.size;
+    document.getElementById("tradeCount").innerText = count;
+    document.getElementById("sidebarTradeCount").innerText = count;
+    document.getElementById("tradeBar").style.width = Math.min(count * 10, 100) + "%";
+    if (count > 0) document.getElementById("tradeBadge").style.display = "flex";
+
+    // Render activity
+    const list = document.getElementById("activityList");
+    if (snap.empty) {
+      list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-box-open"></i><p>No recent activity yet.</p></div>`;
+    } else {
+      let html = "";
+      snap.docs.slice(0, 5).forEach(d => {
+        const t = d.data();
+        const status = t.status || "pending";
+        const cls = status === "completed" ? "badge-done" : status === "active" ? "badge-active" : "badge-pending";
+        html += `<div class="activity-item">
+          <div class="act-icon" style="background:var(--primary-dim);color:var(--primary);"><i class="fa-solid fa-handshake"></i></div>
+          <div class="act-body">
+            <div class="act-title">${t.title || "Skill Trade"}</div>
+            <div class="act-sub">${t.partnerName || "Partner"}</div>
+          </div>
+          <div class="act-right">
+            <span class="badge ${cls}">${status}</span>
+            <div class="act-time">${t.createdAt ? new Date(t.createdAt.seconds*1000).toLocaleDateString() : "—"}</div>
+          </div>
+        </div>`;
+      });
+      list.innerHTML = html;
     }
+  });
 
-    // Wallet
-    const earnSnap = await getDoc(doc(db, "earnings", user.uid));
-    if (earnSnap.exists()) {
-        document.getElementById("walletBalance").innerText = "₹" + (earnSnap.data().balance || 0);
-    }
-
-    // Trade count
-    const tradesQ = query(collection(db, "trades"), where("users", "array-contains", user.uid));
-    onSnapshot(tradesQ, snap => {
-        document.getElementById("tradeCount").innerText = snap.size;
-    });
+  // Completed trades
+  const compQ = query(collection(db, "trades"), where("users", "array-contains", user.uid), where("status","==","completed"));
+  onSnapshot(compQ, snap => {
+    document.getElementById("completedTrades").innerText = snap.size;
+  });
 });
 
-window.openWithdrawModal = function() { document.getElementById("withdrawModal").classList.add("show"); };
-window.closeWithdrawModal = function() { document.getElementById("withdrawModal").classList.remove("show"); };
+// ── Withdraw
 window.submitWithdraw = async function() {
-    const user = auth.currentUser;
-    const amount = Number(document.getElementById("withdrawAmount").value);
-    const upiId = document.getElementById("upiId").value.trim();
-    if (!amount || !upiId) { alert("Please fill all fields"); return; }
-    await addDoc(collection(db, "withdrawRequests"), {
-        tutorId: user.uid, amount, upiId, status: "pending", createdAt: serverTimestamp()
-    });
-    alert("Withdrawal request submitted!");
-    closeWithdrawModal();
+  const user = auth.currentUser;
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const upiId = document.getElementById("upiId").value.trim();
+  if (!amount || !upiId) { showToast("error","Missing info","Please fill all fields."); return; }
+  if (amount < 1) { showToast("error","Invalid amount","Minimum withdrawal is ₹1."); return; }
+  await addDoc(collection(db, "withdrawRequests"), {
+    tutorId: user.uid, amount, upiId, status: "pending", createdAt: serverTimestamp()
+  });
+  closeModal("withdrawModal");
+  showToast("success","Request Submitted","Your withdrawal will be processed shortly.");
+  document.getElementById("withdrawAmount").value = "";
+  document.getElementById("upiId").value = "";
 };
+</script>
+
+<script>
+// ── Date/time
+function setDate() {
+  const now = new Date();
+  const opts = { weekday:'long', month:'long', day:'numeric', year:'numeric' };
+  const str = now.toLocaleDateString('en-IN', opts);
+  const el = document.getElementById("topDate");
+  const mob = document.getElementById("mobileDateText");
+  if (el) el.innerText = str;
+  if (mob) mob.innerText = str;
+  // Greeting
+  const hr = now.getHours();
+  const greet = hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening";
+  const h1 = document.querySelector(".topbar-left h1");
+  const nameSpan = document.getElementById("topName");
+  if (h1 && nameSpan) h1.innerHTML = `${greet}, <span id="topName">${nameSpan.innerText}</span> ${hr < 12 ? "☀️" : hr < 17 ? "🌤️" : "🌙"}`;
+}
+setDate();
+
+// ── Chart
+function renderChart() {
+  const data = [45, 72, 58, 90, 63, 82, 95];
+  const labels = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const max = Math.max(...data);
+  const area = document.getElementById("chartArea");
+  if (!area) return;
+  area.innerHTML = data.map((v,i) => {
+    const h = (v / max) * 130;
+    const isHighlight = v === max;
+    return `<div class="chart-bar-wrap">
+      <div class="chart-bar${isHighlight?" highlight":""}" style="height:${h}px;" title="₹${v*10}"></div>
+      <div class="chart-label">${labels[i]}</div>
+    </div>`;
+  }).join("");
+}
+renderChart();
+
+// ── Sessions (local state)
+let sessions = JSON.parse(localStorage.getItem("ss_sessions") || "[]");
+
+function renderSessions() {
+  const container = document.getElementById("sessionsList");
+  if (!sessions.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:20px 0;"><i class="fa-solid fa-calendar-xmark" style="font-size:1.8rem;"></i><p style="margin-top:8px;">No sessions scheduled</p></div>`;
+    return;
+  }
+  const upcoming = sessions.filter(s => new Date(s.date) > new Date()).slice(0, 3);
+  if (!upcoming.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:16px 0;"><p>No upcoming sessions</p></div>`;
+    return;
+  }
+  container.innerHTML = upcoming.map(s => {
+    const d = new Date(s.date);
+    const day = d.toLocaleDateString('en',{weekday:'short'});
+    const date = d.getDate();
+    return `<div class="session-item">
+      <div class="session-time"><div class="s-day">${day}</div><div class="s-date">${date}</div></div>
+      <div class="session-body">
+        <div class="session-title">${s.title}</div>
+        <div class="session-partner">with ${s.partner} · ${d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <button class="session-action" onclick="alert('Join link coming soon!')">Join</button>
+    </div>`;
+  }).join("");
+}
+renderSessions();
+
+window.addSession = function() {
+  const title = document.getElementById("sessionTitle").value.trim();
+  const partner = document.getElementById("sessionPartner").value.trim();
+  const date = document.getElementById("sessionDate").value;
+  if (!title || !partner || !date) { showToast("error","Missing info","Please fill all fields."); return; }
+  sessions.push({ title, partner, date });
+  localStorage.setItem("ss_sessions", JSON.stringify(sessions));
+  renderSessions();
+  closeModal("scheduleModal");
+  showToast("success","Session Scheduled","Added to your upcoming sessions.");
+  document.getElementById("sessionTitle").value = "";
+  document.getElementById("sessionPartner").value = "";
+  document.getElementById("sessionDate").value = "";
+};
+
+// ── Feedback
+window.submitFeedback = function() {
+  const partner = document.getElementById("feedbackPartner").value.trim();
+  const rating = document.getElementById("feedbackRating").value;
+  if (!partner) { showToast("error","Missing info","Please enter partner name."); return; }
+  closeModal("feedbackModal");
+  showToast("success","Review Submitted",`You rated ${partner} ${rating}⭐`);
+};
+
+// ── Modal helpers
+window.openModal = function(id) { document.getElementById(id).classList.add("show"); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove("show"); };
+// Also expose for old code
+window.openWithdrawModal = () => openModal("withdrawModal");
+window.closeWithdrawModal = () => closeModal("withdrawModal");
+
+// Close on overlay click
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("show"); });
+});
+
+// ── Toast
+window.showToast = function(type, title, msg) {
+  const icons = { success: "✅", error: "❌", info: "ℹ️", warning: "⚠️" };
+  const colors = { success: "var(--success)", error: "var(--danger)", info: "var(--info)", warning: "var(--gold)" };
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.style.borderLeftColor = colors[type] || "var(--primary)";
+  toast.style.borderLeftWidth = "3px";
+  toast.innerHTML = `<div class="toast-icon">${icons[type] || "💬"}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add("removing");
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+};
+
+// ── Sidebar (mobile)
+window.toggleSidebar = function() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("show");
+};
+window.closeSidebar = function() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("show");
+};
+
+// Show mobile greeting section
+if (window.innerWidth <= 768) {
+  document.getElementById("mobileGreeting").style.display = "block";
+}
 </script>
 </body>
 </html>

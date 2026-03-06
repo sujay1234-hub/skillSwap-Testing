@@ -1,1034 +1,802 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SkillSwap – Trade Skills, Not Money.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* --- CSS Variables --- */
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --bg-card-hover: rgba(255, 255, 255, 0.06);
-            --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(255, 255, 255, 0.15);
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-glow: rgba(99, 102, 241, 0.4);
-            --accent: #a855f7;
-            --accent-light: #c084fc;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --text-muted-light: #d4d4d8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-        }
-
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* --- Animated Background --- */
-        .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
-                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.1), transparent),
-                radial-gradient(ellipse 50% 30% at 20% 80%, rgba(99, 102, 241, 0.08), transparent);
-        }
-
-        .bg-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.15;
-            z-index: -1;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .bg-glow-1 {
-            top: -200px;
-            left: -200px;
-            background: var(--primary);
-        }
-
-        .bg-glow-2 {
-            bottom: -200px;
-            right: -200px;
-            background: var(--accent);
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(50px, 50px); }
-        }
-
-        /* --- Navigation --- */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 5%;
-            position: sticky;
-            top: 0;
-            background: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            z-index: 1000;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: white;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .logo i {
-            background: none;
-            -webkit-text-fill-color: white;
-        }
-
-        /* Desktop Nav Links */
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 10px 16px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: white;
-            background: var(--bg-card);
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* Auth Buttons */
-        .btn-login {
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-login:hover {
-            background: var(--bg-card);
-            border-color: var(--border-hover);
-        }
-
-        .btn-primary {
-            padding: 10px 20px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--primary-glow);
-        }
-
-        /* User Profile */
-        .user-profile {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 6px 16px 6px 6px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .user-profile:hover {
-            border-color: var(--border-hover);
-            background: var(--bg-card-hover);
-        }
-
-        .user-profile img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-        }
-
-        .user-profile span {
-            font-weight: 600;
-            font-size: 0.85rem;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .user-profile .logout {
-            color: var(--text-muted);
-            transition: 0.2s;
-            padding: 6px;
-            border-radius: 6px;
-        }
-
-        .user-profile .logout:hover {
-            color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        /* Mobile Menu Button */
-        .menu-btn {
-            display: none;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 10px 12px;
-            transition: all 0.3s ease;
-        }
-
-        .menu-btn:hover {
-            border-color: var(--border-hover);
-        }
-
-        /* --- Hero Section --- */
-        .hero {
-            text-align: center;
-            padding: 80px 5% 60px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 50px;
-            font-size: 0.85rem;
-            color: var(--primary-light);
-            margin-bottom: 24px;
-            font-weight: 500;
-        }
-
-        .hero-badge i {
-            font-size: 0.8rem;
-        }
-
-        .hero h1 {
-            font-size: clamp(2.2rem, 7vw, 4rem);
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -1px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            line-height: 1.7;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 60px;
-        }
-
-        .btn-hero {
-            padding: 16px 28px;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-hero-fill {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            box-shadow: 0 8px 25px -5px var(--primary-glow);
-        }
-
-        .btn-hero-fill:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px -5px var(--primary-glow);
-        }
-
-        .btn-hero-outline {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            color: white;
-        }
-
-        .btn-hero-outline:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-        }
-
-        /* Hero Stats */
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* --- Features Section --- */
-        .features-section {
-            padding: 60px 5% 100px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .section-header h2 {
-            font-size: clamp(1.5rem, 4vw, 2.25rem);
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 32px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            opacity: 0;
-            transition: 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--border-hover);
-            background: var(--bg-card-hover);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: var(--primary-light);
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .feature-card h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .btn-enter-room {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 20px;
-            padding: 12px 18px;
-            border-radius: 12px;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary-light);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
-        .btn-enter-room:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        /* Floating Chat Button */
-        .chat-fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.4rem;
-            text-decoration: none;
-            box-shadow: 0 10px 30px -5px var(--primary-glow);
-            z-index: 999;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .chat-fab:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px -5px var(--primary-glow);
-        }
-
-        .chat-fab::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            opacity: 0.3;
-            animation: pulse 2s ease-out infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        /* --- Footer --- */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 50px 5% 30px;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size:             1.1rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 24px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 30px auto 0;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        /* --- Mobile Nav Overlay --- */
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(9, 9, 11, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.4s ease;
-        }
-
-        .mobile-menu.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .mobile-menu a {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .mobile-menu a:hover {
-            background: var(--bg-card);
-            color: var(--primary-light);
-        }
-
-        .close-menu {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 12px 16px;
-            transition: 0.3s;
-        }
-
-        .close-menu:hover {
-            background: var(--danger);
-            border-color: var(--danger);
-        }
-
-        .mobile-auth {
-            display: flex;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        /* --- Responsive --- */
-        @media (min-width: 1024px) {
-            .hero-btns {
-                flex-direction: row;
-                justify-content: center;
-            }
-            .btn-hero {
-                width: auto;
-                min-width: 200px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links { display: none !important; }
-            .menu-btn { display: flex !important; }
-            .mobile-menu { display: flex !important; }
-            
-            .hero {
-                padding: 60px 5% 50px;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .hero-stats {
-                gap: 30px;
-            }
-            
-            .stat-number {
-                font-size: 1.75rem;
-            }
-            
-            .features-section {
-                padding: 40px 5% 80px;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .feature-card {
-                padding: 28px;
-            }
-            
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .footer-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
-
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.6s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
-        .stagger-4 { animation-delay: 0.4s; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SkillSwap — The student-powered marketplace where you trade skills, not money.">
+<meta name="theme-color" content="#050507">
+<title>SkillSwap — Trade Skills, Not Money.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --bg:#050507;--bg2:#0c0c10;--bg3:#121218;--card:rgba(255,255,255,0.035);--card-h:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.18);
+  --p:#7c6af7;--p2:#a78bfa;--p3:rgba(124,106,247,0.18);
+  --a:#f472b6;--a2:#fb7185;
+  --cyan:#22d3ee;--green:#34d399;--amber:#fbbf24;--red:#f87171;
+  --txt:#f4f4f5;--muted:#71717a;--muted2:#a1a1aa;
+  --glow:rgba(124,106,247,0.35);
+  --fh:'Cabinet Grotesk',sans-serif;
+  --fb:'Instrument Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--p) transparent}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--p);border-radius:99px}
+body{font-family:var(--fb);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;line-height:1.6}
+.bg-mesh{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(124,106,247,0.2),transparent),radial-gradient(ellipse 70% 50% at 90% 70%,rgba(244,114,182,0.12),transparent),radial-gradient(ellipse 60% 40% at 10% 80%,rgba(34,211,238,0.08),transparent),var(--bg)}
+.orb{position:fixed;border-radius:50%;filter:blur(130px);z-index:-1;animation:orbF 24s ease-in-out infinite}
+.o1{width:700px;height:700px;top:-300px;left:-250px;background:var(--p);opacity:.1}
+.o2{width:600px;height:600px;bottom:-250px;right:-200px;background:var(--a);opacity:.08;animation-delay:-12s}
+.o3{width:400px;height:400px;top:40%;left:40%;background:var(--cyan);opacity:.05;animation-delay:-6s}
+@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,50px) scale(1.06)}}
+.grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
+.grad{background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.74rem;font-weight:600;letter-spacing:.04em}
+.bp{background:var(--p3);border:1px solid rgba(124,106,247,.25);color:var(--p2)}
+.bg-g{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.ba{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.br{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:13px 4%;background:rgba(5,5,7,.85);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);font-family:var(--fh);font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 4px 14px var(--glow)}
+.nav-c{display:flex;gap:2px;list-style:none}
+.nav-c a{text-decoration:none;color:var(--muted);font-size:.85rem;font-weight:500;padding:8px 14px;border-radius:12px;transition:all .2s}
+.nav-c a:hover{color:var(--txt);background:var(--card)}
+.nav-r{display:flex;align-items:center;gap:8px}
+.ibtn{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:all .2s;font-size:.9rem;position:relative;font-family:var(--fb)}
+.ibtn:hover{color:var(--txt);border-color:var(--border-h)}
+.ibtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg)}
+.btn-ghost{padding:8px 18px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--txt);text-decoration:none;font-weight:600;font-size:.84rem;transition:all .2s;cursor:pointer;font-family:var(--fb)}
+.btn-ghost:hover{background:var(--card);border-color:var(--border-h)}
+.btn-cta{padding:9px 20px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:var(--fb);transition:all .3s;box-shadow:0 4px 16px var(--glow)}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--glow)}
+.upill{display:none;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);padding:4px 14px 4px 4px;border-radius:99px;cursor:pointer;transition:all .2s}
+.upill:hover{border-color:var(--border-h)}
+.upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p)}
+.upill span{font-size:.82rem;font-weight:600;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbtn{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
+
+/* MOBILE MENU */
+.mmenu{display:none;position:fixed;inset:0;background:rgba(5,5,7,.97);backdrop-filter:blur(20px);z-index:1100;flex-direction:column;justify-content:center;align-items:center;gap:6px;opacity:0;pointer-events:none;transition:opacity .3s}
+.mmenu.open{opacity:1;pointer-events:all}
+.mclose{position:absolute;top:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 12px;cursor:pointer;font-size:1rem;transition:.2s;font-family:var(--fb)}
+.mclose:hover{background:var(--red);border-color:var(--red)}
+.mmenu a{color:var(--txt);font-family:var(--fh);font-size:1.6rem;font-weight:800;text-decoration:none;padding:10px 28px;border-radius:18px;transition:all .2s;letter-spacing:-.5px}
+.mmenu a:hover{background:var(--card);color:var(--p2)}
+.mauth{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+
+/* HERO */
+.hero{text-align:center;padding:96px 5% 80px;max-width:1200px;margin:0 auto}
+.hero h1{font-family:var(--fh);font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;letter-spacing:-2px;margin:20px 0 22px;animation:fadeUp .6s .1s ease both}
+.hero h1 em{font-style:normal;position:relative}
+.hero h1 em::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;animation:slideR .8s .5s ease both;transform-origin:left}
+@keyframes slideR{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero-ey{animation:fadeUp .6s ease both}
+.hero-sub{font-size:1.12rem;color:var(--muted2);max-width:600px;margin:0 auto 44px;line-height:1.8;animation:fadeUp .6s .2s ease both}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
+.bh{padding:15px 32px;border-radius:18px;font-size:1rem;font-weight:700;font-family:var(--fh);text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .3s;letter-spacing:-.2px}
+.bh-fill{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;box-shadow:0 8px 32px -4px var(--glow)}
+.bh-fill:hover{transform:translateY(-3px);box-shadow:0 18px 44px -4px var(--glow)}
+.bh-line{background:var(--card);border:1px solid var(--border);color:var(--txt)}
+.bh-line:hover{background:var(--card-h);border-color:var(--border-h);transform:translateY(-2px)}
+.hstats{display:flex;justify-content:center;gap:52px;flex-wrap:wrap;margin-top:64px;animation:fadeUp .6s .4s ease both}
+.snum{font-family:var(--fh);font-size:2.2rem;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--p2),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.slbl{font-size:.8rem;color:var(--muted);margin-top:2px;font-weight:500}
+
+/* SECTION */
+.sec{padding:80px 5% 100px;max-width:1440px;margin:0 auto}
+.stag{display:block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p2);margin-bottom:10px}
+.stitle{font-family:var(--fh);font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-1px;margin-bottom:12px}
+.ssub{color:var(--muted2);font-size:1.02rem;max-width:520px;line-height:1.75}
+.shead{text-align:center;margin-bottom:60px}
+.shead .ssub{margin:0 auto}
+
+/* FEATURE CARDS */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:26px;padding:30px 26px;cursor:pointer;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.19,1,.22,1),box-shadow .35s,border-color .35s,background .35s}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--a));transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.19,1,.22,1)}
+.fc:hover{transform:translateY(-6px);border-color:var(--border-h);background:var(--card-h);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.fc:hover::before{transform:scaleX(1)}
+.fi{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:18px;transition:transform .3s}
+.fc:hover .fi{transform:scale(1.1) rotate(8deg)}
+.fc h3{font-family:var(--fh);font-size:1.1rem;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+.fc>p{color:var(--muted2);font-size:.9rem;line-height:1.7}
+.farr{position:absolute;top:22px;right:22px;color:var(--muted);font-size:.8rem;transition:all .3s}
+.fc:hover .farr{color:var(--p2);transform:translate(2px,-2px)}
+.fcta{display:inline-flex;align-items:center;gap:7px;margin-top:16px;padding:9px 14px;border-radius:12px;background:rgba(124,106,247,.1);color:var(--p2);text-decoration:none;font-size:.84rem;font-weight:600;border:1px solid rgba(124,106,247,.2);transition:all .25s}
+.fcta:hover{background:var(--p);color:#fff;border-color:var(--p);transform:translateX(3px)}
+
+/* FAB */
+.cfab{position:fixed;bottom:24px;right:24px;z-index:700;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.15rem;box-shadow:0 8px 28px var(--glow);transition:transform .3s,box-shadow .3s}
+.cfab:hover{transform:translateY(-4px) scale(1.08);box-shadow:0 16px 44px var(--glow)}
+.cfab::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--p);opacity:.3;animation:rip 2.5s ease-out infinite}
+@keyframes rip{0%{transform:scale(1);opacity:.3}100%{transform:scale(1.7);opacity:0}}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0,0,0,.2)}
+.fti{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:40px}
+.fbrand{max-width:260px}
+.fbrand .logo{margin-bottom:14px;display:inline-flex}
+.fbrand p{color:var(--muted);font-size:.86rem;line-height:1.7}
+.fcol h5{font-family:var(--fh);font-weight:800;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.fcol a{display:block;color:var(--muted2);text-decoration:none;font-size:.88rem;margin-bottom:10px;transition:color .2s}
+.fcol a:hover{color:var(--txt)}
+.ftbot{max-width:1200px;margin:36px auto 0;padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ftbot p{color:var(--muted);font-size:.82rem}
+.fsoc{display:flex;gap:10px}
+.fsoc a{width:32px;height:32px;border-radius:9px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.82rem;text-decoration:none;transition:all .2s}
+.fsoc a:hover{color:var(--p2);border-color:var(--p)}
+
+/* ════ SETTINGS PANEL ════ */
+.sbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1050}
+.sbg.open{display:block}
+.spanel{position:fixed;top:0;right:-100%;bottom:0;width:min(500px,100vw);z-index:1060;background:var(--bg2);border-left:1px solid var(--border);overflow:hidden;transition:right .45s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
+.spanel.open{right:0}
+.sph{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.sphl{display:flex;align-items:center;gap:12px}
+.sphic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff}
+.sph h3{font-family:var(--fh);font-size:1.1rem;font-weight:900;letter-spacing:-.3px}
+.sph span{font-size:.78rem;color:var(--muted)}
+.sclose{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:.2s;font-size:.9rem;font-family:var(--fb)}
+.sclose:hover{color:var(--txt);border-color:var(--border-h)}
+.stabs{display:flex;padding:12px 24px 0;border-bottom:1px solid var(--border);gap:4px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.stabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:.83rem;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;border-radius:12px 12px 0 0}
+.stab:hover{color:var(--txt);background:var(--card)}
+.stab.active{color:var(--p2);border-bottom-color:var(--p);background:none}
+.sbody{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:6px}
+.ssec{background:var(--bg3);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:4px}
+.sst{padding:14px 20px 11px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--p2);border-bottom:1px solid var(--border)}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .2s}
+.sr:last-child{border-bottom:none}
+.sr:hover{background:rgba(255,255,255,.02)}
+.srl{flex:1;min-width:0}
+.slb{font-size:.89rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sde{font-size:.77rem;color:var(--muted);margin-top:2px;line-height:1.5}
+.sval{font-size:.82rem;color:var(--p2);font-weight:600;white-space:nowrap}
+.tog{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog .sl{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.08);border-radius:99px;transition:.3s;border:1px solid var(--border)}
+.tog .sl::before{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;bottom:3px;left:3px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.tog input:checked+.sl{background:var(--p);border-color:var(--p)}
+.tog input:checked+.sl::before{transform:translateX(20px)}
+.ssel{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:8px 32px 8px 12px;font-family:var(--fb);font-size:.84rem;cursor:pointer;transition:.2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2371717a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.ssel:hover{border-color:var(--border-h)}
+.ssel option{background:#1a1a22}
+.sinp{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:9px 13px;font-family:var(--fb);font-size:.87rem;width:100%;outline:none;transition:border-color .2s}
+.sinp:focus{border-color:var(--p)}
+.sinp::placeholder{color:var(--muted)}
+.stxt{background:var(--bg);border:1px solid var(--border);color:var(--txt);border-radius:12px;padding:10px 13px;font-family:var(--fb);font-size:.87rem;width:100%;outline:none;transition:border-color .2s;resize:vertical;min-height:80px;line-height:1.6}
+.stxt:focus{border-color:var(--p)}
+.savarea{padding:18px 20px;display:flex;align-items:center;gap:16px}
+.sav{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:1.5rem;font-weight:900;color:#fff;border:3px solid var(--p);flex-shrink:0;overflow:hidden}
+.savbtns{display:flex;flex-direction:column;gap:6px}
+.bsm{background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:12px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);display:inline-flex;align-items:center;gap:6px}
+.bsm:hover{color:var(--txt);border-color:var(--border-h)}
+.swrow{display:flex;gap:8px;padding:16px 20px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .25s}
+.sw.active{border-color:#fff;transform:scale(1.18)}
+.sw:hover{transform:scale(1.12)}
+.sktags{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
+.skt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--p3);border:1px solid rgba(124,106,247,.2);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--p2);cursor:pointer;transition:all .2s}
+.skt:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.addsk{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--card);border:1px dashed var(--border-h);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--fb)}
+.addsk:hover{color:var(--p2);border-color:var(--p)}
+.xpwrap{padding:16px 20px}
+.xpinfo{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.xplv{font-family:var(--fh);font-weight:800;font-size:.95rem}
+.xppt{font-size:.8rem;color:var(--muted)}
+.xptrack{height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.xpmil{display:flex;justify-content:space-between;margin-top:8px}
+.xpmil span{font-size:.7rem;color:var(--muted)}
+.ssgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.sscell{background:var(--bg3);padding:16px 20px}
+.sscell .val{font-family:var(--fh);font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,var(--p2),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sscell .lbl{font-size:.77rem;color:var(--muted);margin-top:2px}
+.actlist{padding:8px 0}
+.acti{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);transition:background .2s;cursor:pointer}
+.acti:last-child{border-bottom:none}
+.acti:hover{background:rgba(255,255,255,.02)}
+.actic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.actb p{font-size:.84rem;color:var(--muted2);line-height:1.5}
+.actb p b{color:var(--txt);font-weight:600}
+.actt{font-size:.74rem;color:var(--muted);margin-top:3px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
+.ccard{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;transition:all .2s;cursor:pointer}
+.ccard:hover{border-color:var(--border-h);background:var(--card)}
+.ccard .icon{font-size:1.2rem}
+.ccard .name{font-size:.84rem;font-weight:600}
+.ccard .status{font-size:.74rem}
+.conn{color:var(--green)}
+.noconn{color:var(--muted)}
+.dagrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:16px 20px}
+.dbtn{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 4px;text-align:center;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.dbtn.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.dbtn:hover{border-color:var(--border-h);color:var(--txt)}
+.dinit{display:block;font-size:.7rem;margin-bottom:4px;font-weight:800;letter-spacing:.05em}
+.dcirc{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:.64rem;transition:background .2s}
+.dbtn.on .dcirc{background:var(--p);color:#fff}
+.starrow{display:flex;gap:6px;padding:16px 20px;align-items:center}
+.star{font-size:1.4rem;cursor:pointer;transition:transform .15s,color .15s;color:var(--muted)}
+.star:hover,.star.lit{color:var(--amber);transform:scale(1.15)}
+.tchips{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
+.tchip{padding:7px 14px;border-radius:99px;background:var(--card);border:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s;font-family:var(--fb)}
+.tchip.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.tchip:hover{border-color:var(--border-h);color:var(--txt)}
+.dzwrap{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:18px;overflow:hidden;margin-bottom:20px}
+.dztitle{padding:14px 20px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);border-bottom:1px solid rgba(248,113,113,.12)}
+.dzrow{padding:14px 20px;border-bottom:1px solid rgba(248,113,113,.08);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dzrow:last-child{border-bottom:none}
+.dzinfo .slb{font-size:.88rem}
+.dzinfo .sde{font-size:.77rem;color:var(--muted)}
+.bdang{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red);border-radius:12px;padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);white-space:nowrap}
+.bdang:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.ssavebar{padding:16px 24px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.bsave{width:100%;padding:13px;border-radius:18px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;font-family:var(--fh);font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s;box-shadow:0 4px 18px var(--glow);letter-spacing:-.2px}
+.bsave:hover{transform:translateY(-2px);box-shadow:0 10px 32px var(--glow)}
+
+/* NOTIFICATION PANEL */
+.npanel{position:fixed;top:62px;right:18px;width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;z-index:850;box-shadow:0 24px 64px rgba(0,0,0,.55);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-10px) scale(.97);transition:all .25s cubic-bezier(.22,1,.36,1)}
+.npanel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.nph{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+.nph h4{font-family:var(--fh);font-weight:900;font-size:.95rem;letter-spacing:-.2px}
+.npacts{display:flex;gap:8px}
+.npbtn{background:none;border:none;color:var(--muted);font-size:.76rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:color .2s;padding:2px 6px}
+.npbtn:hover{color:var(--p2)}
+.nlist{max-height:340px;overflow-y:auto}
+.ni{display:flex;gap:11px;padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;position:relative}
+.ni:last-child{border-bottom:none}
+.ni:hover{background:var(--card)}
+.ni.unread::before{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:5px;height:5px;background:var(--p);border-radius:50%}
+.nic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.nib{flex:1}
+.nib p{font-size:.83rem;color:var(--muted2);line-height:1.5}
+.nib p b{color:var(--txt);font-weight:600}
+.ntime{font-size:.73rem;color:var(--muted);margin-top:3px}
+.npft{padding:12px 18px;border-top:1px solid var(--border);text-align:center}
+.npft a{color:var(--p2);font-size:.82rem;font-weight:600;text-decoration:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success .tic{color:var(--green)}
+.toast.info .tic{color:var(--p2)}
+.toast.error .tic{color:var(--red)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .nav-c,.ibtn:not(.mbtn){display:none!important}
+  .mbtn{display:flex!important}
+  .mmenu{display:flex!important}
+  .hero{padding:70px 5% 60px}
+  .hero h1{letter-spacing:-1px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .bh{justify-content:center}
+  .hstats{gap:28px}
+  .snum{font-size:1.75rem}
+  .fgrid{grid-template-columns:1fr}
+  .fc{padding:24px 20px}
+  .fti{flex-direction:column;gap:28px}
+  .fcol{display:none}
+  .ftbot{flex-direction:column;align-items:center;text-align:center;gap:16px}
+  .npanel{right:8px;left:8px;width:auto;top:68px}
+  .cgrid{grid-template-columns:1fr}
+  .ssgrid{grid-template-columns:1fr 1fr}
+  .dagrid{gap:4px}
+}
+@media(min-width:769px) and (max-width:1100px){.fgrid{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head>
 <body>
+<div class="bg-mesh"></div>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="grid-bg"></div>
 
-    <!-- Background Effects -->
-    <div class="bg-gradient"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
+<a href="chat.html" class="cfab" title="Chat"><i class="fa-solid fa-comments"></i></a>
 
-    <!-- Floating Chat Shortcut -->
-    <a href="chat.html" class="chat-fab">
-        <i class="fa-solid fa-comments"></i>
-    </a>
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check tic" id="tic"></i>
+  <span id="tmsg">Saved!</span>
+</div>
 
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu" id="mobileMenu">
-        <button class="close-menu" onclick="toggleMenu()">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <a href="explore.html" onclick="toggleMenu()">Explore</a>
-        <a href="#" onclick="toggleMenu()">Leaderboard</a>
-        <a href="about.html" onclick="toggleMenu()">About</a>
-        <a href="trades.html" onclick="toggleMenu()">My Trades</a>
-        <a href="trade-requests.html" onclick="toggleMenu()">Trade Requests</a>
-        
-        <div class="mobile-auth">
-            <a href="login.html" class="btn-login" onclick="toggleMenu()">Log In</a>
-            <a href="login.html" class="btn-primary" onclick="toggleMenu()">Sign Up</a>
+<!-- MOBILE MENU -->
+<div class="mmenu" id="mmenu">
+  <button class="mclose" onclick="closeMob()"><i class="fa-solid fa-xmark"></i></button>
+  <a href="explore.html" onclick="closeMob()">Explore</a>
+  <a href="leaderboard.html" onclick="closeMob()">Leaderboard</a>
+  <a href="dashboard.html" onclick="closeMob()">Dashboard</a>
+  <a href="trades.html" onclick="closeMob()">My Trades</a>
+  <a href="trade-requests.html" onclick="closeMob()">Requests</a>
+  <a href="about.html" onclick="closeMob()">About</a>
+  <div class="mauth">
+    <a href="login.html" class="btn-ghost" onclick="closeMob()">Log In</a>
+    <a href="login.html" class="btn-cta" onclick="closeMob()">Sign Up Free</a>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="npanel" id="npanel">
+  <div class="nph">
+    <h4>Notifications <span class="pill br" style="font-size:.68rem;padding:3px 9px" id="ucnt">2 new</span></h4>
+    <div class="npacts">
+      <button class="npbtn" onclick="markAllRead()">Mark all read</button>
+      <button class="npbtn" onclick="toggleNotif()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+  <div class="nlist">
+    <div class="ni unread">
+      <div class="nic" style="background:rgba(124,106,247,.14);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div>
+      <div class="nib"><p><b>Arjun Singh</b> accepted your Python ↔ UI/UX swap request.</p><div class="ntime">2 min ago</div></div>
+    </div>
+    <div class="ni unread">
+      <div class="nic" style="background:rgba(52,211,153,.14);color:var(--green)"><i class="fa-solid fa-star"></i></div>
+      <div class="nib"><p><b>Priya Mehta</b> left you a ⭐⭐⭐⭐⭐ review for your React session.</p><div class="ntime">1 hour ago</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(251,191,36,.12);color:var(--amber)"><i class="fa-solid fa-trophy"></i></div>
+      <div class="nib"><p>You reached <b>Level 6 — Advanced</b>! New badge unlocked 🎖️</p><div class="ntime">Yesterday</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(34,211,238,.12);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+      <div class="nib"><p><b>₹450 credited</b> to your wallet from Rohan's session payment.</p><div class="ntime">2 days ago</div></div>
+    </div>
+    <div class="ni">
+      <div class="nic" style="background:rgba(248,113,113,.12);color:var(--red)"><i class="fa-solid fa-clock"></i></div>
+      <div class="nib"><p>Session with <b>Neha Sharma</b> starts in 30 minutes!</p><div class="ntime">3 days ago</div></div>
+    </div>
+  </div>
+  <div class="npft"><a href="notifications.html">View all notifications →</a></div>
+</div>
+
+<!-- SETTINGS BACKDROP -->
+<div class="sbg" id="sbg" onclick="closeSettings()"></div>
+
+<!-- SETTINGS PANEL -->
+<div class="spanel" id="spanel">
+  <div class="sph">
+    <div class="sphl">
+      <div class="sphic"><i class="fa-solid fa-sliders"></i></div>
+      <div><h3>Account Settings</h3><span>Manage profile &amp; preferences</span></div>
+    </div>
+    <button class="sclose" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="stabs" id="stabs">
+    <button class="stab active" onclick="stab(0,this)"><i class="fa-solid fa-user" style="margin-right:5px"></i>Profile</button>
+    <button class="stab" onclick="stab(1,this)"><i class="fa-solid fa-chart-line" style="margin-right:5px"></i>Stats</button>
+    <button class="stab" onclick="stab(2,this)"><i class="fa-solid fa-bell" style="margin-right:5px"></i>Alerts</button>
+    <button class="stab" onclick="stab(3,this)"><i class="fa-solid fa-palette" style="margin-right:5px"></i>Look</button>
+    <button class="stab" onclick="stab(4,this)"><i class="fa-solid fa-shield-halved" style="margin-right:5px"></i>Privacy</button>
+    <button class="stab" onclick="stab(5,this)"><i class="fa-solid fa-calendar" style="margin-right:5px"></i>Schedule</button>
+    <button class="stab" onclick="stab(6,this)"><i class="fa-solid fa-link" style="margin-right:5px"></i>Connect</button>
+    <button class="stab" onclick="stab(7,this)"><i class="fa-solid fa-circle-exclamation" style="margin-right:5px;color:var(--red)"></i>Account</button>
+  </div>
+  <div class="sbody">
+
+    <!-- TAB 0: PROFILE -->
+    <div class="stc" id="t0">
+      <div class="ssec">
+        <div class="sst">Profile Photo</div>
+        <div class="savarea">
+          <div class="sav" id="sav">S</div>
+          <div class="savbtns">
+            <button class="bsm"><i class="fa-solid fa-upload"></i> Upload Photo</button>
+            <button class="bsm" onclick="rmAv()"><i class="fa-solid fa-trash"></i> Remove</button>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="pill bp" style="margin-bottom:6px">Level 6</div>
+            <div style="font-size:.75rem;color:var(--muted)">Advanced 🟣</div>
+          </div>
         </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Basic Information</div>
+        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:11px">
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Display Name</div><input id="sinp-name" class="sinp" type="text" placeholder="Your full name"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Username</div><input id="sinp-username" class="sinp" type="text" placeholder="@username"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Email Address</div><input id="sinp-email" class="sinp" type="email" placeholder="you@example.com"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Phone</div><input id="sinp-phone" class="sinp" type="tel" placeholder="+91 98765 43210"></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Bio</div><textarea id="sinp-bio" class="stxt" placeholder="Tell others what you teach and what you want to learn..."></textarea></div>
+          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">College / University</div><input class="sinp" type="text" placeholder="Your institution"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">City</div><input class="sinp" type="text" placeholder="Mumbai"></div>
+            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">State</div><input class="sinp" type="text" placeholder="Maharashtra"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Skills I Teach</div>
+        <div class="sktags">
+          <span class="skt">React <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt">Python <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt">UI/UX Design <i class="fa-solid fa-xmark"></i></span>
+          <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Skills I Want to Learn</div>
+        <div class="sktags">
+          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Video Editing <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Photography <i class="fa-solid fa-xmark"></i></span>
+          <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Tutoring Preferences</div>
+        <div class="sr"><div class="srl"><div class="slb">Hourly Rate (₹)</div><div class="sde">Your default rate for paid sessions</div></div><input class="sinp" type="number" value="400" style="width:90px;text-align:center"></div>
+        <div class="sr"><div class="srl"><div class="slb">Session Duration</div><div class="sde">Default session length</div></div><select class="ssel"><option>30 min</option><option selected>60 min</option><option>90 min</option><option>2 hours</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Open to Free Swaps</div><div class="sde">Allow skill exchange without payment</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Accept Instant Bookings</div><div class="sde">Allow sessions without approval</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
     </div>
 
-    <!-- Navbar -->
-    <nav>
-        <a href="#" class="logo">
-            <div class="logo-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <span>SkillSwap</span>
-        </a>
-
-        <!-- Desktop Nav Links -->
-        <ul class="nav-links">
-            <li><a href="explore.html">Explore</a></li>
-            <li><a href="#">Leaderboard</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="trades.html">My Trades</a></li>
-            <li><a href="trade-requests.html">Trades</a></li>
-        </ul>
-
-        <div class="nav-actions">
-            <!-- Auth Buttons -->
-            <div id="authButtons">
-                <a href="login.html" class="btn-login">Log In</a>
-                <a href="login.html" class="btn-primary">Sign Up</a>
-            </div>
-
-            <!-- User Profile -->
-            <div id="userProfile" class="user-profile">
-                <img id="userPhoto" src="" alt="User">
-                <span id="userName">User</span>
-                <i class="fa-solid fa-right-from-bracket logout" onclick="logout()" title="Logout"></i>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="menu-btn" onclick="toggleMenu()">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+    <!-- TAB 1: STATS -->
+    <div class="stc" id="t1" style="display:none">
+      <div class="ssec">
+        <div class="sst">XP Progress</div>
+        <div class="xpwrap">
+          <div class="xpinfo"><span class="xplv">Level 6 — Advanced 🟣</span><span class="xppt">2,340 / 3,000 XP</span></div>
+          <div class="xptrack"><div class="xpfill" id="xpf" style="width:0%"></div></div>
+          <div class="xpmil"><span>Lvl 5</span><span>Next: Expert 🔴</span></div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-badge fade-in">
-            <i class="fa-solid fa-star"></i>
-            <span>#1 Student Learning Platform</span>
+      </div>
+      <div class="ssec">
+        <div class="sst">Your Numbers</div>
+        <div class="ssgrid">
+          <div class="sscell"><div class="val">47</div><div class="lbl">Trades Done</div></div>
+          <div class="sscell"><div class="val">₹8.4K</div><div class="lbl">Total Earned</div></div>
+          <div class="sscell"><div class="val">4.9★</div><div class="lbl">Avg Rating</div></div>
+          <div class="sscell"><div class="val">#12</div><div class="lbl">Leaderboard</div></div>
+          <div class="sscell"><div class="val">124h</div><div class="lbl">Hours Taught</div></div>
+          <div class="sscell"><div class="val">18</div><div class="lbl">Badges</div></div>
         </div>
-        
-        <h1 id="heroTitle" class="fade-in stagger-1">
-            Trade Skills,<br>
-            <span class="gradient-text">Not Money.</span>
-        </h1>
-        
-        <p id="heroText" class="fade-in stagger-2">
-            A student powered marketplace where individuals exchange knowledge, teach skills, and earn by helping peers grow together.
-        </p>
-        
-        <div class="hero-btns fade-in stagger-3" id="heroBtns">
-            <a href="login.html" class="btn-hero btn-hero-fill">
-                <i class="fa-solid fa-rocket"></i> Get Started
-            </a>
-            <a href="#features" class="btn-hero btn-hero-outline">
-                <i class="fa-solid fa-compass"></i> Explore Skills
-            </a>
+      </div>
+      <div class="ssec">
+        <div class="sst">Recent Activity</div>
+        <div class="actlist">
+          <div class="acti"><div class="actic" style="background:rgba(52,211,153,.12);color:var(--green)"><i class="fa-solid fa-check"></i></div><div class="actb"><p>Completed <b>Python Basics</b> session with Arjun</p><div class="actt">Today, 3:00 PM</div></div><span class="pill bg-g" style="margin-left:auto;flex-shrink:0">+120 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-star"></i></div><div class="actb"><p>5-star review from <b>Priya Mehta</b></p><div class="actt">Today, 11:30 AM</div></div><span class="pill ba" style="margin-left:auto;flex-shrink:0">+50 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="actb"><p><b>₹450 credited</b> for UI/UX session</p><div class="actt">Yesterday</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Paid</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><div class="actb"><p>New swap request from <b>Rohan Kumar</b></p><div class="actt">2 days ago</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Pending</span></div>
         </div>
-        
-        <div class="hero-stats fade-in stagger-4">
-            <div class="stat-item">
-                <div class="stat-number">10K+</div>
-                <div class="stat-label">Active Students</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">5K+</div>
-                <div class="stat-label">Skills Exchanged</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">1K+</div>
-                <div class="stat-label">Expert Tutors</div>
-            </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Rate Your Last Session</div>
+        <div class="starrow" id="starrow">
+          <i class="fa-solid fa-star star" onclick="rate(1)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(2)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(3)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(4)"></i>
+          <i class="fa-solid fa-star star" onclick="rate(5)"></i>
+          <span style="margin-left:10px;font-size:.84rem;color:var(--muted)" id="slbl">Tap to rate</span>
         </div>
-    </section>
+      </div>
+    </div>
 
-    <!-- Features Grid -->
-    <section id="features" class="features-section">
-        <div class="section-header">
-            <h2>Why Choose SkillSwap?</h2>
-            <p>Everything you need to grow your skills and build your network.</p>
+    <!-- TAB 2: NOTIFICATIONS -->
+    <div class="stc" id="t2" style="display:none">
+      <div class="ssec">
+        <div class="sst">Push Notifications</div>
+        <div class="sr"><div class="srl"><div class="slb">Trade Requests</div><div class="sde">New swap requests</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Messages</div><div class="sde">New direct messages</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Session Reminders</div><div class="sde">30 min before sessions</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">XP &amp; Badges</div><div class="sde">Level-up achievements</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Payment Alerts</div><div class="sde">Receive or send money</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Reviews Received</div><div class="sde">When someone rates you</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Leaderboard Changes</div><div class="sde">When your rank changes</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Platform Updates</div><div class="sde">New features &amp; news</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Email Notifications</div>
+        <div class="sr"><div class="srl"><div class="slb">Weekly Digest</div><div class="sde">Activity summary each week</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Monthly Report</div><div class="sde">Earnings &amp; growth report</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Promotional Emails</div><div class="sde">Tips, events &amp; offers</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Email Frequency</div></div><select class="ssel"><option>Daily</option><option selected>Weekly</option><option>Monthly</option><option>Never</option></select></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Quiet Hours</div>
+        <div class="sr"><div class="srl"><div class="slb">Enable Quiet Hours</div><div class="sde">Mute all notifications</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">From</div></div><input class="sinp" type="time" value="22:00" style="width:110px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Until</div></div><input class="sinp" type="time" value="08:00" style="width:110px"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: APPEARANCE -->
+    <div class="stc" id="t3" style="display:none">
+      <div class="ssec">
+        <div class="sst">Accent Colour</div>
+        <div class="swrow">
+          <div class="sw active" style="background:linear-gradient(135deg,#7c6af7,#f472b6)" onclick="applyTh('#7c6af7','#a78bfa','#f472b6','#fb7185','rgba(124,106,247,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#06b6d4,#7c6af7)" onclick="applyTh('#06b6d4','#22d3ee','#7c6af7','#a78bfa','rgba(6,182,212,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#10b981,#06b6d4)" onclick="applyTh('#10b981','#34d399','#06b6d4','#22d3ee','rgba(16,185,129,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="applyTh('#f59e0b','#fbbf24','#ef4444','#f87171','rgba(245,158,11,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#ec4899,#f97316)" onclick="applyTh('#ec4899','#f472b6','#f97316','#fb923c','rgba(236,72,153,.35)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)" onclick="applyTh('#3b82f6','#60a5fa','#06b6d4','#22d3ee','rgba(59,130,246,.35)',this)"></div>
         </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Interface</div>
+        <div class="sr"><div class="srl"><div class="slb">Reduce Motion</div><div class="sde">Disable animations</div></div><label class="tog"><input type="checkbox" id="motog" onchange="applyMot(this)"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Compact Mode</div><div class="sde">Tighter spacing</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show Online Status</div><div class="sde">Visible to others</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Font Size</div></div><select class="ssel"><option>Small</option><option selected>Medium</option><option>Large</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Language</div></div><select class="ssel"><option selected>English</option><option>हिन्दी</option><option>தமிழ்</option><option>Español</option><option>Français</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Currency</div></div><select class="ssel"><option selected>₹ INR</option><option>$ USD</option><option>€ EUR</option><option>£ GBP</option></select></div>
+      </div>
+    </div>
 
-        <div class="features-grid">
-            <!-- Card 1 -->
-            <div class="feature-card" onclick="window.location.href='skill-exchange.html'">
-                <div class="feature-icon">
-                    <i class="fa-solid fa-repeat"></i>
-                </div>
-                <h3>Skill Exchange</h3>
-                <p>Teach a skill, learn a skill free, mutual growth.</p>
-            </div>
+    <!-- TAB 4: PRIVACY -->
+    <div class="stc" id="t4" style="display:none">
+      <div class="ssec">
+        <div class="sst">Profile Visibility</div>
+        <div class="sr"><div class="srl"><div class="slb">Public Profile</div><div class="sde">Anyone can view your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show on Leaderboard</div><div class="sde">Display your rank publicly</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show Earnings</div><div class="sde">Display earnings on profile</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Searchable by Email</div><div class="sde">Let others find you</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Show College Name</div><div class="sde">Visible on your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Security</div>
+        <div class="sr"><div class="srl"><div class="slb">Two-Factor Authentication</div><div class="sde">SMS or authenticator app</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Login Alerts</div><div class="sde">Email on new device login</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Change Password</div></div><button class="bsm">Update →</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Active Sessions</div><div class="sde">2 devices currently logged in</div></div><button class="bsm">Manage →</button></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Data &amp; Privacy</div>
+        <div class="sr"><div class="srl"><div class="slb">Download My Data</div><div class="sde">Export as JSON</div></div><button class="bsm"><i class="fa-solid fa-download"></i> Export</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Personalised Recommendations</div><div class="sde">Use activity to suggest skills</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Analytics Tracking</div><div class="sde">Help improve SkillSwap</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+    </div>
 
-            <!-- Card 2 -->
-            <div class="feature-card" onclick="window.location.href='paid-help.html'">
-                <div class="feature-icon" style="color: #fbbf24;">
-                    <i class="fa-solid fa-indian-rupee-sign"></i>
-                </div>
-                <h3>Paid Tutoring</h3>
-                <p>Offer paid tutoring sessions. Earn ₹300+ per hour from verified experts sharing their knowledge.</p>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="feature-card" onclick="window.location.href='reputation.html'">
-                <div class="feature-icon" style="color: #a855f7;">
-                    <i class="fa-solid fa-trophy"></i>
-                </div>
-                <h3>Reputation System</h3>
-                <p>Earn XP, unlock badges and climb the ranks from Beginner 🟢 to Expert 🟣.</p>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="feature-card">
-                <div class="feature-icon" style="color: #10b981;">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <h3>Leaderboard</h3>
-                <p>Top helpers are ranked based on ratings and completed trades. Get recognized!</p>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="feature-card" onclick="window.location.href='chat.html'">
-                <div class="feature-icon" style="color: #06b6d4;">
-                    <i class="fa-solid fa-comments"></i>
-                </div>
-                <h3>Real-Time Chat</h3>
-                <p>Secure, instant communication powered by Firebase to discuss details.</p>
-            </div>
-
-            <!-- Card 6 -->
-            <div class="feature-card">
-                <div class="feature-icon" style="color: #22d3ee;">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                </div>
-                <h3>Skill Room</h3>
-                <p>Join a private learning space with video call, live coding, notes, and collaboration.</p>
-                <a href="skill-room.html" class="btn-enter-room">
-                    <i class="fa-solid fa-door-open"></i> Enter Room
-                </a>
-            </div>
-
-            <!-- Card 7 -->
-            <div class="feature-card" onclick="window.location.href='dashboard.html'">
-                <div class="feature-icon" style="color: #ef4444;">
-                    <i class="fa-solid fa-chart-pie"></i>
-                </div>
-                <h3>Analytics Dashboard</h3>
-                <p>Track your earnings, XP progress, and active trades in one unified dashboard.</p>
-            </div>
+    <!-- TAB 5: SCHEDULE -->
+    <div class="stc" id="t5" style="display:none">
+      <div class="ssec">
+        <div class="sst">Available Days</div>
+        <div class="dagrid">
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">MON</span><div class="dcirc">M</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">TUE</span><div class="dcirc">T</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">WED</span><div class="dcirc">W</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">THU</span><div class="dcirc">T</div></div>
+          <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">FRI</span><div class="dcirc">F</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SAT</span><div class="dcirc">S</div></div>
+          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SUN</span><div class="dcirc">S</div></div>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fa-solid fa-bolt" style="color: var(--primary-light);"></i>
-                <span>SkillSwap</span>
-            </div>
-            <div class="footer-links">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Support</a>
-                <a href="#">Contact</a>
-            </div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Preferred Session Times</div>
+        <div class="tchips">
+          <button class="tchip on" onclick="this.classList.toggle('on')">Morning (6–9 AM)</button>
+          <button class="tchip on" onclick="this.classList.toggle('on')">Afternoon (12–3 PM)</button>
+          <button class="tchip"    onclick="this.classList.toggle('on')">Evening (5–8 PM)</button>
+          <button class="tchip on" onclick="this.classList.toggle('on')">Night (8–11 PM)</button>
+          <button class="tchip"    onclick="this.classList.toggle('on')">Late Night (11 PM+)</button>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 SkillSwap. Built for students, by students.</p>
+      </div>
+      <div class="ssec">
+        <div class="sst">Booking Settings</div>
+        <div class="sr"><div class="srl"><div class="slb">Timezone</div></div><select class="ssel"><option selected>IST (UTC+5:30)</option><option>UTC</option><option>EST</option><option>PST</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Buffer Between Sessions</div></div><select class="ssel"><option>None</option><option selected>15 min</option><option>30 min</option><option>1 hour</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Max Sessions Per Day</div></div><select class="ssel"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>Unlimited</option></select></div>
+        <div class="sr"><div class="srl"><div class="slb">Vacation Mode</div><div class="sde">Pause all new booking requests</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+    </div>
+
+    <!-- TAB 6: CONNECTED -->
+    <div class="stc" id="t6" style="display:none">
+      <div class="ssec">
+        <div class="sst">Social Logins</div>
+        <div class="cgrid">
+          <div class="ccard" onclick="toast('Google account connected!','success')"><div class="icon" style="color:#ea4335"><i class="fa-brands fa-google"></i></div><div class="name">Google</div><div class="status conn"><i class="fa-solid fa-circle-check" style="font-size:.7rem;margin-right:4px"></i>Connected</div></div>
+          <div class="ccard" onclick="toast('Linking GitHub...','info')"><div class="icon" style="color:var(--txt)"><i class="fa-brands fa-github"></i></div><div class="name">GitHub</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
+          <div class="ccard" onclick="toast('Linking LinkedIn...','info')"><div class="icon" style="color:#0a66c2"><i class="fa-brands fa-linkedin"></i></div><div class="name">LinkedIn</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
+          <div class="ccard" onclick="toast('Linking Discord...','info')"><div class="icon" style="color:#5865f2"><i class="fa-brands fa-discord"></i></div><div class="name">Discord</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
         </div>
-    </footer>
+      </div>
+      <div class="ssec">
+        <div class="sst">Payment Methods</div>
+        <div class="sr"><div class="srl"><div class="slb">UPI ID</div><div class="sde">For instant payouts</div></div><input class="sinp" type="text" placeholder="yourname@upi" style="width:150px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Bank Account</div><div class="sde">For larger withdrawals</div></div><button class="bsm">Add Bank →</button></div>
+        <div class="sr"><div class="srl"><div class="slb">Wallet Balance</div></div><span class="sval">₹ 1,240.00</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Auto-Withdraw</div><div class="sde">When balance ≥ ₹500</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+      </div>
+      <div class="ssec">
+        <div class="sst">Integrations</div>
+        <div class="sr"><div class="srl"><div class="slb">Google Calendar</div><div class="sde">Sync sessions automatically</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">Zoom</div><div class="sde">Auto-generate meeting links</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
+        <div class="sr"><div class="srl"><div class="slb">WhatsApp Alerts</div><div class="sde">Session reminders via WhatsApp</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
+      </div>
+    </div>
 
-    <!-- Firebase Auth Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <!-- TAB 7: ACCOUNT -->
+    <div class="stc" id="t7" style="display:none">
+      <div class="ssec">
+        <div class="sst">Account Status</div>
+        <div class="sr"><div class="srl"><div class="slb">Account Type</div></div><span class="pill bp">Student Free</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Member Since</div></div><span class="sval">Jan 2025</span></div>
+        <div class="sr"><div class="srl"><div class="slb">Upgrade to Pro</div><div class="sde">Priority matching &amp; analytics</div></div><button class="btn-cta" style="font-size:.79rem;padding:7px 14px">Upgrade ✦</button></div>
+      </div>
+      <div style="height:6px"></div>
+      <div class="dzwrap">
+        <div class="dztitle">⚠ Danger Zone</div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Log Out Everywhere</div><div class="sde">Sign out from all devices</div></div><button class="bdang" onclick="toast('Logged out from all devices','info')">Log Out All</button></div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Suspend Account</div><div class="sde">Temporarily disable profile</div></div><button class="bdang" onclick="toast('Account suspended','error')">Suspend</button></div>
+        <div class="dzrow"><div class="dzinfo"><div class="slb">Delete Account</div><div class="sde">Permanently removes all data</div></div><button class="bdang" onclick="if(confirm('This is permanent. Continue?'))toast('Deletion request submitted','error')">Delete Forever</button></div>
+      </div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-            authDomain: "skillswapp-35e86.firebaseapp.com",
-            projectId: "skillswapp-35e86",
-            storageBucket: "skillswapp-35e86.appspot.com",
-            messagingSenderId: "668466292157",
-            appId: "1:668466292157:web:9be85414fc752b67779ed4"
-        };
+  </div>
+  <div class="ssavebar"><button class="bsave" onclick="saveSet()"><i class="fa-solid fa-floppy-disk" style="margin-right:9px"></i>Save All Changes</button></div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
+  <ul class="nav-c">
+    <li><a href="explore.html">Explore</a></li>
+    <li><a href="leaderboard.html">Leaderboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="trades.html">Trades</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-r">
+    <button class="ibtn" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
+    <button class="ibtn" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
+    <div id="abtns" style="display:flex;gap:8px">
+      <a href="login.html" class="btn-ghost">Log In</a>
+      <a href="login.html" class="btn-cta">Sign Up Free</a>
+    </div>
+    <div id="upill" class="upill">
+      <img id="uph" src="" alt="You">
+      <span id="unm">Student</span>
+      <i class="fa-solid fa-right-from-bracket" onclick="logout()" title="Log out" style="color:var(--muted);padding:4px;cursor:pointer;font-size:.8rem;transition:color .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'"></i>
+    </div>
+    <button class="mbtn ibtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</nav>
 
-        const authButtons = document.getElementById("authButtons");
-        const userProfile = document.getElementById("userProfile");
-        const userPhoto = document.getElementById("userPhoto");
-        const userName = document.getElementById("userName");
-        const heroBtns = document.getElementById("heroBtns");
+<!-- MAIN -->
+<main>
+<section class="hero">
+  <div class="hero-ey"><span class="pill bp"><i class="fa-solid fa-bolt"></i>&nbsp;#1 Student Skill Exchange Platform</span></div>
+  <h1>Trade Skills,<br><em class="grad">Not Money.</em></h1>
+  <p class="hero-sub">A student-powered marketplace to exchange knowledge, teach what you know, and earn by helping peers grow — together.</p>
+  <div class="hero-btns" id="hbtns">
+    <a href="login.html" class="bh bh-fill"><i class="fa-solid fa-rocket"></i>Get Started Free</a>
+    <a href="#features" class="bh bh-line"><i class="fa-solid fa-compass"></i>Explore Skills</a>
+  </div>
+  <div class="hstats">
+    <div><div class="snum">10K+</div><div class="slbl">Active Students</div></div>
+    <div><div class="snum">5K+</div><div class="slbl">Skills Exchanged</div></div>
+    <div><div class="snum">4.9★</div><div class="slbl">Platform Rating</div></div>
+  </div>
+</section>
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                authButtons.style.display = "none";
-                userProfile.style.display = "flex";
+<section id="features" class="sec">
+  <div class="shead reveal">
+    <span class="stag">Platform Features</span>
+    <h2 class="stitle">Why Choose <span class="grad">SkillSwap?</span></h2>
+    <p class="ssub">Everything you need to grow your skills, build your reputation, and earn real money.</p>
+  </div>
+  <div class="fgrid">
+    <div class="fc reveal" onclick="location.href='skill-exchange.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><h3>Skill Exchange</h3><p>Teach a skill, learn a skill — completely free. Peer-to-peer knowledge barter with zero money exchanged.</p></div>
+    <div class="fc reveal" onclick="location.href='paid-help.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-indian-rupee-sign"></i></div><h3>Paid Tutoring</h3><p>Earn ₹300–₹1,000+ per hour teaching verified students in your area of expertise.</p></div>
+    <div class="fc reveal" onclick="location.href='reputation.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-trophy"></i></div><h3>Reputation System</h3><p>Earn XP, unlock badges, and climb from Beginner 🟢 to Expert 🟣 as you teach and trade.</p></div>
+    <div class="fc reveal" onclick="location.href='leaderboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(52,211,153,.1);color:var(--green)"><i class="fa-solid fa-chart-line"></i></div><h3>Leaderboard</h3><p>Top helpers ranked by ratings and completed trades. Get recognised and build your standing.</p></div>
+    <div class="fc reveal" onclick="location.href='chat.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-comments"></i></div><h3>Real-Time Chat</h3><p>Secure instant messaging powered by Firebase. Discuss details before committing to a session.</p></div>
+    <div class="fc reveal" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(96,165,250,.1);color:#60a5fa"><i class="fa-solid fa-chalkboard-user"></i></div><h3>Skill Room</h3><p>Private learning space with video calls, live coding, shared notes, and real-time collaboration.</p><a href="skill-room.html" class="fcta" onclick="event.stopPropagation()"><i class="fa-solid fa-door-open"></i>Enter Room</a></div>
+    <div class="fc reveal" onclick="location.href='dashboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(248,113,113,.1);color:var(--red)"><i class="fa-solid fa-chart-pie"></i></div><h3>Analytics Dashboard</h3><p>Track earnings, XP progress, session history, and active trades in one unified dashboard.</p></div>
+    <div class="fc reveal" onclick="location.href='explore.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Skill Discovery</h3><p>Browse hundreds of skills — coding, design, languages, music, finance — all student-taught.</p></div>
+  </div>
+</section>
+</main>
 
-                userPhoto.src = user.photoURL || "";
-                userName.textContent = user.displayName || "User";
+<footer>
+  <div class="fti">
+    <div class="fbrand">
+      <a class="logo" href="index.html"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
+      <p>A student-powered skill exchange platform. Teach what you know, learn what you need — no money required.</p>
+    </div>
+    <div class="fcol"><h5>Platform</h5><a href="explore.html">Explore Skills</a><a href="leaderboard.html">Leaderboard</a><a href="dashboard.html">Dashboard</a><a href="trades.html">My Trades</a></div>
+    <div class="fcol"><h5>Company</h5><a href="about.html">About Us</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Press Kit</a></div>
+    <div class="fcol"><h5>Support</h5><a href="#">Help Centre</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Contact Us</a></div>
+  </div>
+  <div class="ftbot">
+    <p>© 2025 SkillSwap. Built for students, by students. 🚀</p>
+    <div class="fsoc">
+      <a href="#" title="X"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a href="#" title="Discord"><i class="fa-brands fa-discord"></i></a>
+    </div>
+  </div>
+</footer>
 
-                heroBtns.innerHTML = `
-                    <a href="dashboard.html" class="btn-hero btn-hero-fill">
-                        <i class="fa-solid fa-chart-line"></i> Dashboard
-                    </a>
-                    <a href="trades.html" class="btn-hero btn-hero-outline">
-                        <i class="fa-solid fa-compass"></i> My Trades
-                    </a>
-                `;
-            } else {
-                authButtons.style.display = "flex";
-                userProfile.style.display = "none";
-
-                heroBtns.innerHTML = `
-                    <a href="login.html" class="btn-hero btn-hero-fill">
-                        <i class="fa-solid fa-rocket"></i> Get Started
-                    </a>
-                    <a href="#features" class="btn-hero btn-hero-outline">
-                        <i class="fa-solid fa-compass"></i> Explore Skills
-                    </a>
-                `;
-            }
-        });
-
-        window.logout = function() {
-            signOut(auth).then(() => {
-                location.reload();
-            }).catch((error) => {
-                console.error("Logout error:", error);
-            });
-        };
-    </script>
-
-    <!-- Mobile Menu Toggle -->
-    <script>
-        function toggleMenu() {
-            const mobileMenu = document.getElementById("mobileMenu");
-            mobileMenu.classList.toggle("active");
-            
-            const menuBtn = document.querySelector(".menu-btn i");
-            if (mobileMenu.classList.contains("active")) {
-                menuBtn.classList.remove("fa-bars");
-                menuBtn.classList.add("fa-xmark");
-            } else {
-                menuBtn.classList.remove("fa-xmark");
-                menuBtn.classList.add("fa-bars");
-            }
-        }
-
-        document.querySelectorAll(".mobile-menu a").forEach(link => {
-            link.addEventListener("click", () => {
-                toggleMenu();
-            });
-        });
-    </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswapp-35e86.firebaseapp.com",projectId:"skillswapp-35e86",storageBucket:"skillswapp-35e86.appspot.com",messagingSenderId:"668466292157",appId:"1:668466292157:web:9be85414fc752b67779ed4"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+// Expose auth globally so non-module scripts can access it
+window._auth=auth;window._db=db;
+onAuthStateChanged(auth,u=>{
+  const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn"),sb=document.getElementById("sbtn");
+  if(u){ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";document.getElementById("uph").src=u.photoURL||"";document.getElementById("unm").textContent=u.displayName||u.email||"Student";document.getElementById("sav").textContent=(u.displayName||u.email||"S").charAt(0).toUpperCase();document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;}
+  else{ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";}
+});
+window.logout=()=>signOut(auth).then(()=>location.reload()).catch(console.error);
+window._openSettingsData=async function(){
+  const u=auth.currentUser;
+  if(!u)return;
+  document.getElementById("sinp-name").value=u.displayName||"";
+  document.getElementById("sinp-email").value=u.email||"";
+  try{
+    const snap=await getDoc(doc(db,"users",u.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      document.getElementById("sinp-username").value=d.username||("@"+(u.displayName||u.email.split("@")[0]).toLowerCase().replace(/\s+/g,"_"));
+      document.getElementById("sinp-phone").value=d.phone||"";
+      if(document.getElementById("sinp-bio"))document.getElementById("sinp-bio").value=d.bio||"";
+    }
+  }catch(e){console.error(e);}
+};
+window._saveSettings=async function(){
+  const u=auth.currentUser;
+  if(!u){window.toast("Not logged in","error");return;}
+  const name=document.getElementById("sinp-name").value.trim();
+  const phone=document.getElementById("sinp-phone").value.trim();
+  const bio=document.getElementById("sinp-bio")?document.getElementById("sinp-bio").value.trim():"";
+  const username=document.getElementById("sinp-username").value.trim();
+  try{
+    await setDoc(doc(db,"users",u.uid),{name,phone,bio,username,updatedAt:new Date()},{merge:true});
+    await updateProfile(u,{displayName:name});
+    document.getElementById("unm").textContent=name||u.email||"Student";
+    document.getElementById("sav").textContent=(name||u.email||"S").charAt(0).toUpperCase();
+    window.toast("Settings saved successfully ✓","success");
+    window.closeSettings();
+  }catch(e){window.toast("Save failed: "+e.message,"error");}
+};
+</script>
+<script>
+function openMob(){document.getElementById("mmenu").classList.add("open");document.body.style.overflow="hidden"}
+function closeMob(){document.getElementById("mmenu").classList.remove("open");document.body.style.overflow=""}
+function openSettings(){
+  document.getElementById("spanel").classList.add("open");
+  document.getElementById("sbg").classList.add("open");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>{document.getElementById("xpf").style.width="78%"},350);
+  if(window._openSettingsData) window._openSettingsData();
+}
+function closeSettings(){document.getElementById("spanel").classList.remove("open");document.getElementById("sbg").classList.remove("open");document.body.style.overflow=""}
+function stab(n,el){document.querySelectorAll(".stc").forEach(t=>{t.style.display="none"});const t=document.getElementById("t"+n);t.style.display="flex";t.style.flexDirection="column";document.querySelectorAll(".stab").forEach(t=>t.classList.remove("active"));el.classList.add("active");if(n===1)setTimeout(()=>{document.getElementById("xpf").style.width="78%"},200)}
+let nOpen=false;
+function toggleNotif(){nOpen=!nOpen;document.getElementById("npanel").classList.toggle("open",nOpen)}
+function markAllRead(){document.querySelectorAll(".ni.unread").forEach(i=>i.classList.remove("unread"));document.getElementById("ndot").style.display="none";document.getElementById("ucnt").style.display="none";toast("All notifications marked as read","success")}
+document.addEventListener("click",e=>{const p=document.getElementById("npanel"),b=document.getElementById("nbtn");if(nOpen&&!p.contains(e.target)&&b&&!b.contains(e.target)){nOpen=false;p.classList.remove("open")}});
+function applyTh(p,p2,a,a2,glow,el){const r=document.documentElement;r.style.setProperty("--p",p);r.style.setProperty("--p2",p2);r.style.setProperty("--a",a);r.style.setProperty("--a2",a2);r.style.setProperty("--glow",glow);r.style.setProperty("--p3",h2a(p,.15));document.querySelectorAll(".sw").forEach(s=>s.classList.remove("active"));el.classList.add("active")}
+function h2a(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`}
+function applyMot(cb){let s=document.getElementById("nm");if(cb.checked){if(!s){s=document.createElement("style");s.id="nm";s.textContent="*,*::before,*::after{animation:none!important;transition:none!important}";document.head.appendChild(s)}}else{if(s)s.remove()}}
+function rmAv(){document.getElementById("sav").textContent="S"}
+function rate(n){document.querySelectorAll("#starrow .star").forEach((s,i)=>s.classList.toggle("lit",i<n));const L=["","Poor","Fair","Good","Great","Excellent!"];document.getElementById("slbl").textContent=L[n]+" ("+n+"/5)"}
+let ttimer;
+function toast(msg,type="success"){clearTimeout(ttimer);const t=document.getElementById("toast"),icons={success:"fa-circle-check",info:"fa-circle-info",error:"fa-circle-xmark"};t.className="toast "+type;document.getElementById("tic").className="fa-solid "+icons[type]+" tic";document.getElementById("tmsg").textContent=msg;t.classList.add("show");ttimer=setTimeout(()=>t.classList.remove("show"),3000)}
+window.toast=toast;
+function saveSet(){
+  if(window._saveSettings) window._saveSettings();
+  else toast("Auth not ready","error");
+}
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll(".reveal").forEach((el,i)=>{el.style.transitionDelay=((i%4)*.08)+"s";io.observe(el)});
+document.querySelectorAll(".fc[role='button']").forEach(c=>c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();c.click()}}));
+</script>
 </body>
 </html>
