@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#03030a">
 <title>SkillSwap — Trade Skills, Not Money.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 /* ═══════════════════ DESIGN TOKENS ═══════════════════ */
@@ -39,7 +39,7 @@
   --muted: #5a5a7a;
   --muted2:#9090b8;
 
-  --fh: 'Cabinet Grotesk', sans-serif;
+  --fh: 'Syne', sans-serif;
   --fb: 'DM Sans', sans-serif;
 
   --r-sm: 14px;
@@ -1379,7 +1379,7 @@ body{padding-bottom:0!important}
     </button>
     <div class="contact-links">
       <a class="contact-link" href="#">
-        <i class="fa-solid fa-envelope"></i> <span class="__cf_email__" data-cfemail="f59d9099999ab5869e9c999986829485db9c9b">[email&#160;protected]</span>
+        <i class="fa-solid fa-envelope"></i> hello@skillswap.in
       </a>
       <a class="contact-link" href="#">
         <i class="fa-brands fa-instagram"></i> @skillswap
@@ -1445,7 +1445,7 @@ body{padding-bottom:0!important}
 </div>
 
 <!-- FIREBASE + APP SCRIPTS -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -1634,4 +1634,10 @@ const io = new IntersectionObserver(entries=>{
 },{threshold:.1});
 document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 
-// Keyboard acce
+// Keyboard accessibility
+document.querySelectorAll(".fc[role='button']").forEach(c=>c.addEventListener("keydown",e=>{
+  if(e.key==="Enter"||e.key===" "){e.preventDefault();c.click();}
+}));
+</script>
+</body>
+</html>
