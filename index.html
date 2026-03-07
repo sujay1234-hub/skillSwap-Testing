@@ -4,151 +4,593 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="SkillSwap — The student-powered marketplace where you trade skills, not money.">
-<meta name="theme-color" content="#050507">
+<meta name="theme-color" content="#03030a">
 <title>SkillSwap — Trade Skills, Not Money.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
+/* ═══════════════════ DESIGN TOKENS ═══════════════════ */
 :root {
-  --bg:#050507;--bg2:#0c0c10;--bg3:#121218;--card:rgba(255,255,255,0.035);--card-h:rgba(255,255,255,0.07);
-  --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.18);
-  --p:#7c6af7;--p2:#a78bfa;--p3:rgba(124,106,247,0.18);
-  --a:#f472b6;--a2:#fb7185;
-  --cyan:#22d3ee;--green:#34d399;--amber:#fbbf24;--red:#f87171;
-  --txt:#f4f4f5;--muted:#71717a;--muted2:#a1a1aa;
-  --glow:rgba(124,106,247,0.35);
-  --fh:'Cabinet Grotesk',sans-serif;
-  --fb:'Instrument Sans',sans-serif;
+  --bg:   #03030a;
+  --bg2:  #080812;
+  --bg3:  #0d0d1a;
+  --bg4:  #111124;
+  --card: rgba(255,255,255,0.028);
+  --card-h: rgba(255,255,255,0.055);
+  --border: rgba(255,255,255,0.065);
+  --border-h: rgba(255,255,255,0.16);
+
+  /* Brand palette — electric indigo × hot coral */
+  --p:    #6157ff;
+  --p2:   #8b83ff;
+  --p3:   rgba(97,87,255,0.15);
+  --a:    #ff5c7c;
+  --a2:   #ff8fa3;
+  --cyan: #00d4ff;
+  --green:#00e5a0;
+  --amber:#ffb930;
+  --red:  #ff5050;
+
+  --glow:       rgba(97,87,255,0.4);
+  --glow-coral: rgba(255,92,124,0.3);
+
+  --txt:   #f0f0f8;
+  --muted: #5a5a7a;
+  --muted2:#9090b8;
+
+  --fh: 'Cabinet Grotesk', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+
+  --r-sm: 14px;
+  --r-md: 20px;
+  --r-lg: 28px;
+  --r-xl: 36px;
+
+  --sab: env(safe-area-inset-bottom,0px);
+  --sat: env(safe-area-inset-top,0px);
 }
+
+/* ═══════════════════ RESET & BASE ═══════════════════ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--p) transparent}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--p);border-radius:99px}
-body{font-family:var(--fb);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;line-height:1.6}
-.bg-mesh{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(124,106,247,0.2),transparent),radial-gradient(ellipse 70% 50% at 90% 70%,rgba(244,114,182,0.12),transparent),radial-gradient(ellipse 60% 40% at 10% 80%,rgba(34,211,238,0.08),transparent),var(--bg)}
-.orb{position:fixed;border-radius:50%;filter:blur(130px);z-index:-1;animation:orbF 24s ease-in-out infinite}
-.o1{width:700px;height:700px;top:-300px;left:-250px;background:var(--p);opacity:.1}
-.o2{width:600px;height:600px;bottom:-250px;right:-200px;background:var(--a);opacity:.08;animation-delay:-12s}
-.o3{width:400px;height:400px;top:40%;left:40%;background:var(--cyan);opacity:.05;animation-delay:-6s}
-@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,50px) scale(1.06)}}
-.grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--p),var(--a));border-radius:99px}
+body{font-family:var(--fb);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;line-height:1.6;-webkit-text-size-adjust:100%}
+
+/* ═══════════════════ AMBIENT BACKGROUND ═══════════════════ */
+.bg-canvas{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.bg-canvas::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 100% 80% at 20% -5%,  rgba(97,87,255,.18) 0%, transparent 65%),
+    radial-gradient(ellipse 80%  60% at 85% 15%,  rgba(255,92,124,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60%  50% at 50% 100%, rgba(0,212,255,.07)  0%, transparent 55%),
+    var(--bg);
+}
+/* Subtle noise grain overlay */
+.bg-canvas::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.4;mix-blend-mode:overlay;
+}
+
+/* Animated orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(110px);z-index:-1;pointer-events:none;animation:orbDrift 30s ease-in-out infinite}
+.o1{width:900px;height:900px;top:-400px;left:-350px;background:radial-gradient(circle,rgba(97,87,255,.22),transparent 70%);animation-duration:28s}
+.o2{width:700px;height:700px;bottom:-300px;right:-250px;background:radial-gradient(circle,rgba(255,92,124,.18),transparent 70%);animation-duration:36s;animation-delay:-14s}
+.o3{width:500px;height:500px;top:35%;left:45%;background:radial-gradient(circle,rgba(0,212,255,.09),transparent 70%);animation-duration:22s;animation-delay:-7s}
+@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,40px) scale(1.05)}66%{transform:translate(-30px,70px) scale(.97)}}
+
+/* Fine dot grid */
+.dot-grid{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.065) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:radial-gradient(ellipse 85% 60% at 50% 0%,black 20%,transparent 90%)}
+
+/* ═══════════════════ UTILITY ═══════════════════ */
 .grad{background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;font-size:.74rem;font-weight:600;letter-spacing:.04em}
-.bp{background:var(--p3);border:1px solid rgba(124,106,247,.25);color:var(--p2)}
-.bg-g{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
-.ba{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
-.br{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.grad-cyan{background:linear-gradient(135deg,var(--cyan),var(--p2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:13px 4%;background:rgba(5,5,7,.85);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);font-family:var(--fh);font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
-.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 4px 14px var(--glow)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;font-size:.72rem;font-weight:600;letter-spacing:.04em;font-family:var(--fb)}
+.bp{background:rgba(97,87,255,.12);border:1px solid rgba(97,87,255,.25);color:var(--p2)}
+.bg-g{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);color:var(--green)}
+.ba{background:rgba(255,185,48,.1);border:1px solid rgba(255,185,48,.2);color:var(--amber)}
+.br{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:var(--red)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes slideRight{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes rip{0%{transform:scale(1);opacity:.4}100%{transform:scale(2);opacity:0}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════ NAVIGATION ═══════════════════ */
+nav{
+  position:sticky;top:0;z-index:800;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 4%;height:66px;
+  background:rgba(3,3,10,.82);
+  backdrop-filter:blur(32px) saturate(180%);
+  -webkit-backdrop-filter:blur(32px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+
+.logo{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;color:var(--txt);
+  font-family:var(--fh);font-size:1.25rem;font-weight:800;letter-spacing:-.4px
+}
+.logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.88rem;box-shadow:0 0 20px var(--glow),0 4px 12px rgba(0,0,0,.4);
+  position:relative;overflow:hidden;
+}
+.logo-mark::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.25),transparent);
+}
+
 .nav-c{display:flex;gap:2px;list-style:none}
-.nav-c a{text-decoration:none;color:var(--muted);font-size:.85rem;font-weight:500;padding:8px 14px;border-radius:12px;transition:all .2s}
-.nav-c a:hover{color:var(--txt);background:var(--card)}
+.nav-c a{
+  text-decoration:none;color:var(--muted2);font-size:.84rem;font-weight:500;
+  padding:7px 14px;border-radius:10px;transition:all .2s;letter-spacing:.01em;
+}
+.nav-c a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+.nav-c a.active{color:var(--txt)}
+
 .nav-r{display:flex;align-items:center;gap:8px}
-.ibtn{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:all .2s;font-size:.9rem;position:relative;font-family:var(--fb)}
-.ibtn:hover{color:var(--txt);border-color:var(--border-h)}
-.ibtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg)}
-.btn-ghost{padding:8px 18px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--txt);text-decoration:none;font-weight:600;font-size:.84rem;transition:all .2s;cursor:pointer;font-family:var(--fb)}
-.btn-ghost:hover{background:var(--card);border-color:var(--border-h)}
-.btn-cta{padding:9px 20px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:var(--fb);transition:all .3s;box-shadow:0 4px 16px var(--glow)}
-.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--glow)}
-.upill{display:none;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:4px 12px 4px 4px;border-radius:99px;cursor:pointer;transition:all .25s}
-.upill:hover{border-color:var(--p);background:rgba(124,106,247,.08);box-shadow:0 0 0 3px rgba(124,106,247,.12)}
-.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(124,106,247,.4)}
-.upill:hover{border-color:var(--border-h)}
+
+.ibtn{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;
+  color:var(--muted);padding:8px 10px;cursor:pointer;transition:all .2s;font-size:.9rem;
+  position:relative;font-family:var(--fb);
+}
+.ibtn:hover{color:var(--txt);border-color:var(--border-h);background:rgba(255,255,255,.07)}
+.ibtn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg);animation:pulse 2s ease-in-out infinite}
+
+.btn-ghost{
+  padding:8px 18px;border-radius:11px;border:1px solid var(--border);
+  background:transparent;color:var(--muted2);text-decoration:none;
+  font-weight:500;font-size:.84rem;transition:all .2s;cursor:pointer;font-family:var(--fb);
+}
+.btn-ghost:hover{color:var(--txt);background:rgba(255,255,255,.04);border-color:var(--border-h)}
+
+.btn-cta{
+  padding:9px 20px;border-radius:11px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  color:#fff;text-decoration:none;font-weight:600;font-size:.84rem;
+  border:none;cursor:pointer;font-family:var(--fb);transition:all .3s;
+  box-shadow:0 4px 18px var(--glow);letter-spacing:.01em;
+}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--glow),0 4px 12px var(--glow-coral)}
+
+/* User pill */
+.upill{
+  display:none;align-items:center;gap:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  padding:4px 12px 4px 4px;border-radius:99px;cursor:pointer;transition:all .25s;
+}
+.upill:hover{border-color:rgba(97,87,255,.4);background:rgba(97,87,255,.07);box-shadow:0 0 0 3px rgba(97,87,255,.1)}
+.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(97,87,255,.4)}
 .upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p);display:none}
-.upill span{font-size:.82rem;font-weight:600;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mbtn{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
+.upill span{font-size:.82rem;font-weight:500;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* MOBILE MENU */
-.mmenu{display:none;position:fixed;inset:0;background:rgba(5,5,7,.97);backdrop-filter:blur(20px);z-index:1100;flex-direction:column;justify-content:center;align-items:center;gap:6px;opacity:0;pointer-events:none;transition:opacity .3s}
-.mmenu.open{opacity:1;pointer-events:all}
-.mclose{position:absolute;top:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--txt);padding:9px 12px;cursor:pointer;font-size:1rem;transition:.2s;font-family:var(--fb)}
-.mclose:hover{background:var(--red);border-color:var(--red)}
-.mmenu a{color:var(--txt);font-family:var(--fh);font-size:1.6rem;font-weight:800;text-decoration:none;padding:10px 28px;border-radius:18px;transition:all .2s;letter-spacing:-.5px}
-.mmenu a:hover{background:var(--card);color:var(--p2)}
-.mauth{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+/* Hamburger mobile */
+.mbtn{display:none;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
 
-/* HERO */
-.hero{text-align:center;padding:96px 5% 80px;max-width:1200px;margin:0 auto}
-.hero h1{font-family:var(--fh);font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;letter-spacing:-2px;margin:20px 0 22px;animation:fadeUp .6s .1s ease both}
-.hero h1 em{font-style:normal;position:relative}
-.hero h1 em::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;animation:slideR .8s .5s ease both;transform-origin:left}
-@keyframes slideR{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.hero-ey{animation:fadeUp .6s ease both}
-.hero-sub{font-size:1.12rem;color:var(--muted2);max-width:600px;margin:0 auto 44px;line-height:1.8;animation:fadeUp .6s .2s ease both}
-.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
-.bh{padding:15px 32px;border-radius:18px;font-size:1rem;font-weight:700;font-family:var(--fh);text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .3s;letter-spacing:-.2px}
-.bh-fill{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;box-shadow:0 8px 32px -4px var(--glow)}
-.bh-fill:hover{transform:translateY(-3px);box-shadow:0 18px 44px -4px var(--glow)}
-.bh-line{background:var(--card);border:1px solid var(--border);color:var(--txt)}
-.bh-line:hover{background:var(--card-h);border-color:var(--border-h);transform:translateY(-2px)}
-.hstats{display:flex;justify-content:center;gap:52px;flex-wrap:wrap;margin-top:64px;animation:fadeUp .6s .4s ease both}
-.snum{font-family:var(--fh);font-size:2.2rem;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--p2),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.slbl{font-size:.8rem;color:var(--muted);margin-top:2px;font-weight:500}
+/* ═══════════════════ MOBILE DRAWER ═══════════════════ */
+.mmenu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1099;backdrop-filter:blur(6px);opacity:0;transition:opacity .3s}
+.mmenu-overlay.open{opacity:1}
 
-/* SECTION */
-.sec{padding:80px 5% 100px;max-width:1440px;margin:0 auto}
-.stag{display:block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--p2);margin-bottom:10px}
-.stitle{font-family:var(--fh);font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-1px;margin-bottom:12px}
-.ssub{color:var(--muted2);font-size:1.02rem;max-width:520px;line-height:1.75}
-.shead{text-align:center;margin-bottom:60px}
+.mmenu{
+  display:flex;position:fixed;top:0;right:0;bottom:0;
+  width:min(88vw,340px);
+  background:#0a0a16;border-left:1px solid rgba(255,255,255,.07);
+  z-index:1100;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;overflow-x:hidden;
+  box-shadow:-24px 0 80px rgba(0,0,0,.7);
+}
+.mmenu.open{transform:translateX(0)}
+
+.mm-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mm-logo{font-family:var(--fh);font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mclose{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:#8888aa;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.mclose:hover{background:rgba(255,80,80,.15);border-color:rgba(255,80,80,.3);color:var(--red)}
+
+.mm-profile{margin:14px;padding:14px;background:rgba(97,87,255,.08);border:1px solid rgba(97,87,255,.18);border-radius:16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:.2s;text-decoration:none}
+.mm-profile:hover{background:rgba(97,87,255,.14)}
+.mm-av{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:1.2rem;color:white;overflow:hidden}
+.mm-av img{width:100%;height:100%;object-fit:cover}
+.mm-user-info{flex:1;min-width:0}
+.mm-user-name{font-size:.92rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.mm-user-sub{font-size:.75rem;color:var(--p2);margin-top:2px}
+.mm-profile-arrow{color:var(--p2);font-size:.8rem;flex-shrink:0}
+.mm-profile.hidden{display:none}
+
+.mm-auth{margin:0 14px 4px;display:none;flex-direction:column;gap:8px}
+.mm-auth.visible{display:flex}
+.mm-auth-login{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--txt);font-family:var(--fb);font-size:.9rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;transition:.2s;display:block}
+.mm-auth-login:hover{background:rgba(255,255,255,.06)}
+.mm-auth-signup{padding:12px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--a));color:white;font-family:var(--fb);font-size:.9rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;transition:.2s;display:block;box-shadow:0 4px 14px var(--glow)}
+.mm-auth-signup:hover{opacity:.9;transform:translateY(-1px)}
+
+.mm-section{padding:14px 18px 6px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444466}
+.mm-link{display:flex;align-items:center;gap:13px;padding:12px 18px;margin:1px 8px;border-radius:12px;cursor:pointer;color:#8888aa;font-size:.88rem;font-weight:500;text-decoration:none;transition:.2s}
+.mm-link i{width:20px;text-align:center;font-size:1rem;flex-shrink:0}
+.mm-link:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.mm-link.accent{color:var(--p2)}
+.mm-link.accent:hover{background:rgba(97,87,255,.1)}
+.mm-link.danger{color:var(--red)}
+.mm-link.danger:hover{background:rgba(255,80,80,.1)}
+.mm-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 18px}
+.mm-spacer{flex:1}
+.mm-bottom{padding:16px 8px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.06)}
+.mm-logged-section{display:none}
+.mm-logged-section.visible{display:block}
+.mm-guest-section{display:block}
+.mm-guest-section.hidden{display:none}
+
+/* ═══════════════════ HERO ═══════════════════ */
+.hero{
+  text-align:center;
+  padding:110px 5% 100px;
+  max-width:1200px;margin:0 auto;
+  position:relative;
+}
+
+/* Eyebrow badge */
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px 6px 6px;
+  border-radius:99px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  font-size:.78rem;font-weight:500;color:var(--muted2);
+  margin-bottom:28px;
+  animation:fadeUp .6s ease both;
+  letter-spacing:.02em;
+}
+.hero-badge .badge-dot{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  color:white;padding:3px 10px;border-radius:99px;
+  font-size:.72rem;font-weight:700;letter-spacing:.04em;
+}
+.hero-badge .badge-dot::before{
+  content:'';width:6px;height:6px;background:white;border-radius:50%;
+  animation:pulse 2s ease-in-out infinite;
+}
+
+.hero h1{
+  font-family:var(--fh);
+  font-size:clamp(2.8rem,8.5vw,5.8rem);
+  font-weight:800;
+  line-height:1.02;
+  letter-spacing:-2.5px;
+  margin-bottom:26px;
+  animation:fadeUp .7s .12s ease both;
+}
+.hero h1 .line2{display:block;position:relative;width:fit-content;margin:0 auto}
+.hero h1 .line2::after{
+  content:'';position:absolute;bottom:-6px;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--p),var(--a),var(--cyan));
+  border-radius:99px;
+  animation:slideRight .9s .6s ease both;
+  transform-origin:left;
+}
+
+.hero-sub{
+  font-size:1.15rem;color:var(--muted2);max-width:560px;
+  margin:0 auto 48px;line-height:1.85;font-weight:300;
+  animation:fadeUp .6s .22s ease both;
+}
+
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .32s ease both}
+
+.bh{
+  padding:16px 34px;border-radius:16px;
+  font-size:1rem;font-weight:600;font-family:var(--fh);
+  text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  transition:all .35s cubic-bezier(.22,1,.36,1);letter-spacing:-.1px;
+}
+.bh-fill{
+  background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;
+  box-shadow:0 8px 32px -4px var(--glow),0 4px 16px -4px var(--glow-coral);
+}
+.bh-fill:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 20px 48px -4px var(--glow),0 10px 28px -4px var(--glow-coral)}
+.bh-line{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--txt)}
+.bh-line:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);transform:translateY(-3px)}
+
+/* Stats row */
+.hstats{
+  display:flex;justify-content:center;gap:0;
+  flex-wrap:wrap;margin-top:72px;
+  animation:fadeUp .6s .42s ease both;
+  background:rgba(255,255,255,.028);
+  border:1px solid var(--border);
+  border-radius:22px;padding:0;
+  max-width:560px;margin-left:auto;margin-right:auto;
+  overflow:hidden;
+  backdrop-filter:blur(20px);
+}
+.hstats>div{
+  flex:1;padding:24px 20px;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.hstats>div:last-child{border-right:none}
+.snum{
+  font-family:var(--fh);font-size:2rem;font-weight:800;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--p2),var(--a2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.slbl{font-size:.76rem;color:var(--muted);margin-top:3px;font-weight:400}
+
+/* Quick links bar */
+.hero-quicklinks{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;margin-top:28px;
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;
+  max-width:620px;margin-left:auto;margin-right:auto;
+  animation:fadeUp .6s .5s ease both;
+  backdrop-filter:blur(20px);
+}
+.hql-item{
+  flex:1;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;text-decoration:none;color:var(--txt);
+  transition:all .25s;
+}
+.hql-item:hover{background:rgba(255,255,255,.04)}
+.hql-div{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.hql-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:rgba(97,87,255,.1);color:var(--p2);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;
+}
+.hql-text{display:flex;flex-direction:column;gap:1px}
+.hql-label{font-size:.8rem;font-weight:600;letter-spacing:-.1px}
+.hql-sub{font-size:.68rem;color:var(--muted);font-weight:400}
+
+/* Scroll hint */
+.scroll-hint{
+  margin-top:60px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp .6s .65s ease both;
+  color:var(--muted);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;
+}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--p),transparent);animation:floatY 2s ease-in-out infinite}
+
+/* ═══════════════════ SECTION WRAPPER ═══════════════════ */
+.sec{padding:100px 5%;max-width:1440px;margin:0 auto}
+
+.stag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--p2);margin-bottom:14px;
+}
+.stag::before{content:'';width:20px;height:2px;background:linear-gradient(90deg,var(--p),transparent);border-radius:99px}
+
+.stitle{font-family:var(--fh);font-size:clamp(1.8rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-1.2px;margin-bottom:14px;line-height:1.1}
+.ssub{color:var(--muted2);font-size:1rem;max-width:500px;line-height:1.8;font-weight:300}
+.shead{text-align:center;margin-bottom:64px}
 .shead .ssub{margin:0 auto}
+.shead .stag{display:inline-flex}
 
-/* FEATURE CARDS */
-.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
-.fc{background:var(--card);border:1px solid var(--border);border-radius:26px;padding:30px 26px;cursor:pointer;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.19,1,.22,1),box-shadow .35s,border-color .35s,background .35s}
-.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--a));transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.19,1,.22,1)}
-.fc:hover{transform:translateY(-6px);border-color:var(--border-h);background:var(--card-h);box-shadow:0 20px 50px rgba(0,0,0,.4)}
-.fc:hover::before{transform:scaleX(1)}
-.fi{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:18px;transition:transform .3s}
-.fc:hover .fi{transform:scale(1.1) rotate(8deg)}
-.fc h3{font-family:var(--fh);font-size:1.1rem;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
-.fc>p{color:var(--muted2);font-size:.9rem;line-height:1.7}
-.farr{position:absolute;top:22px;right:22px;color:var(--muted);font-size:.8rem;transition:all .3s}
-.fc:hover .farr{color:var(--p2);transform:translate(2px,-2px)}
-.fcta{display:inline-flex;align-items:center;gap:7px;margin-top:16px;padding:9px 14px;border-radius:12px;background:rgba(124,106,247,.1);color:var(--p2);text-decoration:none;font-size:.84rem;font-weight:600;border:1px solid rgba(124,106,247,.2);transition:all .25s}
-.fcta:hover{background:var(--p);color:#fff;border-color:var(--p);transform:translateX(3px)}
+/* ═══════════════════ FEATURE CARDS ═══════════════════ */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
 
-/* FAB */
-.cfab{position:fixed;bottom:24px;right:24px;z-index:700;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.15rem;box-shadow:0 8px 28px var(--glow);transition:transform .3s,box-shadow .3s}
-.cfab:hover{transform:translateY(-4px) scale(1.08);box-shadow:0 16px 44px var(--glow)}
-.cfab::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--p);opacity:.3;animation:rip 2.5s ease-out infinite}
-@keyframes rip{0%{transform:scale(1);opacity:.3}100%{transform:scale(1.7);opacity:0}}
+.fc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:34px 28px;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .4s cubic-bezier(.19,1,.22,1),box-shadow .4s,border-color .4s,background .4s;
+}
+/* Top gradient line */
+.fc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--p),transparent);
+  opacity:0;transition:opacity .4s;
+}
+/* Ambient glow spot */
+.fc::after{
+  content:'';position:absolute;inset:0;border-radius:var(--r-xl);
+  background:radial-gradient(ellipse 60% 50% at 30% 0%,rgba(97,87,255,.08),transparent);
+  opacity:0;transition:opacity .4s;
+}
+.fc:hover{transform:translateY(-8px);border-color:rgba(97,87,255,.3);background:rgba(97,87,255,.04);box-shadow:0 24px 60px -12px rgba(0,0,0,.6),0 0 0 1px rgba(97,87,255,.15)}
+.fc:hover::before{opacity:1}
+.fc:hover::after{opacity:1}
 
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0,0,0,.2)}
-.fti{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:40px}
+.fi{
+  width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;margin-bottom:20px;transition:transform .35s cubic-bezier(.22,1,.36,1);
+  position:relative;z-index:1;
+}
+.fc:hover .fi{transform:scale(1.12) rotate(6deg)}
+
+.fc h3{font-family:var(--fh);font-size:1.1rem;font-weight:700;margin-bottom:10px;letter-spacing:-.3px;position:relative;z-index:1}
+.fc>p{color:var(--muted2);font-size:.88rem;line-height:1.75;position:relative;z-index:1;font-weight:300}
+
+.farr{position:absolute;top:24px;right:24px;color:var(--muted);font-size:.8rem;transition:all .3s;opacity:.5}
+.fc:hover .farr{color:var(--p2);transform:translate(3px,-3px);opacity:1}
+
+.fcta{
+  display:inline-flex;align-items:center;gap:7px;margin-top:18px;padding:9px 14px;
+  border-radius:12px;background:rgba(97,87,255,.08);color:var(--p2);text-decoration:none;
+  font-size:.82rem;font-weight:600;border:1px solid rgba(97,87,255,.18);transition:all .25s;
+  position:relative;z-index:1;
+}
+.fcta:hover{background:var(--p);color:#fff;border-color:var(--p);transform:translateX(4px)}
+
+/* ═══════════════════ FEATURES MARQUEE / EXPLORE SECTION ═══════════════════ */
+.skills-explore{
+  padding:80px 0;
+  overflow:hidden;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(to bottom,transparent,rgba(97,87,255,.03),transparent);
+  position:relative;
+}
+.skills-explore::before,.skills-explore::after{
+  content:'';position:absolute;top:0;bottom:0;width:200px;z-index:2;pointer-events:none;
+}
+.skills-explore::before{left:0;background:linear-gradient(to right,var(--bg),transparent)}
+.skills-explore::after{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+
+.skills-label{
+  text-align:center;margin-bottom:44px;padding:0 5%;
+}
+
+.marquee-track{display:flex;gap:10px;animation:marquee 30s linear infinite;width:max-content}
+.marquee-track:hover{animation-play-state:paused}
+.marquee-reverse{animation-direction:reverse;animation-duration:36s;margin-top:10px}
+
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.skill-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:99px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  font-size:.84rem;font-weight:500;color:var(--muted2);white-space:nowrap;
+  transition:all .25s;cursor:default;
+  letter-spacing:.01em;
+}
+.skill-chip:hover{color:var(--txt);border-color:rgba(97,87,255,.3);background:rgba(97,87,255,.07);transform:translateY(-2px)}
+.skill-chip .chip-icon{font-size:.85rem;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ═══════════════════ HOW IT WORKS ═══════════════════ */
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px}
+.how-card{
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  padding:40px 32px;position:relative;overflow:hidden;
+  transition:background .35s;
+}
+.how-card:first-child{border-radius:var(--r-xl) 0 0 var(--r-xl)}
+.how-card:last-child{border-radius:0 var(--r-xl) var(--r-xl) 0}
+.how-card:hover{background:rgba(97,87,255,.04)}
+.how-num{
+  font-family:var(--fh);font-size:4.5rem;font-weight:800;
+  color:rgba(255,255,255,.04);position:absolute;top:20px;right:24px;
+  line-height:1;letter-spacing:-3px;
+  transition:color .35s;
+}
+.how-card:hover .how-num{color:rgba(97,87,255,.12)}
+.how-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:20px}
+.how-card h4{font-family:var(--fh);font-size:1.05rem;font-weight:700;margin-bottom:10px;letter-spacing:-.2px}
+.how-card p{font-size:.88rem;color:var(--muted2);line-height:1.75;font-weight:300}
+
+/* ═══════════════════ TESTIMONIALS ═══════════════════ */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.tc{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:28px;transition:all .35s;
+}
+.tc:hover{transform:translateY(-4px);border-color:var(--border-h);background:var(--card-h)}
+.tq{font-size:1.8rem;color:rgba(97,87,255,.3);font-family:Georgia,serif;line-height:1;margin-bottom:12px}
+.tp{font-size:.9rem;color:var(--muted2);line-height:1.75;font-weight:300;font-style:italic}
+.ta{display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.tav{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;color:white;font-size:.95rem;flex-shrink:0}
+.tan{font-family:var(--fh);font-weight:700;font-size:.9rem;letter-spacing:-.2px}
+.tad{font-size:.76rem;color:var(--muted);margin-top:1px}
+.tstars{color:var(--amber);font-size:.75rem;margin-top:6px;letter-spacing:1px}
+
+/* ═══════════════════ CONTACT ═══════════════════ */
+.contact-section{
+  padding:100px 5%;
+  max-width:800px;margin:0 auto;
+}
+.contact-card{
+  background:rgba(255,255,255,.025);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:44px;
+  backdrop-filter:blur(20px);
+}
+.contact-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.cf-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--txt);border-radius:14px;padding:13px 16px;
+  font-family:var(--fb);font-size:.9rem;outline:none;transition:border-color .2s,background .2s;
+  margin-bottom:0;
+}
+.cf-input:focus{border-color:rgba(97,87,255,.5);background:rgba(97,87,255,.05)}
+.cf-input::placeholder{color:var(--muted)}
+.cf-textarea{min-height:130px;resize:vertical;margin-top:0}
+.cf-submit{
+  width:100%;padding:15px;border-radius:14px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  color:white;border:none;font-family:var(--fh);font-size:1rem;font-weight:700;
+  cursor:pointer;transition:all .3s;letter-spacing:-.2px;
+  box-shadow:0 6px 24px var(--glow);margin-top:14px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.cf-submit:hover{transform:translateY(-3px);box-shadow:0 14px 40px var(--glow),0 6px 20px var(--glow-coral)}
+.contact-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.contact-link{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:12px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--muted2);font-size:.84rem;text-decoration:none;font-weight:500;transition:all .2s;
+}
+.contact-link:hover{color:var(--txt);border-color:var(--border-h);background:rgba(255,255,255,.07)}
+
+/* ═══════════════════ FAB ═══════════════════ */
+.cfab{
+  position:fixed;bottom:28px;right:28px;z-index:700;
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;text-decoration:none;font-size:1.15rem;
+  box-shadow:0 8px 30px var(--glow),0 4px 14px var(--glow-coral);
+  transition:transform .3s,box-shadow .3s;
+}
+.cfab:hover{transform:translateY(-5px) scale(1.08);box-shadow:0 18px 48px var(--glow),0 8px 24px var(--glow-coral)}
+.cfab::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid rgba(97,87,255,.5);animation:rip 2.5s ease-out infinite}
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer{
+  border-top:1px solid var(--border);
+  padding:60px 5% 36px;
+  background:linear-gradient(to bottom,transparent,rgba(0,0,0,.3));
+}
+.fti{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:44px}
 .fbrand{max-width:260px}
-.fbrand .logo{margin-bottom:14px;display:inline-flex}
-.fbrand p{color:var(--muted);font-size:.86rem;line-height:1.7}
-.fcol h5{font-family:var(--fh);font-weight:800;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
-.fcol a{display:block;color:var(--muted2);text-decoration:none;font-size:.88rem;margin-bottom:10px;transition:color .2s}
+.fbrand .logo{margin-bottom:16px;display:inline-flex}
+.fbrand p{color:var(--muted);font-size:.84rem;line-height:1.75;font-weight:300}
+.fcol h5{font-family:var(--fh);font-weight:700;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.fcol a{display:block;color:var(--muted2);text-decoration:none;font-size:.86rem;margin-bottom:12px;transition:color .2s;font-weight:300}
 .fcol a:hover{color:var(--txt)}
-.ftbot{max-width:1200px;margin:36px auto 0;padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.ftbot p{color:var(--muted);font-size:.82rem}
-.fsoc{display:flex;gap:10px}
-.fsoc a{width:32px;height:32px;border-radius:9px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.82rem;text-decoration:none;transition:all .2s}
-.fsoc a:hover{color:var(--p2);border-color:var(--p)}
+.ftbot{max-width:1200px;margin:44px auto 0;padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.ftbot p{color:var(--muted);font-size:.8rem;font-weight:300}
+.fsoc{display:flex;gap:8px}
+.fsoc a{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.82rem;text-decoration:none;transition:all .2s}
+.fsoc a:hover{color:var(--p2);border-color:rgba(97,87,255,.3);background:rgba(97,87,255,.08)}
 
-/* ════ SETTINGS PANEL ════ */
-.sbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1050}
+/* ═══════════════════ SETTINGS PANEL ═══════════════════ */
+.sbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:1050}
 .sbg.open{display:block}
 .spanel{position:fixed;top:0;right:-100%;bottom:0;width:min(500px,100vw);z-index:1060;background:var(--bg2);border-left:1px solid var(--border);overflow:hidden;transition:right .45s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column}
 .spanel.open{right:0}
 .sph{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
 .sphl{display:flex;align-items:center;gap:12px}
 .sphic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff}
-.sph h3{font-family:var(--fh);font-size:1.1rem;font-weight:900;letter-spacing:-.3px}
+.sph h3{font-family:var(--fh);font-size:1.1rem;font-weight:700;letter-spacing:-.3px}
 .sph span{font-size:.78rem;color:var(--muted)}
-.sclose{background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:.2s;font-size:.9rem;font-family:var(--fb)}
+.sclose{background:var(--card);border:1px solid var(--border);border-radius:11px;color:var(--muted);padding:9px 11px;cursor:pointer;transition:.2s;font-size:.9rem;font-family:var(--fb)}
 .sclose:hover{color:var(--txt);border-color:var(--border-h)}
 .stabs{display:flex;padding:12px 24px 0;border-bottom:1px solid var(--border);gap:4px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 .stabs::-webkit-scrollbar{display:none}
-.stab{flex-shrink:0;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:.83rem;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;border-radius:12px 12px 0 0}
-.stab:hover{color:var(--txt);background:var(--card)}
+.stab{flex-shrink:0;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:.83rem;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;border-radius:12px 12px 0 0}
+.stab:hover{color:var(--txt);background:rgba(255,255,255,.03)}
 .stab.active{color:var(--p2);border-bottom-color:var(--p);background:none}
 .sbody{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:6px}
 .ssec{background:var(--bg3);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:4px}
@@ -184,7 +626,7 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .sw.active{border-color:#fff;transform:scale(1.18)}
 .sw:hover{transform:scale(1.12)}
 .sktags{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
-.skt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--p3);border:1px solid rgba(124,106,247,.2);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--p2);cursor:pointer;transition:all .2s}
+.skt{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--p3);border:1px solid rgba(97,87,255,.2);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--p2);cursor:pointer;transition:all .2s}
 .skt:hover{background:var(--p);color:#fff;border-color:var(--p)}
 .addsk{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--card);border:1px dashed var(--border-h);border-radius:99px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--fb)}
 .addsk:hover{color:var(--p2);border-color:var(--p)}
@@ -192,7 +634,7 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .xpinfo{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .xplv{font-family:var(--fh);font-weight:800;font-size:.95rem}
 .xppt{font-size:.8rem;color:var(--muted)}
-.xptrack{height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.xptrack{height:7px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
 .xpfill{height:100%;background:linear-gradient(90deg,var(--p),var(--a));border-radius:99px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
 .xpmil{display:flex;justify-content:space-between;margin-top:8px}
 .xpmil span{font-size:.7rem;color:var(--muted)}
@@ -218,7 +660,7 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .noconn{color:var(--muted)}
 .dagrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:16px 20px}
 .dbtn{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 4px;text-align:center;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
-.dbtn.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.dbtn.on{background:var(--p3);border-color:rgba(97,87,255,.3);color:var(--p2)}
 .dbtn:hover{border-color:var(--border-h);color:var(--txt)}
 .dinit{display:block;font-size:.7rem;margin-bottom:4px;font-weight:800;letter-spacing:.05em}
 .dcirc{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:.64rem;transition:background .2s}
@@ -228,25 +670,25 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .star:hover,.star.lit{color:var(--amber);transform:scale(1.15)}
 .tchips{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px}
 .tchip{padding:7px 14px;border-radius:99px;background:var(--card);border:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .2s;font-family:var(--fb)}
-.tchip.on{background:var(--p3);border-color:rgba(124,106,247,.3);color:var(--p2)}
+.tchip.on{background:var(--p3);border-color:rgba(97,87,255,.3);color:var(--p2)}
 .tchip:hover{border-color:var(--border-h);color:var(--txt)}
-.dzwrap{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:18px;overflow:hidden;margin-bottom:20px}
-.dztitle{padding:14px 20px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);border-bottom:1px solid rgba(248,113,113,.12)}
-.dzrow{padding:14px 20px;border-bottom:1px solid rgba(248,113,113,.08);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dzwrap{background:rgba(255,80,80,.04);border:1px solid rgba(255,80,80,.15);border-radius:18px;overflow:hidden;margin-bottom:20px}
+.dztitle{padding:14px 20px;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);border-bottom:1px solid rgba(255,80,80,.12)}
+.dzrow{padding:14px 20px;border-bottom:1px solid rgba(255,80,80,.08);display:flex;justify-content:space-between;align-items:center;gap:12px}
 .dzrow:last-child{border-bottom:none}
 .dzinfo .slb{font-size:.88rem}
 .dzinfo .sde{font-size:.77rem;color:var(--muted)}
-.bdang{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red);border-radius:12px;padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);white-space:nowrap}
+.bdang{background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.2);color:var(--red);border-radius:12px;padding:8px 16px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fb);white-space:nowrap}
 .bdang:hover{background:var(--red);color:#fff;border-color:var(--red)}
 .ssavebar{padding:16px 24px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
-.bsave{width:100%;padding:13px;border-radius:18px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;font-family:var(--fh);font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s;box-shadow:0 4px 18px var(--glow);letter-spacing:-.2px}
+.bsave{width:100%;padding:13px;border-radius:18px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;font-family:var(--fh);font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 4px 18px var(--glow);letter-spacing:-.2px}
 .bsave:hover{transform:translateY(-2px);box-shadow:0 10px 32px var(--glow)}
 
-/* NOTIFICATION PANEL */
-.npanel{position:fixed;top:62px;right:18px;width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;z-index:850;box-shadow:0 24px 64px rgba(0,0,0,.55);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-10px) scale(.97);transition:all .25s cubic-bezier(.22,1,.36,1)}
+/* ═══════════════════ NOTIFICATION PANEL ═══════════════════ */
+.npanel{position:fixed;top:72px;right:18px;width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;z-index:850;box-shadow:0 24px 64px rgba(0,0,0,.6);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-12px) scale(.97);transition:all .25s cubic-bezier(.22,1,.36,1)}
 .npanel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
 .nph{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
-.nph h4{font-family:var(--fh);font-weight:900;font-size:.95rem;letter-spacing:-.2px}
+.nph h4{font-family:var(--fh);font-weight:700;font-size:.95rem;letter-spacing:-.2px}
 .npacts{display:flex;gap:8px}
 .npbtn{background:none;border:none;color:var(--muted);font-size:.76rem;font-weight:600;cursor:pointer;font-family:var(--fb);transition:color .2s;padding:2px 6px}
 .npbtn:hover{color:var(--p2)}
@@ -263,224 +705,141 @@ footer{border-top:1px solid var(--border);padding:52px 5% 30px;background:rgba(0
 .npft{padding:12px 18px;border-top:1px solid var(--border);text-align:center}
 .npft a{color:var(--p2);font-size:.82rem;font-weight:600;text-decoration:none}
 
-/* TOAST */
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;white-space:nowrap}
+/* ═══════════════════ TOAST ═══════════════════ */
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:12px 24px;font-size:.88rem;font-weight:500;z-index:9999;box-shadow:0 14px 44px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.success .tic{color:var(--green)}
 .toast.info .tic{color:var(--p2)}
 .toast.error .tic{color:var(--red)}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
+/* ═══════════════════ UNIVERSAL MOBILE ═══════════════════ */
+:root{--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px)}
+.mobile-back-btn{display:none !important}
+img,video{max-width:100%}
+input,textarea,select{font-size:16px !important;-webkit-appearance:none;border-radius:10px}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:none}
+.ss-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,18,.97);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:10px 4px;padding-bottom:calc(10px + var(--sab));z-index:500}
+.ss-mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;max-width:480px;margin:0 auto}
+.ss-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;color:#71717a;font-size:.62rem;font-weight:600;cursor:pointer;border-radius:12px;transition:color .2s,background .2s;text-decoration:none;min-width:52px;text-align:center;letter-spacing:.02em}
+.ss-nav-item i{font-size:1.2rem}
+.ss-nav-item.active{color:var(--p2)}
+.ss-mobile-header{display:none;position:sticky;top:0;z-index:400;align-items:center;justify-content:space-between;padding:14px 18px;padding-top:calc(14px + var(--sat));background:rgba(3,3,10,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07)}
+.ss-mob-logo{font-weight:800;font-size:1.1rem;background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
+.ss-mob-btn{width:40px;height:40px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:#a1a1aa;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;text-decoration:none;transition:background .2s}
+.ss-mob-btn:hover{background:rgba(97,87,255,.2);color:var(--p2)}
 
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
 @media(max-width:768px){
   .nav-c,.nav-desk-only{display:none!important}
   .mbtn{display:flex!important}
   .mmenu{display:flex!important}
   .mob-ibtn{padding:7px 9px;font-size:.82rem;border-radius:10px}
   .mob-icons{display:none;align-items:center;gap:6px}
-  .hero{padding:70px 5% 60px}
+  .ss-mobile-nav{display:block}
+  .ss-mobile-header{display:flex}
+  body{padding-bottom:calc(70px + var(--sab))!important}
+  .sidebar{transform:translateX(-100%)!important}
+  .sidebar.open{transform:translateX(0)!important}
+  .main{margin-left:0!important}
+  button,.btn-primary,.btn-secondary,a[role=button]{min-height:44px}
+  .container{padding-left:16px!important;padding-right:16px!important}
+  .card,.panel,.settings-card{padding:18px 16px!important}
+  nav{padding:12px 16px!important;height:auto}
+  .hero{padding:80px 5% 70px}
   .hero h1{letter-spacing:-1px}
   .hero-btns{flex-direction:column;align-items:stretch}
   .bh{justify-content:center}
-  .hstats{gap:28px}
-  .snum{font-size:1.75rem}
+  .hstats{max-width:100%;flex-direction:row}
   .fgrid{grid-template-columns:1fr}
-  .fc{padding:24px 20px}
+  .fc{padding:26px 22px}
   .fti{flex-direction:column;gap:28px}
   .fcol{display:none}
   .ftbot{flex-direction:column;align-items:center;text-align:center;gap:16px}
-  .npanel{right:8px;left:8px;width:auto;top:68px}
+  .npanel{right:8px;left:8px;width:auto;top:72px}
   .cgrid{grid-template-columns:1fr}
   .ssgrid{grid-template-columns:1fr 1fr}
   .dagrid{gap:4px}
+  .contact-form-row{grid-template-columns:1fr}
+  .contact-card{padding:28px 24px}
+  .how-card:first-child,.how-card:last-child{border-radius:0}
+  .how-grid{gap:8px}
+  .how-card{border-radius:16px!important;padding:28px 24px}
+  .tgrid{grid-template-columns:1fr}
+  .hero-quicklinks{display:none}
 }
-@media(min-width:769px) and (max-width:1100px){.fgrid{grid-template-columns:repeat(2,1fr)}}
-</style>
-<style id="ss-universal-responsive">
-/* ══════════════════════════════════════════
-   UNIVERSAL RESPONSIVE FIXES — SkillSwap
-   Applied to all pages for consistent UX
-══════════════════════════════════════════ */
-
-/* Safe area support */
-:root {
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sat: env(safe-area-inset-top, 0px);
+@media(max-width:480px){
+  .form-grid{grid-template-columns:1fr!important}
+  .stats-row,.stat-row{grid-template-columns:1fr 1fr!important}
+  h1{font-size:1.5rem!important}
+  .hstats>div{padding:18px 12px}
 }
-
-/* Remove legacy floating back buttons */
-.mobile-back-btn { display: none !important; }
-
-/* ── Smooth scrolling & selection ── */
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-
-/* ── Universal input fixes for mobile ── */
-input, textarea, select {
-  font-size: 16px !important; /* Prevents iOS zoom */
-  -webkit-appearance: none;
-  border-radius: 10px;
+@media(min-width:769px) and (max-width:1100px){
+  .fgrid{grid-template-columns:repeat(2,1fr)}
+  .how-grid{grid-template-columns:1fr 1fr}
 }
-
-/* ── Focus ring ── */
-input:focus, textarea:focus, select:focus, button:focus-visible {
-  outline: none;
-}
-
-/* ── Prevent horizontal overflow ── */
-body { overflow-x: hidden; }
-img, video { max-width: 100%; }
-
-/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
-.ss-mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(9,9,11,0.97);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 10px 4px;
-  padding-bottom: calc(10px + var(--sab));
-  z-index: 500;
-}
-.ss-mobile-nav-inner {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.ss-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
-  color: #71717a;
-  font-size: 0.62rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: color 0.2s, background 0.2s;
-  text-decoration: none;
-  min-width: 52px;
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-.ss-nav-item i { font-size: 1.2rem; }
-.ss-nav-item.active { color: #6366f1; }
-.ss-nav-item.active i { color: #6366f1; }
-
-/* ── Universal Mobile Header ── */
-.ss-mobile-header {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 400;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  padding-top: calc(14px + var(--sat));
-  background: rgba(9,9,11,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.ss-mob-logo {
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: flex; align-items: center; gap: 8px;
-}
-.ss-mob-btn {
-  width: 40px; height: 40px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.04);
-  color: #a1a1aa;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 1rem;
-  text-decoration: none; transition: background 0.2s;
-}
-.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
-
-@media (max-width: 768px) {
-  .ss-mobile-nav { display: block; }
-  .ss-mobile-header { display: flex; }
-
-  /* Extra bottom padding so content not hidden behind nav */
-  body { padding-bottom: calc(70px + var(--sab)) !important; }
-
-  /* Hide desktop sidebars on mobile */
-  .sidebar { transform: translateX(-100%) !important; }
-  .sidebar.open { transform: translateX(0) !important; }
-  .main { margin-left: 0 !important; }
-
-  /* Bigger tap targets */
-  button, .btn-primary, .btn-secondary, a[role=button] {
-    min-height: 44px;
-  }
-
-  /* Container full padding on mobile */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-
-  /* Card padding on mobile */
-  .card, .panel, .settings-card { padding: 18px 16px !important; }
-}
-
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr !important; }
-  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
-  h1 { font-size: 1.5rem !important; }
-}
-</style>
-<style id="ss-per-page-responsive">
-/* Landing page mobile */
-@media (max-width: 768px) {
-  nav { padding: 12px 16px !important; }
-  .nav-c { display: none !important; }
-  .hero-title { font-size: 2.2rem !important; line-height: 1.15 !important; }
-  .hero-sub { font-size: 0.95rem !important; }
-  .hero-actions { flex-direction: column !important; gap: 10px !important; }
-  .hero-actions a, .hero-actions button { width: 100% !important; text-align: center; justify-content: center !important; }
-  .features-grid, .how-grid, .stats-grid { grid-template-columns: 1fr !important; }
-  .testimonials-grid { grid-template-columns: 1fr !important; }
-  section { padding: 40px 16px !important; }
-  .hero { padding: 60px 16px 40px !important; }
-}
-body { padding-bottom: 0 !important; }
+body{padding-bottom:0!important}
+@media(max-width:768px){body{padding-bottom:calc(70px + var(--sab))!important}}
 </style>
 </head>
 <body>
-<div class="bg-mesh"></div>
-<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
-<div class="grid-bg"></div>
 
+<!-- AMBIENT BACKGROUND -->
+<div class="bg-canvas"></div>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+<div class="dot-grid"></div>
+
+<!-- FAB -->
 <a href="chat.html" class="cfab" title="Chat"><i class="fa-solid fa-comments"></i></a>
 
+<!-- TOAST -->
 <div class="toast" id="toast">
   <i class="fa-solid fa-circle-check tic" id="tic"></i>
   <span id="tmsg">Saved!</span>
 </div>
 
-<!-- MOBILE MENU -->
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="mmenu-overlay" id="mmenuOverlay" onclick="closeMob()"></div>
+
+<!-- MOBILE DRAWER -->
 <div class="mmenu" id="mmenu">
-  <button class="mclose" onclick="closeMob()"><i class="fa-solid fa-xmark"></i></button>
-  <a href="explore.html" onclick="closeMob()">Explore</a>
-  <a href="leaderboard.html" onclick="closeMob()">Leaderboard</a>
-  <a href="dashboard.html" onclick="closeMob()">Dashboard</a>
-  <a href="trades.html" onclick="closeMob()">My Trades</a>
-  <a href="trade-requests.html" onclick="closeMob()">Requests</a>
-  <a href="about.html" onclick="closeMob()">About</a>
-  <div class="mauth">
-    <a href="login.html" class="btn-ghost" onclick="closeMob()">Log In</a>
-    <a href="login.html" class="btn-cta" onclick="closeMob()">Sign Up Free</a>
+  <div class="mm-head">
+    <span class="mm-logo">⚡ SkillSwap</span>
+    <button class="mclose" onclick="closeMob()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <a class="mm-profile hidden" id="mmProfile" href="profile.html" onclick="closeMob()">
+    <div class="mm-av" id="mmAv">S</div>
+    <div class="mm-user-info">
+      <div class="mm-user-name" id="mmName">Student</div>
+      <div class="mm-user-sub" id="mmSub">⭐ View Profile</div>
+    </div>
+    <i class="fa-solid fa-chevron-right mm-profile-arrow"></i>
+  </a>
+  <div class="mm-auth mm-guest-section" id="mmAuth">
+    <a href="login.html" class="mm-auth-login" onclick="closeMob()">Log In</a>
+    <a href="login.html" class="mm-auth-signup" onclick="closeMob()">Sign Up Free 🚀</a>
+  </div>
+  <div class="mm-section mm-logged-section" id="mmLoggedSection">Quick Links</div>
+  <a class="mm-link mm-logged-section accent" href="dashboard.html" onclick="closeMob()"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+  <a class="mm-link mm-logged-section" href="skill-exchange.html" onclick="closeMob()"><i class="fa-solid fa-arrows-rotate"></i>Skill Exchange</a>
+  <a class="mm-link mm-logged-section" href="chat.html" onclick="closeMob()"><i class="fa-solid fa-message"></i>Messages</a>
+  <a class="mm-link mm-logged-section" href="schedule.html" onclick="closeMob()"><i class="fa-solid fa-calendar-days"></i>My Schedule</a>
+  <div class="mm-divider mm-logged-section"></div>
+  <div class="mm-section">Explore</div>
+  <a class="mm-link" href="explore.html" onclick="closeMob()"><i class="fa-solid fa-compass"></i>Explore Skills</a>
+  <a class="mm-link" href="paid-help.html" onclick="closeMob()"><i class="fa-solid fa-star"></i>Expert Marketplace</a>
+  <a class="mm-link" href="leaderboard.html" onclick="closeMob()"><i class="fa-solid fa-trophy"></i>Leaderboard</a>
+  <a class="mm-link" href="about.html" onclick="closeMob()"><i class="fa-solid fa-circle-info"></i>About Us</a>
+  <div class="mm-divider mm-logged-section"></div>
+  <div class="mm-section mm-logged-section">Account</div>
+  <a class="mm-link mm-logged-section" href="profile.html" onclick="closeMob()"><i class="fa-solid fa-user"></i>My Profile</a>
+  <a class="mm-link mm-logged-section" href="setting.html" onclick="closeMob()"><i class="fa-solid fa-gear"></i>Settings</a>
+  <a class="mm-link mm-logged-section" href="#" onclick="closeMob();openSettings()"><i class="fa-solid fa-sliders"></i>Account Settings</a>
+  <a class="mm-link mm-logged-section" href="reputation.html" onclick="closeMob()"><i class="fa-solid fa-medal"></i>Reputation & Badges</a>
+  <div class="mm-spacer"></div>
+  <div class="mm-bottom">
+    <a class="mm-link danger mm-logged-section" id="mmLogout" href="#" onclick="closeMob();logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log Out</a>
   </div>
 </div>
 
@@ -494,56 +853,37 @@ body { padding-bottom: 0 !important; }
     </div>
   </div>
   <div class="nlist">
-    <div class="ni unread">
-      <div class="nic" style="background:rgba(124,106,247,.14);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div>
-      <div class="nib"><p><b>Arjun Singh</b> accepted your Python ↔ UI/UX swap request.</p><div class="ntime">2 min ago</div></div>
-    </div>
-    <div class="ni unread">
-      <div class="nic" style="background:rgba(52,211,153,.14);color:var(--green)"><i class="fa-solid fa-star"></i></div>
-      <div class="nib"><p><b>Priya Mehta</b> left you a ⭐⭐⭐⭐⭐ review for your React session.</p><div class="ntime">1 hour ago</div></div>
-    </div>
-    <div class="ni">
-      <div class="nic" style="background:rgba(251,191,36,.12);color:var(--amber)"><i class="fa-solid fa-trophy"></i></div>
-      <div class="nib"><p>You reached <b>Level 6 — Advanced</b>! New badge unlocked 🎖️</p><div class="ntime">Yesterday</div></div>
-    </div>
-    <div class="ni">
-      <div class="nic" style="background:rgba(34,211,238,.12);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-      <div class="nib"><p><b>₹450 credited</b> to your wallet from Rohan's session payment.</p><div class="ntime">2 days ago</div></div>
-    </div>
-    <div class="ni">
-      <div class="nic" style="background:rgba(248,113,113,.12);color:var(--red)"><i class="fa-solid fa-clock"></i></div>
-      <div class="nib"><p>Session with <b>Neha Sharma</b> starts in 30 minutes!</p><div class="ntime">3 days ago</div></div>
-    </div>
+    <div class="ni unread"><div class="nic" style="background:rgba(97,87,255,.14);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><div class="nib"><p><b>Arjun Singh</b> accepted your Python ↔ UI/UX swap request.</p><div class="ntime">2 min ago</div></div></div>
+    <div class="ni unread"><div class="nic" style="background:rgba(0,229,160,.14);color:var(--green)"><i class="fa-solid fa-star"></i></div><div class="nib"><p><b>Priya Mehta</b> left you a ⭐⭐⭐⭐⭐ review for your React session.</p><div class="ntime">1 hour ago</div></div></div>
+    <div class="ni"><div class="nic" style="background:rgba(255,185,48,.12);color:var(--amber)"><i class="fa-solid fa-trophy"></i></div><div class="nib"><p>You reached <b>Level 6 — Advanced</b>! New badge unlocked 🎖️</p><div class="ntime">Yesterday</div></div></div>
+    <div class="ni"><div class="nic" style="background:rgba(0,212,255,.12);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="nib"><p><b>₹450 credited</b> to your wallet from Rohan's session payment.</p><div class="ntime">2 days ago</div></div></div>
+    <div class="ni"><div class="nic" style="background:rgba(255,80,80,.12);color:var(--red)"><i class="fa-solid fa-clock"></i></div><div class="nib"><p>Session with <b>Neha Sharma</b> starts in 30 minutes!</p><div class="ntime">3 days ago</div></div></div>
   </div>
   <div class="npft"><a href="notifications.html">View all notifications →</a></div>
 </div>
 
-<!-- SETTINGS BACKDROP -->
-<div class="sbg" id="sbg" onclick="closeSettings()"></div>
-
 <!-- SETTINGS PANEL -->
+<div class="sbg" id="sbg" onclick="closeSettings()"></div>
 <div class="spanel" id="spanel">
   <div class="sph">
     <div class="sphl">
       <div class="sphic"><i class="fa-solid fa-sliders"></i></div>
-      <div><h3>Account Settings</h3><span>Manage profile &amp; preferences</span></div>
+      <div><h3>Account Settings</h3><span>Manage your profile & preferences</span></div>
     </div>
     <button class="sclose" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <div class="stabs" id="stabs">
-    <button class="stab active" onclick="stab(0,this)"><i class="fa-solid fa-user" style="margin-right:5px"></i>Profile</button>
-    <button class="stab" onclick="stab(1,this)"><i class="fa-solid fa-chart-line" style="margin-right:5px"></i>Stats</button>
-    <button class="stab" onclick="stab(2,this)"><i class="fa-solid fa-bell" style="margin-right:5px"></i>Alerts</button>
-    <button class="stab" onclick="stab(3,this)"><i class="fa-solid fa-palette" style="margin-right:5px"></i>Look</button>
-    <button class="stab" onclick="stab(4,this)"><i class="fa-solid fa-shield-halved" style="margin-right:5px"></i>Privacy</button>
-    <button class="stab" onclick="stab(5,this)"><i class="fa-solid fa-calendar" style="margin-right:5px"></i>Schedule</button>
-    <button class="stab" onclick="stab(6,this)"><i class="fa-solid fa-link" style="margin-right:5px"></i>Connect</button>
-    <button class="stab" onclick="stab(7,this)"><i class="fa-solid fa-circle-exclamation" style="margin-right:5px;color:var(--red)"></i>Account</button>
+  <div class="stabs">
+    <button class="stab active" onclick="stab(1,this)">Profile</button>
+    <button class="stab" onclick="stab(2,this)">Notifications</button>
+    <button class="stab" onclick="stab(3,this)">Appearance</button>
+    <button class="stab" onclick="stab(4,this)">Privacy</button>
+    <button class="stab" onclick="stab(5,this)">Schedule</button>
+    <button class="stab" onclick="stab(6,this)">Connected</button>
+    <button class="stab" onclick="stab(7,this)">Account</button>
   </div>
   <div class="sbody">
-
-    <!-- TAB 0: PROFILE -->
-    <div class="stc" id="t0">
+    <!-- TAB 1: PROFILE -->
+    <div class="stc" id="t1" style="display:flex;flex-direction:column">
       <div class="ssec">
         <div class="sst">Profile Photo</div>
         <div class="savarea">
@@ -552,81 +892,50 @@ body { padding-bottom: 0 !important; }
             <button class="bsm"><i class="fa-solid fa-upload"></i> Upload Photo</button>
             <button class="bsm" onclick="rmAv()"><i class="fa-solid fa-trash"></i> Remove</button>
           </div>
-          <div style="margin-left:auto;text-align:right">
-            <div class="pill bp" style="margin-bottom:6px">Level 6</div>
-            <div style="font-size:.75rem;color:var(--muted)">Advanced 🟣</div>
-          </div>
         </div>
       </div>
       <div class="ssec">
-        <div class="sst">Basic Information</div>
-        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:11px">
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Display Name</div><input id="sinp-name" class="sinp" type="text" placeholder="Your full name"></div>
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Username</div><input id="sinp-username" class="sinp" type="text" placeholder="@username"></div>
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Email Address</div><input id="sinp-email" class="sinp" type="email" placeholder="you@example.com"></div>
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Phone</div><input id="sinp-phone" class="sinp" type="tel" placeholder="+91 98765 43210"></div>
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">Bio</div><textarea id="sinp-bio" class="stxt" placeholder="Tell others what you teach and what you want to learn..."></textarea></div>
-          <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">College / University</div><input class="sinp" type="text" placeholder="Your institution"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">City</div><input class="sinp" type="text" placeholder="Mumbai"></div>
-            <div><div style="font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px">State</div><input class="sinp" type="text" placeholder="Maharashtra"></div>
-          </div>
-        </div>
+        <div class="sst">Personal Info</div>
+        <div class="sr"><div class="srl"><div class="slb">Full Name</div></div><input class="sinp" type="text" id="sinp-name" placeholder="Your name" style="width:180px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Username</div></div><input class="sinp" type="text" id="sinp-username" placeholder="@username" style="width:180px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Email</div></div><input class="sinp" type="email" id="sinp-email" placeholder="email@example.com" style="width:180px"></div>
+        <div class="sr"><div class="srl"><div class="slb">Phone</div></div><input class="sinp" type="tel" id="sinp-phone" placeholder="+91 00000 00000" style="width:180px"></div>
+        <div class="sr" style="flex-direction:column;align-items:flex-start;gap:8px"><div class="slb">Bio</div><textarea class="stxt" id="sinp-bio" placeholder="Tell others about you and your skills..."></textarea></div>
       </div>
       <div class="ssec">
-        <div class="sst">Skills I Teach</div>
+        <div class="sst">Skills</div>
         <div class="sktags">
-          <span class="skt">React <i class="fa-solid fa-xmark"></i></span>
-          <span class="skt">Python <i class="fa-solid fa-xmark"></i></span>
-          <span class="skt">UI/UX Design <i class="fa-solid fa-xmark"></i></span>
+          <span class="skt">Python <i class="fa-solid fa-xmark" style="font-size:.65rem"></i></span>
+          <span class="skt">React <i class="fa-solid fa-xmark" style="font-size:.65rem"></i></span>
+          <span class="skt">UI/UX <i class="fa-solid fa-xmark" style="font-size:.65rem"></i></span>
+          <span class="skt">Machine Learning <i class="fa-solid fa-xmark" style="font-size:.65rem"></i></span>
           <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
         </div>
       </div>
       <div class="ssec">
-        <div class="sst">Skills I Want to Learn</div>
-        <div class="sktags">
-          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Video Editing <i class="fa-solid fa-xmark"></i></span>
-          <span class="skt" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.2);color:var(--cyan)">Photography <i class="fa-solid fa-xmark"></i></span>
-          <button class="addsk"><i class="fa-solid fa-plus"></i> Add Skill</button>
-        </div>
-      </div>
-      <div class="ssec">
-        <div class="sst">Tutoring Preferences</div>
-        <div class="sr"><div class="srl"><div class="slb">Hourly Rate (₹)</div><div class="sde">Your default rate for paid sessions</div></div><input class="sinp" type="number" value="400" style="width:90px;text-align:center"></div>
-        <div class="sr"><div class="srl"><div class="slb">Session Duration</div><div class="sde">Default session length</div></div><select class="ssel"><option>30 min</option><option selected>60 min</option><option>90 min</option><option>2 hours</option></select></div>
-        <div class="sr"><div class="srl"><div class="slb">Open to Free Swaps</div><div class="sde">Allow skill exchange without payment</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
-        <div class="sr"><div class="srl"><div class="slb">Accept Instant Bookings</div><div class="sde">Allow sessions without approval</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
-      </div>
-    </div>
-
-    <!-- TAB 1: STATS -->
-    <div class="stc" id="t1" style="display:none">
-      <div class="ssec">
-        <div class="sst">XP Progress</div>
+        <div class="sst">Progress</div>
         <div class="xpwrap">
-          <div class="xpinfo"><span class="xplv">Level 6 — Advanced 🟣</span><span class="xppt">2,340 / 3,000 XP</span></div>
+          <div class="xpinfo"><span class="xplv">Level 5 — Intermediate 🔵</span><span class="xppt">2,450 / 3,000 XP</span></div>
           <div class="xptrack"><div class="xpfill" id="xpf" style="width:0%"></div></div>
-          <div class="xpmil"><span>Lvl 5</span><span>Next: Expert 🔴</span></div>
+          <div class="xpmil"><span>0</span><span>1,000</span><span>2,000</span><span>3,000 XP</span></div>
         </div>
       </div>
       <div class="ssec">
-        <div class="sst">Your Numbers</div>
+        <div class="sst">Stats</div>
         <div class="ssgrid">
-          <div class="sscell"><div class="val">47</div><div class="lbl">Trades Done</div></div>
-          <div class="sscell"><div class="val">₹8.4K</div><div class="lbl">Total Earned</div></div>
-          <div class="sscell"><div class="val">4.9★</div><div class="lbl">Avg Rating</div></div>
-          <div class="sscell"><div class="val">#12</div><div class="lbl">Leaderboard</div></div>
-          <div class="sscell"><div class="val">124h</div><div class="lbl">Hours Taught</div></div>
+          <div class="sscell"><div class="val">24</div><div class="lbl">Sessions</div></div>
+          <div class="sscell"><div class="val">4.9★</div><div class="lbl">Rating</div></div>
+          <div class="sscell"><div class="val">₹4,200</div><div class="lbl">Earned</div></div>
           <div class="sscell"><div class="val">18</div><div class="lbl">Badges</div></div>
         </div>
       </div>
       <div class="ssec">
         <div class="sst">Recent Activity</div>
         <div class="actlist">
-          <div class="acti"><div class="actic" style="background:rgba(52,211,153,.12);color:var(--green)"><i class="fa-solid fa-check"></i></div><div class="actb"><p>Completed <b>Python Basics</b> session with Arjun</p><div class="actt">Today, 3:00 PM</div></div><span class="pill bg-g" style="margin-left:auto;flex-shrink:0">+120 XP</span></div>
-          <div class="acti"><div class="actic" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-star"></i></div><div class="actb"><p>5-star review from <b>Priya Mehta</b></p><div class="actt">Today, 11:30 AM</div></div><span class="pill ba" style="margin-left:auto;flex-shrink:0">+50 XP</span></div>
-          <div class="acti"><div class="actic" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="actb"><p><b>₹450 credited</b> for UI/UX session</p><div class="actt">Yesterday</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Paid</span></div>
-          <div class="acti"><div class="actic" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><div class="actb"><p>New swap request from <b>Rohan Kumar</b></p><div class="actt">2 days ago</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Pending</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(0,229,160,.12);color:var(--green)"><i class="fa-solid fa-check"></i></div><div class="actb"><p>Completed <b>Python Basics</b> session with Arjun</p><div class="actt">Today, 3:00 PM</div></div><span class="pill bg-g" style="margin-left:auto;flex-shrink:0">+120 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(255,185,48,.1);color:var(--amber)"><i class="fa-solid fa-star"></i></div><div class="actb"><p>5-star review from <b>Priya Mehta</b></p><div class="actt">Today, 11:30 AM</div></div><span class="pill ba" style="margin-left:auto;flex-shrink:0">+50 XP</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-indian-rupee-sign"></i></div><div class="actb"><p><b>₹450 credited</b> for UI/UX session</p><div class="actt">Yesterday</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Paid</span></div>
+          <div class="acti"><div class="actic" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><div class="actb"><p>New swap request from <b>Rohan Kumar</b></p><div class="actt">2 days ago</div></div><span class="pill bp" style="margin-left:auto;flex-shrink:0">Pending</span></div>
         </div>
       </div>
       <div class="ssec">
@@ -641,11 +950,9 @@ body { padding-bottom: 0 !important; }
         </div>
       </div>
     </div>
-
     <!-- TAB 2: NOTIFICATIONS -->
     <div class="stc" id="t2" style="display:none">
-      <div class="ssec">
-        <div class="sst">Push Notifications</div>
+      <div class="ssec"><div class="sst">Push Notifications</div>
         <div class="sr"><div class="srl"><div class="slb">Trade Requests</div><div class="sde">New swap requests</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Messages</div><div class="sde">New direct messages</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Session Reminders</div><div class="sde">30 min before sessions</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
@@ -655,36 +962,31 @@ body { padding-bottom: 0 !important; }
         <div class="sr"><div class="srl"><div class="slb">Leaderboard Changes</div><div class="sde">When your rank changes</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Platform Updates</div><div class="sde">New features &amp; news</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
       </div>
-      <div class="ssec">
-        <div class="sst">Email Notifications</div>
+      <div class="ssec"><div class="sst">Email Notifications</div>
         <div class="sr"><div class="srl"><div class="slb">Weekly Digest</div><div class="sde">Activity summary each week</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Monthly Report</div><div class="sde">Earnings &amp; growth report</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Promotional Emails</div><div class="sde">Tips, events &amp; offers</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Email Frequency</div></div><select class="ssel"><option>Daily</option><option selected>Weekly</option><option>Monthly</option><option>Never</option></select></div>
       </div>
-      <div class="ssec">
-        <div class="sst">Quiet Hours</div>
+      <div class="ssec"><div class="sst">Quiet Hours</div>
         <div class="sr"><div class="srl"><div class="slb">Enable Quiet Hours</div><div class="sde">Mute all notifications</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">From</div></div><input class="sinp" type="time" value="22:00" style="width:110px"></div>
         <div class="sr"><div class="srl"><div class="slb">Until</div></div><input class="sinp" type="time" value="08:00" style="width:110px"></div>
       </div>
     </div>
-
     <!-- TAB 3: APPEARANCE -->
     <div class="stc" id="t3" style="display:none">
-      <div class="ssec">
-        <div class="sst">Accent Colour</div>
+      <div class="ssec"><div class="sst">Accent Colour</div>
         <div class="swrow">
-          <div class="sw active" style="background:linear-gradient(135deg,#7c6af7,#f472b6)" onclick="applyTh('#7c6af7','#a78bfa','#f472b6','#fb7185','rgba(124,106,247,.35)',this)"></div>
-          <div class="sw" style="background:linear-gradient(135deg,#06b6d4,#7c6af7)" onclick="applyTh('#06b6d4','#22d3ee','#7c6af7','#a78bfa','rgba(6,182,212,.35)',this)"></div>
-          <div class="sw" style="background:linear-gradient(135deg,#10b981,#06b6d4)" onclick="applyTh('#10b981','#34d399','#06b6d4','#22d3ee','rgba(16,185,129,.35)',this)"></div>
-          <div class="sw" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="applyTh('#f59e0b','#fbbf24','#ef4444','#f87171','rgba(245,158,11,.35)',this)"></div>
-          <div class="sw" style="background:linear-gradient(135deg,#ec4899,#f97316)" onclick="applyTh('#ec4899','#f472b6','#f97316','#fb923c','rgba(236,72,153,.35)',this)"></div>
-          <div class="sw" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)" onclick="applyTh('#3b82f6','#60a5fa','#06b6d4','#22d3ee','rgba(59,130,246,.35)',this)"></div>
+          <div class="sw active" style="background:linear-gradient(135deg,#6157ff,#ff5c7c)" onclick="applyTh('#6157ff','#8b83ff','#ff5c7c','#ff8fa3','rgba(97,87,255,.4)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#00bcd4,#6157ff)" onclick="applyTh('#00bcd4','#00d4ff','#6157ff','#8b83ff','rgba(0,188,212,.4)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#00c87a,#00bcd4)" onclick="applyTh('#00c87a','#00e5a0','#00bcd4','#00d4ff','rgba(0,200,122,.4)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="applyTh('#f59e0b','#ffb930','#ef4444','#ff5050','rgba(245,158,11,.4)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#ec4899,#f97316)" onclick="applyTh('#ec4899','#ff5c7c','#f97316','#ff8c00','rgba(236,72,153,.4)',this)"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#3b82f6,#00bcd4)" onclick="applyTh('#3b82f6','#60a5fa','#00bcd4','#00d4ff','rgba(59,130,246,.4)',this)"></div>
         </div>
       </div>
-      <div class="ssec">
-        <div class="sst">Interface</div>
+      <div class="ssec"><div class="sst">Interface</div>
         <div class="sr"><div class="srl"><div class="slb">Reduce Motion</div><div class="sde">Disable animations</div></div><label class="tog"><input type="checkbox" id="motog" onchange="applyMot(this)"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Compact Mode</div><div class="sde">Tighter spacing</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Show Online Status</div><div class="sde">Visible to others</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
@@ -693,69 +995,59 @@ body { padding-bottom: 0 !important; }
         <div class="sr"><div class="srl"><div class="slb">Currency</div></div><select class="ssel"><option selected>₹ INR</option><option>$ USD</option><option>€ EUR</option><option>£ GBP</option></select></div>
       </div>
     </div>
-
     <!-- TAB 4: PRIVACY -->
     <div class="stc" id="t4" style="display:none">
-      <div class="ssec">
-        <div class="sst">Profile Visibility</div>
+      <div class="ssec"><div class="sst">Profile Visibility</div>
         <div class="sr"><div class="srl"><div class="slb">Public Profile</div><div class="sde">Anyone can view your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Show on Leaderboard</div><div class="sde">Display your rank publicly</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Show Earnings</div><div class="sde">Display earnings on profile</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Searchable by Email</div><div class="sde">Let others find you</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Show College Name</div><div class="sde">Visible on your profile</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
       </div>
-      <div class="ssec">
-        <div class="sst">Security</div>
+      <div class="ssec"><div class="sst">Security</div>
         <div class="sr"><div class="srl"><div class="slb">Two-Factor Authentication</div><div class="sde">SMS or authenticator app</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Login Alerts</div><div class="sde">Email on new device login</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Change Password</div></div><button class="bsm">Update →</button></div>
         <div class="sr"><div class="srl"><div class="slb">Active Sessions</div><div class="sde">2 devices currently logged in</div></div><button class="bsm">Manage →</button></div>
       </div>
-      <div class="ssec">
-        <div class="sst">Data &amp; Privacy</div>
+      <div class="ssec"><div class="sst">Data &amp; Privacy</div>
         <div class="sr"><div class="srl"><div class="slb">Download My Data</div><div class="sde">Export as JSON</div></div><button class="bsm"><i class="fa-solid fa-download"></i> Export</button></div>
         <div class="sr"><div class="srl"><div class="slb">Personalised Recommendations</div><div class="sde">Use activity to suggest skills</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Analytics Tracking</div><div class="sde">Help improve SkillSwap</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
       </div>
     </div>
-
     <!-- TAB 5: SCHEDULE -->
     <div class="stc" id="t5" style="display:none">
-      <div class="ssec">
-        <div class="sst">Available Days</div>
+      <div class="ssec"><div class="sst">Available Days</div>
         <div class="dagrid">
           <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">MON</span><div class="dcirc">M</div></div>
           <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">TUE</span><div class="dcirc">T</div></div>
           <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">WED</span><div class="dcirc">W</div></div>
-          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">THU</span><div class="dcirc">T</div></div>
+          <div class="dbtn" onclick="this.classList.toggle('on')"><span class="dinit">THU</span><div class="dcirc">T</div></div>
           <div class="dbtn on" onclick="this.classList.toggle('on')"><span class="dinit">FRI</span><div class="dcirc">F</div></div>
-          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SAT</span><div class="dcirc">S</div></div>
-          <div class="dbtn"    onclick="this.classList.toggle('on')"><span class="dinit">SUN</span><div class="dcirc">S</div></div>
+          <div class="dbtn" onclick="this.classList.toggle('on')"><span class="dinit">SAT</span><div class="dcirc">S</div></div>
+          <div class="dbtn" onclick="this.classList.toggle('on')"><span class="dinit">SUN</span><div class="dcirc">S</div></div>
         </div>
       </div>
-      <div class="ssec">
-        <div class="sst">Preferred Session Times</div>
+      <div class="ssec"><div class="sst">Preferred Session Times</div>
         <div class="tchips">
           <button class="tchip on" onclick="this.classList.toggle('on')">Morning (6–9 AM)</button>
           <button class="tchip on" onclick="this.classList.toggle('on')">Afternoon (12–3 PM)</button>
-          <button class="tchip"    onclick="this.classList.toggle('on')">Evening (5–8 PM)</button>
+          <button class="tchip" onclick="this.classList.toggle('on')">Evening (5–8 PM)</button>
           <button class="tchip on" onclick="this.classList.toggle('on')">Night (8–11 PM)</button>
-          <button class="tchip"    onclick="this.classList.toggle('on')">Late Night (11 PM+)</button>
+          <button class="tchip" onclick="this.classList.toggle('on')">Late Night (11 PM+)</button>
         </div>
       </div>
-      <div class="ssec">
-        <div class="sst">Booking Settings</div>
+      <div class="ssec"><div class="sst">Booking Settings</div>
         <div class="sr"><div class="srl"><div class="slb">Timezone</div></div><select class="ssel"><option selected>IST (UTC+5:30)</option><option>UTC</option><option>EST</option><option>PST</option></select></div>
         <div class="sr"><div class="srl"><div class="slb">Buffer Between Sessions</div></div><select class="ssel"><option>None</option><option selected>15 min</option><option>30 min</option><option>1 hour</option></select></div>
         <div class="sr"><div class="srl"><div class="slb">Max Sessions Per Day</div></div><select class="ssel"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>Unlimited</option></select></div>
         <div class="sr"><div class="srl"><div class="slb">Vacation Mode</div><div class="sde">Pause all new booking requests</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
       </div>
     </div>
-
     <!-- TAB 6: CONNECTED -->
     <div class="stc" id="t6" style="display:none">
-      <div class="ssec">
-        <div class="sst">Social Logins</div>
+      <div class="ssec"><div class="sst">Social Logins</div>
         <div class="cgrid">
           <div class="ccard" onclick="toast('Google account connected!','success')"><div class="icon" style="color:#ea4335"><i class="fa-brands fa-google"></i></div><div class="name">Google</div><div class="status conn"><i class="fa-solid fa-circle-check" style="font-size:.7rem;margin-right:4px"></i>Connected</div></div>
           <div class="ccard" onclick="toast('Linking GitHub...','info')"><div class="icon" style="color:var(--txt)"><i class="fa-brands fa-github"></i></div><div class="name">GitHub</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
@@ -763,25 +1055,21 @@ body { padding-bottom: 0 !important; }
           <div class="ccard" onclick="toast('Linking Discord...','info')"><div class="icon" style="color:#5865f2"><i class="fa-brands fa-discord"></i></div><div class="name">Discord</div><div class="status noconn"><i class="fa-solid fa-plus-circle" style="font-size:.7rem;margin-right:4px"></i>Connect</div></div>
         </div>
       </div>
-      <div class="ssec">
-        <div class="sst">Payment Methods</div>
+      <div class="ssec"><div class="sst">Payment Methods</div>
         <div class="sr"><div class="srl"><div class="slb">UPI ID</div><div class="sde">For instant payouts</div></div><input class="sinp" type="text" placeholder="yourname@upi" style="width:150px"></div>
         <div class="sr"><div class="srl"><div class="slb">Bank Account</div><div class="sde">For larger withdrawals</div></div><button class="bsm">Add Bank →</button></div>
         <div class="sr"><div class="srl"><div class="slb">Wallet Balance</div></div><span class="sval">₹ 1,240.00</span></div>
         <div class="sr"><div class="srl"><div class="slb">Auto-Withdraw</div><div class="sde">When balance ≥ ₹500</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
       </div>
-      <div class="ssec">
-        <div class="sst">Integrations</div>
+      <div class="ssec"><div class="sst">Integrations</div>
         <div class="sr"><div class="srl"><div class="slb">Google Calendar</div><div class="sde">Sync sessions automatically</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">Zoom</div><div class="sde">Auto-generate meeting links</div></div><label class="tog"><input type="checkbox"><span class="sl"></span></label></div>
         <div class="sr"><div class="srl"><div class="slb">WhatsApp Alerts</div><div class="sde">Session reminders via WhatsApp</div></div><label class="tog"><input type="checkbox" checked><span class="sl"></span></label></div>
       </div>
     </div>
-
     <!-- TAB 7: ACCOUNT -->
     <div class="stc" id="t7" style="display:none">
-      <div class="ssec">
-        <div class="sst">Account Status</div>
+      <div class="ssec"><div class="sst">Account Status</div>
         <div class="sr"><div class="srl"><div class="slb">Account Type</div></div><span class="pill bp">Student Free</span></div>
         <div class="sr"><div class="srl"><div class="slb">Member Since</div></div><span class="sval">Jan 2025</span></div>
         <div class="sr"><div class="srl"><div class="slb">Upgrade to Pro</div><div class="sde">Priority matching &amp; analytics</div></div><button class="btn-cta" style="font-size:.79rem;padding:7px 14px">Upgrade ✦</button></div>
@@ -794,64 +1082,177 @@ body { padding-bottom: 0 !important; }
         <div class="dzrow"><div class="dzinfo"><div class="slb">Delete Account</div><div class="sde">Permanently removes all data</div></div><button class="bdang" onclick="if(confirm('This is permanent. Continue?'))toast('Deletion request submitted','error')">Delete Forever</button></div>
       </div>
     </div>
-
   </div>
   <div class="ssavebar"><button class="bsave" onclick="saveSet()"><i class="fa-solid fa-floppy-disk" style="margin-right:9px"></i>Save All Changes</button></div>
 </div>
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="logo"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>
+    SkillSwap
+  </a>
   <ul class="nav-c">
     <li><a href="explore.html">Explore</a></li>
     <li><a href="leaderboard.html">Leaderboard</a></li>
     <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="trades.html">Trades</a></li>
-    <li><a href="about.html">About</a></li>
+    <li><a href="about.html">About Us</a></li>
   </ul>
   <div class="nav-r">
-    <!-- Desktop: notification + settings -->
     <button class="ibtn nav-desk-only" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
     <button class="ibtn nav-desk-only" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
-    <!-- Auth buttons (logged out) -->
     <div id="abtns" style="display:flex;gap:8px">
       <a href="login.html" class="btn-ghost">Log In</a>
       <a href="login.html" class="btn-cta">Sign Up Free</a>
     </div>
-    <!-- User pill (logged in) -->
     <div id="upill" class="upill" onclick="openSettings()" title="Account Settings">
       <div class="uav" id="uav">S</div>
       <img id="uph" src="" alt="You">
       <span id="unm">Student</span>
       <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:var(--muted);margin-left:2px"></i>
     </div>
-    <!-- Mobile: icon row shown when logged in -->
     <div class="mob-icons" id="mob-icons" style="display:none">
       <button class="ibtn mob-ibtn" onclick="toggleNotif()" title="Notifications"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot2"></span></button>
       <button class="ibtn mob-ibtn" onclick="openSettings()" title="Settings"><i class="fa-solid fa-sliders"></i></button>
     </div>
-    <!-- Hamburger (always visible on mobile) -->
     <button class="mbtn ibtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
   </div>
 </nav>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <main>
+
+<!-- ══ HERO ══ -->
 <section class="hero">
-  <div class="hero-ey"><span class="pill bp"><i class="fa-solid fa-bolt"></i>&nbsp;#1 Student Skill Exchange Platform</span></div>
-  <h1>Trade Skills,<br><em class="grad">Not Money.</em></h1>
-  <p class="hero-sub">A student-powered marketplace to exchange knowledge, teach what you know, and earn by helping peers grow — together.</p>
+  <div class="hero-badge" style="animation:fadeUp .5s ease both">
+    <span class="badge-dot">NEW</span>
+    Now with Expert Marketplace — earn ₹300–₹1,000+/hr
+  </div>
+
+  <h1>
+    Trade Skills,
+    <span class="line2"><em class="grad">Not Money.</em></span>
+  </h1>
+
+  <p class="hero-sub">
+    A student-powered platform to exchange knowledge, teach what you know, and grow together — completely free.
+  </p>
+
   <div class="hero-btns" id="hbtns">
     <a href="login.html" class="bh bh-fill"><i class="fa-solid fa-rocket"></i>Get Started Free</a>
     <a href="#features" class="bh bh-line"><i class="fa-solid fa-compass"></i>Explore Skills</a>
   </div>
-  <div class="hstats">
-    <div><div class="snum">10K+</div><div class="slbl">Active Students</div></div>
-    <div><div class="snum">5K+</div><div class="slbl">Skills Exchanged</div></div>
-    <div><div class="snum">4.9★</div><div class="slbl">Platform Rating</div></div>
+
+  <div class="hstats" style="margin-top:52px">
+    <div>
+      <div class="snum">10K+</div>
+      <div class="slbl">Active Students</div>
+    </div>
+    <div>
+      <div class="snum">5K+</div>
+      <div class="slbl">Skills Exchanged</div>
+    </div>
+    <div>
+      <div class="snum">4.9★</div>
+      <div class="slbl">Rating</div>
+    </div>
+  </div>
+
+  <div class="hero-quicklinks" id="heroQuickLinks">
+    <a class="hql-item" href="explore.html">
+      <div class="hql-icon"><i class="fa-solid fa-compass"></i></div>
+      <div class="hql-text"><span class="hql-label">Explore</span><span class="hql-sub">Browse all skills</span></div>
+    </a>
+    <div class="hql-div"></div>
+    <a class="hql-item" href="chat.html">
+      <div class="hql-icon" style="background:rgba(168,85,247,0.12);color:#c084fc"><i class="fa-solid fa-message"></i></div>
+      <div class="hql-text"><span class="hql-label">Messages</span><span class="hql-sub">Chat with peers</span></div>
+    </a>
+    <div class="hql-div"></div>
+    <a class="hql-item" href="paid-help.html">
+      <div class="hql-icon" style="background:rgba(255,185,48,0.12);color:var(--amber)"><i class="fa-solid fa-star"></i></div>
+      <div class="hql-text"><span class="hql-label">Experts</span><span class="hql-sub">Get paid help</span></div>
+    </a>
+    <div class="hql-div"></div>
+    <a class="hql-item" href="#contact" onclick="document.getElementById('contactSection').scrollIntoView({behavior:'smooth'});return false;">
+      <div class="hql-icon" style="background:rgba(0,229,160,0.12);color:var(--green)"><i class="fa-solid fa-envelope"></i></div>
+      <div class="hql-text"><span class="hql-label">Contact Us</span><span class="hql-sub">Get in touch</span></div>
+    </a>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>scroll</span>
   </div>
 </section>
 
+<!-- ══ SKILLS MARQUEE ══ -->
+<section class="skills-explore">
+  <div class="skills-label reveal">
+    <span class="stag" style="justify-content:center">Skills Being Traded Right Now</span>
+  </div>
+  <div style="overflow:hidden">
+    <div class="marquee-track">
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🐍</span>Python</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">⚛️</span>React.js</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🎨</span>UI/UX Design</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">📊</span>Data Science</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">📸</span>Photography</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🎸</span>Guitar</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">🤖</span>Machine Learning</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">✍️</span>Copywriting</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">📱</span>Flutter</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🎬</span>Video Editing</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🔢</span>Mathematics</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">💻</span>Node.js</span>
+      <!-- Duplicate for infinite loop -->
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🐍</span>Python</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">⚛️</span>React.js</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🎨</span>UI/UX Design</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">📊</span>Data Science</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">📸</span>Photography</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🎸</span>Guitar</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">🤖</span>Machine Learning</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">✍️</span>Copywriting</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">📱</span>Flutter</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🎬</span>Video Editing</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">🔢</span>Mathematics</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">💻</span>Node.js</span>
+    </div>
+  </div>
+  <div style="overflow:hidden;margin-top:10px">
+    <div class="marquee-track marquee-reverse">
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🎵</span>Music Theory</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">🌐</span>Web Dev</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">📐</span>Graphic Design</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🗣️</span>Public Speaking</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">☕</span>Java</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">📝</span>Content Writing</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">🔐</span>Cybersecurity</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">📈</span>Finance</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🎭</span>Acting</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">🏋️</span>Fitness Training</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🌍</span>Spanish</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">⚙️</span>DevOps</span>
+      <!-- Duplicate -->
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🎵</span>Music Theory</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">🌐</span>Web Dev</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">📐</span>Graphic Design</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🗣️</span>Public Speaking</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">☕</span>Java</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">📝</span>Content Writing</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">🔐</span>Cybersecurity</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(97,87,255,.15);color:var(--p2)">📈</span>Finance</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,185,48,.15);color:var(--amber)">🎭</span>Acting</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,212,255,.15);color:var(--cyan)">🏋️</span>Fitness Training</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(255,92,124,.15);color:var(--a)">🌍</span>Spanish</span>
+      <span class="skill-chip"><span class="chip-icon" style="background:rgba(0,229,160,.15);color:var(--green)">⚙️</span>DevOps</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
 <section id="features" class="sec">
   <div class="shead reveal">
     <span class="stag">Platform Features</span>
@@ -859,27 +1260,167 @@ body { padding-bottom: 0 !important; }
     <p class="ssub">Everything you need to grow your skills, build your reputation, and earn real money.</p>
   </div>
   <div class="fgrid">
-    <div class="fc reveal" onclick="location.href='skill-exchange.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(124,106,247,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div><h3>Skill Exchange</h3><p>Teach a skill, learn a skill — completely free. Peer-to-peer knowledge barter with zero money exchanged.</p></div>
-    <div class="fc reveal" onclick="location.href='paid-help.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-indian-rupee-sign"></i></div><h3>Paid Tutoring</h3><p>Earn ₹300–₹1,000+ per hour teaching verified students in your area of expertise.</p></div>
-    <div class="fc reveal" onclick="location.href='reputation.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-trophy"></i></div><h3>Reputation System</h3><p>Earn XP, unlock badges, and climb from Beginner 🟢 to Expert 🟣 as you teach and trade.</p></div>
-    <div class="fc reveal" onclick="location.href='leaderboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(52,211,153,.1);color:var(--green)"><i class="fa-solid fa-chart-line"></i></div><h3>Leaderboard</h3><p>Top helpers ranked by ratings and completed trades. Get recognised and build your standing.</p></div>
-    <div class="fc reveal" onclick="location.href='chat.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-comments"></i></div><h3>Real-Time Chat</h3><p>Secure instant messaging powered by Firebase. Discuss details before committing to a session.</p></div>
-    <div class="fc reveal" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(96,165,250,.1);color:#60a5fa"><i class="fa-solid fa-chalkboard-user"></i></div><h3>Skill Room</h3><p>Private learning space with video calls, live coding, shared notes, and real-time collaboration.</p><a href="skill-room.html" class="fcta" onclick="event.stopPropagation()"><i class="fa-solid fa-door-open"></i>Enter Room</a></div>
-    <div class="fc reveal" onclick="location.href='dashboard.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(248,113,113,.1);color:var(--red)"><i class="fa-solid fa-chart-pie"></i></div><h3>Analytics Dashboard</h3><p>Track earnings, XP progress, session history, and active trades in one unified dashboard.</p></div>
-    <div class="fc reveal" onclick="location.href='explore.html'" role="button" tabindex="0"><i class="farr fa-solid fa-arrow-up-right"></i><div class="fi" style="background:rgba(251,191,36,.1);color:var(--amber)"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Skill Discovery</h3><p>Browse hundreds of skills — coding, design, languages, music, finance — all student-taught.</p></div>
+    <div class="fc reveal" onclick="location.href='skill-exchange.html'" role="button" tabindex="0">
+      <i class="farr fa-solid fa-arrow-up-right"></i>
+      <div class="fi" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-repeat"></i></div>
+      <h3>Skill Exchange</h3>
+      <p>Teach a skill, learn a skill — completely free. Peer-to-peer knowledge barter with zero money exchanged.</p>
+      <a class="fcta" href="skill-exchange.html">Start swapping <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="fc reveal" onclick="location.href='paid-help.html'" role="button" tabindex="0">
+      <i class="farr fa-solid fa-arrow-up-right"></i>
+      <div class="fi" style="background:rgba(255,185,48,.1);color:var(--amber)"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+      <h3>Paid Tutoring</h3>
+      <p>Earn ₹300–₹1,000+ per hour teaching verified students in your area of expertise.</p>
+      <a class="fcta" href="paid-help.html">Browse experts <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="fc reveal" onclick="location.href='reputation.html'" role="button" tabindex="0">
+      <i class="farr fa-solid fa-arrow-up-right"></i>
+      <div class="fi" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-trophy"></i></div>
+      <h3>Reputation System</h3>
+      <p>Earn XP, unlock badges, and climb from Beginner 🟢 to Expert 🟣 as you teach and trade.</p>
+      <a class="fcta" href="reputation.html">View leaderboard <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
   </div>
 </section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="sec" style="padding-top:20px">
+  <div class="shead reveal">
+    <span class="stag">How It Works</span>
+    <h2 class="stitle">Three steps to <span class="grad-cyan">skill up</span></h2>
+    <p class="ssub">Get started in minutes. No credit card required.</p>
+  </div>
+  <div class="how-grid reveal">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-icon" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-user-plus"></i></div>
+      <h4>Create Your Profile</h4>
+      <p>Sign up with your college email, list the skills you have and the skills you want to learn.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-icon" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-handshake"></i></div>
+      <h4>Match & Connect</h4>
+      <p>Our smart algorithm finds perfect skill matches. Send a swap request in one click.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-icon" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-graduation-cap"></i></div>
+      <h4>Learn & Grow</h4>
+      <p>Schedule sessions, exchange knowledge, earn XP and build your skill reputation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="sec" style="padding-top:20px">
+  <div class="shead reveal">
+    <span class="stag">Student Stories</span>
+    <h2 class="stitle">Loved by <span class="grad">10,000+ students</span></h2>
+    <p class="ssub">From IIT to local colleges — SkillSwap is changing how students grow.</p>
+  </div>
+  <div class="tgrid">
+    <div class="tc reveal">
+      <div class="tq">"</div>
+      <p class="tp">I traded Python lessons for design feedback and ended up landing an internship. SkillSwap genuinely changed my trajectory.</p>
+      <div class="ta">
+        <div class="tav" style="background:linear-gradient(135deg,var(--p),var(--a))">A</div>
+        <div>
+          <div class="tan">Arjun Singh</div>
+          <div class="tad">IIT Delhi · CS Sophomore</div>
+          <div class="tstars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="tc reveal">
+      <div class="tq">"</div>
+      <p class="tp">Earned ₹12,000 last semester tutoring juniors in React while learning Figma from a design student. Best side hustle ever.</p>
+      <div class="ta">
+        <div class="tav" style="background:linear-gradient(135deg,var(--cyan),var(--p))">P</div>
+        <div>
+          <div class="tan">Priya Mehta</div>
+          <div class="tad">NSIT · Final Year</div>
+          <div class="tstars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="tc reveal">
+      <div class="tq">"</div>
+      <p class="tp">The matching algorithm is scary good. Found a guitar teacher who wanted to learn machine learning — we've been meeting weekly for 3 months.</p>
+      <div class="ta">
+        <div class="tav" style="background:linear-gradient(135deg,var(--green),var(--cyan))">R</div>
+        <div>
+          <div class="tan">Rohan Kumar</div>
+          <div class="tad">DTU · Third Year ECE</div>
+          <div class="tstars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contactSection" class="contact-section reveal">
+  <div class="shead" style="margin-bottom:40px">
+    <span class="stag">Get In Touch</span>
+    <h2 class="stitle">Contact <span class="grad">Us</span></h2>
+    <p class="ssub">Questions, feedback, or partnership inquiries — we'd love to hear from you.</p>
+  </div>
+  <div class="contact-card">
+    <div class="contact-form-row">
+      <input class="cf-input" type="text" placeholder="Your Name" id="cfName">
+      <input class="cf-input" type="email" placeholder="Email Address" id="cfEmail">
+    </div>
+    <input class="cf-input" type="text" placeholder="Subject" id="cfSubject" style="width:100%;margin-bottom:14px;display:block">
+    <textarea class="cf-input cf-textarea" placeholder="Your message…" id="cfMessage"></textarea>
+    <button class="cf-submit" onclick="submitContact()">
+      <i class="fa-solid fa-paper-plane"></i> Send Message
+    </button>
+    <div class="contact-links">
+      <a class="contact-link" href="#">
+        <i class="fa-solid fa-envelope"></i> <span class="__cf_email__" data-cfemail="f59d9099999ab5869e9c999986829485db9c9b">[email&#160;protected]</span>
+      </a>
+      <a class="contact-link" href="#">
+        <i class="fa-brands fa-instagram"></i> @skillswap
+      </a>
+      <a class="contact-link" href="#">
+        <i class="fa-brands fa-twitter"></i> @skillswap
+      </a>
+    </div>
+  </div>
+</section>
+
 </main>
 
+<!-- FOOTER -->
 <footer>
   <div class="fti">
     <div class="fbrand">
       <a class="logo" href="index.html"><div class="logo-mark"><i class="fa-solid fa-bolt"></i></div>SkillSwap</a>
       <p>A student-powered skill exchange platform. Teach what you know, learn what you need — no money required.</p>
     </div>
-    <div class="fcol"><h5>Platform</h5><a href="explore.html">Explore Skills</a><a href="leaderboard.html">Leaderboard</a><a href="dashboard.html">Dashboard</a><a href="trades.html">My Trades</a></div>
-    <div class="fcol"><h5>Company</h5><a href="about.html">About Us</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Press Kit</a></div>
-    <div class="fcol"><h5>Support</h5><a href="#">Help Centre</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Contact Us</a></div>
+    <div class="fcol">
+      <h5>Platform</h5>
+      <a href="explore.html">Explore Skills</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="trades.html">My Trades</a>
+    </div>
+    <div class="fcol">
+      <h5>Company</h5>
+      <a href="about.html">About Us</a>
+      <a href="#">Blog</a>
+      <a href="#">Careers</a>
+      <a href="#">Press Kit</a>
+    </div>
+    <div class="fcol">
+      <h5>Support</h5>
+      <a href="#">Help Centre</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Contact Us</a>
+    </div>
   </div>
   <div class="ftbot">
     <p>© 2025 SkillSwap. Built for students, by students. 🚀</p>
@@ -892,16 +1433,34 @@ body { padding-bottom: 0 !important; }
   </div>
 </footer>
 
-<script type="module">
+<!-- MOBILE BOTTOM NAV (app pages) -->
+<div class="ss-mobile-nav">
+  <div class="ss-mobile-nav-inner">
+    <a href="index.html" class="ss-nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="explore.html" class="ss-nav-item"><i class="fa-solid fa-compass"></i>Explore</a>
+    <a href="dashboard.html" class="ss-nav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+    <a href="chat.html" class="ss-nav-item"><i class="fa-solid fa-message"></i>Messages</a>
+    <a href="profile.html" class="ss-nav-item"><i class="fa-solid fa-user"></i>Profile</a>
+  </div>
+</div>
+
+<!-- FIREBASE + APP SCRIPTS -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswapp-35e86.firebaseapp.com",projectId:"skillswapp-35e86",storageBucket:"skillswapp-35e86.appspot.com",messagingSenderId:"668466292157",appId:"1:668466292157:web:9be85414fc752b67779ed4"};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
-// Expose auth globally so non-module scripts can access it
 window._auth=auth;window._db=db;
 onAuthStateChanged(auth,u=>{
   const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn"),sb=document.getElementById("sbtn");
+  const mmProfile=document.getElementById("mmProfile");
+  const mmAv=document.getElementById("mmAv");
+  const mmName=document.getElementById("mmName");
+  const mmSub=document.getElementById("mmSub");
+  const mmAuth=document.getElementById("mmAuth");
+  const mmLoggedEls=document.querySelectorAll(".mm-logged-section");
+  const mmGuestEls=document.querySelectorAll(".mm-guest-section");
   if(u){
     ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";
     const mi=document.getElementById("mob-icons");if(mi)mi.style.display="flex";
@@ -913,8 +1472,22 @@ onAuthStateChanged(auth,u=>{
     document.getElementById("unm").textContent=name.split(" ")[0];
     document.getElementById("sav").textContent=initial;
     document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;
+    if(mmProfile){ mmProfile.classList.remove("hidden"); }
+    if(mmAv){
+      if(u.photoURL){ mmAv.innerHTML=`<img src="${u.photoURL}" alt="${initial}">`; }
+      else{ mmAv.textContent=initial; }
+    }
+    if(mmName){ mmName.textContent=name; }
+    if(mmSub){ mmSub.textContent="⚡ View Profile & Stats"; }
+    mmLoggedEls.forEach(el=>el.style.display="");
+    mmGuestEls.forEach(el=>el.style.display="none");
+  } else {
+    ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";
+    const mi=document.getElementById("mob-icons");if(mi)mi.style.display="none";
+    if(mmProfile) mmProfile.classList.add("hidden");
+    mmLoggedEls.forEach(el=>el.style.display="none");
+    mmGuestEls.forEach(el=>el.style.display="");
   }
-  else{ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";const mi=document.getElementById("mob-icons");if(mi)mi.style.display="none";}
 });
 window.logout=()=>signOut(auth).then(()=>location.reload()).catch(console.error);
 window._openSettingsData=async function(){
@@ -949,9 +1522,22 @@ window._saveSettings=async function(){
   }catch(e){window.toast("Save failed: "+e.message,"error");}
 };
 </script>
+
 <script>
-function openMob(){document.getElementById("mmenu").classList.add("open");document.body.style.overflow="hidden"}
-function closeMob(){document.getElementById("mmenu").classList.remove("open");document.body.style.overflow=""}
+function openMob(){
+  const m=document.getElementById("mmenu"),o=document.getElementById("mmenuOverlay");
+  m.classList.add("open");
+  o.style.display="block";
+  requestAnimationFrame(()=>o.classList.add("open"));
+  document.body.style.overflow="hidden";
+}
+function closeMob(){
+  const m=document.getElementById("mmenu"),o=document.getElementById("mmenuOverlay");
+  m.classList.remove("open");
+  o.classList.remove("open");
+  setTimeout(()=>{o.style.display="none";},320);
+  document.body.style.overflow="";
+}
 function openSettings(){
   document.getElementById("spanel").classList.add("open");
   document.getElementById("sbg").classList.add("open");
@@ -959,27 +1545,93 @@ function openSettings(){
   setTimeout(()=>{document.getElementById("xpf").style.width="78%"},350);
   if(window._openSettingsData) window._openSettingsData();
 }
-function closeSettings(){document.getElementById("spanel").classList.remove("open");document.getElementById("sbg").classList.remove("open");document.body.style.overflow=""}
-function stab(n,el){document.querySelectorAll(".stc").forEach(t=>{t.style.display="none"});const t=document.getElementById("t"+n);t.style.display="flex";t.style.flexDirection="column";document.querySelectorAll(".stab").forEach(t=>t.classList.remove("active"));el.classList.add("active");if(n===1)setTimeout(()=>{document.getElementById("xpf").style.width="78%"},200)}
+function closeSettings(){
+  document.getElementById("spanel").classList.remove("open");
+  document.getElementById("sbg").classList.remove("open");
+  document.body.style.overflow="";
+}
+window.closeSettings=closeSettings;
+function stab(n,el){
+  document.querySelectorAll(".stc").forEach(t=>{t.style.display="none"});
+  const t=document.getElementById("t"+n);
+  t.style.display="flex";t.style.flexDirection="column";
+  document.querySelectorAll(".stab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  if(n===1)setTimeout(()=>{document.getElementById("xpf").style.width="78%"},200);
+}
 let nOpen=false;
-function toggleNotif(){nOpen=!nOpen;document.getElementById("npanel").classList.toggle("open",nOpen)}
-function markAllRead(){document.querySelectorAll(".ni.unread").forEach(i=>i.classList.remove("unread"));document.getElementById("ndot").style.display="none";document.getElementById("ucnt").style.display="none";toast("All notifications marked as read","success")}
-document.addEventListener("click",e=>{const p=document.getElementById("npanel"),b=document.getElementById("nbtn");if(nOpen&&!p.contains(e.target)&&b&&!b.contains(e.target)){nOpen=false;p.classList.remove("open")}});
-function applyTh(p,p2,a,a2,glow,el){const r=document.documentElement;r.style.setProperty("--p",p);r.style.setProperty("--p2",p2);r.style.setProperty("--a",a);r.style.setProperty("--a2",a2);r.style.setProperty("--glow",glow);r.style.setProperty("--p3",h2a(p,.15));document.querySelectorAll(".sw").forEach(s=>s.classList.remove("active"));el.classList.add("active")}
+function toggleNotif(){
+  nOpen=!nOpen;
+  document.getElementById("npanel").classList.toggle("open",nOpen);
+}
+function markAllRead(){
+  document.querySelectorAll(".ni.unread").forEach(i=>i.classList.remove("unread"));
+  document.getElementById("ndot").style.display="none";
+  document.getElementById("ucnt").style.display="none";
+  toast("All notifications marked as read","success");
+}
+document.addEventListener("click",e=>{
+  const p=document.getElementById("npanel"),b=document.getElementById("nbtn");
+  if(nOpen&&!p.contains(e.target)&&b&&!b.contains(e.target)){nOpen=false;p.classList.remove("open");}
+});
+function applyTh(p,p2,a,a2,glow,el){
+  const r=document.documentElement;
+  r.style.setProperty("--p",p);r.style.setProperty("--p2",p2);
+  r.style.setProperty("--a",a);r.style.setProperty("--a2",a2);
+  r.style.setProperty("--glow",glow);
+  r.style.setProperty("--p3",h2a(p,.15));
+  document.querySelectorAll(".sw").forEach(s=>s.classList.remove("active"));
+  el.classList.add("active");
+}
 function h2a(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`}
-function applyMot(cb){let s=document.getElementById("nm");if(cb.checked){if(!s){s=document.createElement("style");s.id="nm";s.textContent="*,*::before,*::after{animation:none!important;transition:none!important}";document.head.appendChild(s)}}else{if(s)s.remove()}}
+function applyMot(cb){
+  let s=document.getElementById("nm");
+  if(cb.checked){if(!s){s=document.createElement("style");s.id="nm";s.textContent="*,*::before,*::after{animation:none!important;transition:none!important}";document.head.appendChild(s)}}
+  else{if(s)s.remove()}
+}
 function rmAv(){document.getElementById("sav").textContent="S"}
-function rate(n){document.querySelectorAll("#starrow .star").forEach((s,i)=>s.classList.toggle("lit",i<n));const L=["","Poor","Fair","Good","Great","Excellent!"];document.getElementById("slbl").textContent=L[n]+" ("+n+"/5)"}
+function rate(n){
+  document.querySelectorAll("#starrow .star").forEach((s,i)=>s.classList.toggle("lit",i<n));
+  const L=["","Poor","Fair","Good","Great","Excellent!"];
+  document.getElementById("slbl").textContent=L[n]+" ("+n+"/5)";
+}
 let ttimer;
-function toast(msg,type="success"){clearTimeout(ttimer);const t=document.getElementById("toast"),icons={success:"fa-circle-check",info:"fa-circle-info",error:"fa-circle-xmark"};t.className="toast "+type;document.getElementById("tic").className="fa-solid "+icons[type]+" tic";document.getElementById("tmsg").textContent=msg;t.classList.add("show");ttimer=setTimeout(()=>t.classList.remove("show"),3000)}
+function toast(msg,type="success"){
+  clearTimeout(ttimer);
+  const t=document.getElementById("toast"),icons={success:"fa-circle-check",info:"fa-circle-info",error:"fa-circle-xmark"};
+  t.className="toast "+type;
+  document.getElementById("tic").className="fa-solid "+icons[type]+" tic";
+  document.getElementById("tmsg").textContent=msg;
+  t.classList.add("show");
+  ttimer=setTimeout(()=>t.classList.remove("show"),3000);
+}
 window.toast=toast;
 function saveSet(){
   if(window._saveSettings) window._saveSettings();
   else toast("Auth not ready","error");
 }
-const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");io.unobserve(e.target)}})},{threshold:.12});
-document.querySelectorAll(".reveal").forEach((el,i)=>{el.style.transitionDelay=((i%4)*.08)+"s";io.observe(el)});
-document.querySelectorAll(".fc[role='button']").forEach(c=>c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();c.click()}}));
-</script>
-</body>
-</html>
+
+window.submitContact = function() {
+  const name = document.getElementById('cfName').value.trim();
+  const email = document.getElementById('cfEmail').value.trim();
+  const msg = document.getElementById('cfMessage').value.trim();
+  if (!name || !email || !msg) {
+    window.toast && window.toast('Please fill in all required fields', 'error');
+    return;
+  }
+  window.toast && window.toast("Message sent! We'll get back to you soon ✓", 'success');
+};
+
+// Intersection observer for reveal animations
+const io = new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      e.target.style.transitionDelay = (i % 4 * 0.1) + 's';
+      e.target.classList.add("visible");
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+// Keyboard acce
