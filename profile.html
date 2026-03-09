@@ -3,268 +3,1164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Profile - SkillSwap</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Profile — SkillSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--bg-dark:#09090b;--card-bg:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.08);--primary:#6366f1;--primary-glow:rgba(99,102,241,0.3);--accent:#a855f7;--success:#10b981;--text-main:#ffffff;--text-muted:#a1a1aa;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-dark);color:var(--text-main);min-height:100vh;background-image:radial-gradient(circle at 10% 20%,rgba(99,102,241,0.1) 0%,transparent 20%),radial-gradient(circle at 90% 80%,rgba(168,85,247,0.1) 0%,transparent 20%);}
-.container{max-width:700px;margin:0 auto;padding:40px 20px;}
-.profile-header{display:flex;align-items:center;gap:20px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;padding:28px;margin-bottom:24px;backdrop-filter:blur(10px);position:relative;overflow:hidden;}
-.profile-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));}
-.avatar-wrap{position:relative;flex-shrink:0;}
-.avatar-img{width:90px;height:90px;border-radius:50%;border:3px solid transparent;background:linear-gradient(var(--bg-dark),var(--bg-dark)) padding-box,linear-gradient(135deg,var(--primary),var(--accent)) border-box;object-fit:cover;}
-.avatar-fallback{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:white;}
-.profile-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;}
-.profile-info p{color:var(--text-muted);font-size:0.9rem;}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-top:8px;}
-.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:24px;margin-bottom:20px;backdrop-filter:blur(10px);}
-.card-title{font-size:1rem;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:10px;color:white;}
-.card-title i{color:var(--primary);}
-.input-group{margin-bottom:16px;}
-.input-group label{display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:7px;font-weight:500;}
-.input-group input{width:100%;padding:13px 16px;background:rgba(0,0,0,0.25);border:1px solid var(--card-border);border-radius:12px;color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.95rem;outline:none;transition:0.2s;}
-.input-group input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
-.btn-primary{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:600;font-size:1rem;cursor:pointer;transition:0.2s;}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px var(--primary-glow);}
-.skills-tags{display:flex;flex-wrap:wrap;gap:8px;}
-.skill-tag{background:rgba(255,255,255,0.06);border:1px solid var(--card-border);padding:6px 14px;border-radius:20px;font-size:0.82rem;color:var(--text-muted);}
-.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center;}
-.stat-item{background:rgba(255,255,255,0.03);border:1px solid var(--card-border);border-radius:14px;padding:16px 8px;}
-.stat-item .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.stat-item .lbl{font-size:0.72rem;color:var(--text-muted);margin-top:4px;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#18181b;border:1px solid var(--card-border);color:white;padding:12px 22px;border-radius:12px;font-size:0.9rem;opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-/* BACK BTN */
-.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
-@media(max-width:768px){
-.mobile-back-btn{display:flex;}
-.container{padding:70px 16px 30px;}
-.profile-header{flex-direction:column;text-align:center;padding:24px 18px;}
-.stat-row{grid-template-columns:1fr 1fr 1fr;}
-.card{padding:18px 16px;}
-}
-@media(max-width:400px){
-.stat-row{grid-template-columns:1fr;}
-}
-</style>
-<style id="ss-universal-responsive">
-/* ══════════════════════════════════════════
-   UNIVERSAL RESPONSIVE FIXES — SkillSwap
-   Applied to all pages for consistent UX
-══════════════════════════════════════════ */
-
-/* Safe area support */
 :root {
+  --bg: #06060a;
+  --surface: #0e0e14;
+  --surface2: #15151e;
+  --border: rgba(255,255,255,0.07);
+  --border-bright: rgba(255,255,255,0.13);
+  --primary: #7c6af7;
+  --primary-dim: rgba(124,106,247,0.15);
+  --primary-glow: rgba(124,106,247,0.25);
+  --accent: #f059c7;
+  --accent-dim: rgba(240,89,199,0.12);
+  --gold: #f5b640;
+  --success: #22d3a8;
+  --success-dim: rgba(34,211,168,0.12);
+  --danger: #f56565;
+  --text: #f0f0f8;
+  --muted: #6b6b82;
+  --muted2: #9898b0;
   --sab: env(safe-area-inset-bottom, 0px);
   --sat: env(safe-area-inset-top, 0px);
 }
 
-/* Remove legacy floating back buttons */
-.mobile-back-btn { display: none !important; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-/* ── Smooth scrolling & selection ── */
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* ── Universal input fixes for mobile ── */
-input, textarea, select {
-  font-size: 16px !important; /* Prevents iOS zoom */
-  -webkit-appearance: none;
+/* ── Ambient background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(124,106,247,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 85% 85%, rgba(240,89,199,0.06) 0%, transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Layout ── */
+.page-wrap {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar (desktop) ── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0 20px;
+  z-index: 10;
+}
+.sidebar-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 0 22px 28px;
+  letter-spacing: -0.02em;
+}
+.sidebar-logo span { font-weight: 400; opacity: 0.6; }
+.sidebar-nav { flex: 1; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 22px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0;
+  transition: color 0.2s, background 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-item.active { color: var(--primary); background: var(--primary-dim); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+}
+.nav-item i { width: 18px; text-align: center; font-size: 0.95rem; }
+.sidebar-footer {
+  padding: 16px 22px 0;
+  border-top: 1px solid var(--border);
+}
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; color: white;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-user-info { overflow: hidden; }
+.sidebar-user-name { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 0.72rem; color: var(--muted); }
+
+/* ── Main content ── */
+.main {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Desktop header ── */
+.desktop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 36px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(6,6,10,0.8);
+  backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+.header-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.header-btn {
+  padding: 8px 16px;
   border-radius: 10px;
+  border: 1px solid var(--border-bright);
+  background: rgba(255,255,255,0.04);
+  color: var(--muted2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: all 0.2s;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.header-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.header-btn.primary-btn {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.header-btn.primary-btn:hover { background: #8f7ef9; }
+
+/* ── Mobile header ── */
+.mobile-header {
+  display: none;
+  position: sticky;
+  top: 0; z-index: 400;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  padding-top: calc(14px + var(--sat));
+  background: rgba(6,6,10,0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.mob-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.mob-icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.95rem;
+  text-decoration: none; transition: all 0.2s;
 }
 
-/* ── Focus ring ── */
-input:focus, textarea:focus, select:focus, button:focus-visible {
+/* ── Content area ── */
+.content {
+  padding: 32px 36px;
+  max-width: 900px;
+}
+
+/* ── Profile hero ── */
+.profile-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar-ring {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  padding: 3px;
+  position: relative;
+}
+.avatar-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: var(--surface);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.avatar-inner img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.avatar-inner img.loaded { display: block; }
+.avatar-letter {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.online-dot {
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid var(--surface);
+}
+
+.hero-info { flex: 1; min-width: 0; }
+.hero-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.hero-email {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 12px;
+}
+.hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-level {
+  background: linear-gradient(135deg, rgba(124,106,247,0.2), rgba(240,89,199,0.2));
+  border: 1px solid rgba(124,106,247,0.35);
+  color: #c4b8ff;
+}
+.badge-verified {
+  background: rgba(34,211,168,0.12);
+  border: 1px solid rgba(34,211,168,0.3);
+  color: var(--success);
+}
+.badge-new {
+  background: rgba(245,182,64,0.12);
+  border: 1px solid rgba(245,182,64,0.3);
+  color: var(--gold);
+}
+
+.hero-bio {
+  color: var(--muted2);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-width: 440px;
+}
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border-radius: 11px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  min-height: 42px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), #9b7cf7);
+  color: white;
+  box-shadow: 0 4px 16px rgba(124,106,247,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.4); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--muted2);
+}
+.btn-outline:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid rgba(245,101,101,0.25);
+  color: var(--danger);
+}
+.btn-danger-outline:hover { background: rgba(245,101,101,0.08); }
+
+/* ── Stats row ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.stat-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%;
+  height: 1px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.stat-card:hover::after { opacity: 1; }
+.stat-card.trades::after { background: var(--primary); }
+.stat-card.xp::after { background: var(--accent); }
+.stat-card.earned::after { background: var(--gold); }
+.stat-card.rating::after { background: var(--success); }
+.stat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.stat-card.trades .stat-val { color: var(--primary); }
+.stat-card.xp .stat-val { color: #c084fc; }
+.stat-card.earned .stat-val { color: var(--gold); }
+.stat-card.rating .stat-val { color: var(--success); }
+.stat-lbl { font-size: 0.72rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-icon {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+
+/* ── Two-col layout for cards ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.cards-grid .full { grid-column: 1 / -1; }
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-bright); }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 9px;
+  letter-spacing: -0.01em;
+}
+.card-title i {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+}
+.card-title i.purple { background: var(--primary-dim); color: var(--primary); }
+.card-title i.pink { background: var(--accent-dim); color: var(--accent); }
+.card-title i.green { background: var(--success-dim); color: var(--success); }
+.card-title i.gold { background: rgba(245,182,64,0.12); color: var(--gold); }
+.card-title i.blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
+
+.card-link {
+  font-size: 0.78rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.card-link:hover { opacity: 1; }
+
+/* ── Input group ── */
+.input-group { margin-bottom: 16px; }
+.input-group:last-of-type { margin-bottom: 0; }
+.input-label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 7px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.input-field {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
   outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.input-field::placeholder { color: var(--muted); }
+
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── Skills ── */
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.skill-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--muted2);
+  transition: all 0.2s;
+  cursor: default;
+}
+.skill-chip:hover { background: var(--primary-dim); border-color: rgba(124,106,247,0.3); color: #c4b8ff; }
+.skill-chip .remove {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+  color: var(--muted);
+}
+.skill-chip .remove:hover { background: rgba(245,101,101,0.3); color: var(--danger); }
+.skill-add-row { display: flex; gap: 8px; }
+.skill-add-row .input-field { flex: 1; }
+
+/* ── Activity feed ── */
+.activity-list { display: flex; flex-direction: column; gap: 12px; }
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.activity-item:hover { border-color: var(--border-bright); }
+.activity-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.activity-icon.trade { background: var(--primary-dim); color: var(--primary); }
+.activity-icon.earn { background: rgba(245,182,64,0.12); color: var(--gold); }
+.activity-icon.badge { background: var(--success-dim); color: var(--success); }
+.activity-text { flex: 1; min-width: 0; }
+.activity-title { font-size: 0.85rem; font-weight: 500; margin-bottom: 2px; }
+.activity-time { font-size: 0.74rem; color: var(--muted); }
+.activity-empty {
+  text-align: center;
+  padding: 28px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.activity-empty i { display: block; font-size: 2rem; margin-bottom: 8px; opacity: 0.3; }
+
+/* ── Expert CTA ── */
+.expert-card {
+  background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(240,89,199,0.08));
+  border: 1px solid rgba(124,106,247,0.25);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.expert-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,89,199,0.08), transparent 70%);
+}
+.expert-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.expert-sub {
+  color: var(--muted2);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.expert-perks {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.perk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted2);
+}
+.perk i { color: var(--primary); font-size: 0.8rem; }
+
+/* ── Bank details ── */
+.bank-icon-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.bank-opt {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: 11px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+}
+.bank-opt:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+.bank-opt.active { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+
+/* ── Progress bar ── */
+.xp-row { margin-bottom: 16px; }
+.xp-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.xp-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+.xp-val { font-size: 0.8rem; font-weight: 700; color: #c084fc; }
+.xp-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.xp-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* ── Prevent horizontal overflow ── */
-body { overflow-x: hidden; }
-img, video { max-width: 100%; }
+/* ── Security items ── */
+.security-list { display: flex; flex-direction: column; gap: 10px; }
+.sec-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+}
+.sec-left { display: flex; align-items: center; gap: 11px; }
+.sec-icon { font-size: 1rem; color: var(--muted2); width: 20px; text-align: center; }
+.sec-text { font-size: 0.85rem; font-weight: 500; }
+.sec-sub { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+.toggle {
+  width: 40px; height: 22px;
+  border-radius: 11px;
+  background: rgba(255,255,255,0.1);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--primary); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(18px); }
 
-/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
-.ss-mobile-nav {
+/* ── Mobile bottom nav ── */
+.mobile-nav {
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(9,9,11,0.97);
-  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(6,6,10,0.97);
+  border-top: 1px solid var(--border);
   backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 10px 4px;
+  padding: 10px 8px;
   padding-bottom: calc(10px + var(--sab));
   z-index: 500;
 }
-.ss-mobile-nav-inner {
+.mobile-nav-inner {
   display: flex;
   justify-content: space-around;
   align-items: center;
   max-width: 480px;
   margin: 0 auto;
 }
-.ss-nav-item {
+.m-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 6px 10px;
-  color: #71717a;
-  font-size: 0.62rem;
+  padding: 6px 12px;
+  color: var(--muted);
+  font-size: 0.6rem;
   font-weight: 600;
   cursor: pointer;
   border-radius: 12px;
-  transition: color 0.2s, background 0.2s;
+  transition: color 0.2s;
   text-decoration: none;
   min-width: 52px;
   text-align: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
-.ss-nav-item i { font-size: 1.2rem; }
-.ss-nav-item.active { color: #6366f1; }
-.ss-nav-item.active i { color: #6366f1; }
+.m-nav-item i { font-size: 1.15rem; }
+.m-nav-item.active { color: var(--primary); }
 
-/* ── Universal Mobile Header ── */
-.ss-mobile-header {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 400;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  padding-top: calc(14px + var(--sat));
-  background: rgba(9,9,11,0.95);
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 9999;
+  white-space: nowrap;
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
-.ss-mob-logo {
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: flex; align-items: center; gap: 8px;
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(34,211,168,0.35); }
+.toast.error { border-color: rgba(245,101,101,0.35); }
+
+/* ── Section tabs ── */
+.section-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  width: fit-content;
 }
-.ss-mob-btn {
-  width: 40px; height: 40px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.04);
-  color: #a1a1aa;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 1rem;
-  text-decoration: none; transition: background 0.2s;
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 9px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s;
 }
-.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+.tab-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .cards-grid { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 768px) {
-  .ss-mobile-nav { display: block; }
-  .ss-mobile-header { display: flex; }
-
-  /* Extra bottom padding so content not hidden behind nav */
-  body { padding-bottom: calc(70px + var(--sab)) !important; }
-
-  /* Hide desktop sidebars on mobile */
-  .sidebar { transform: translateX(-100%) !important; }
-  .sidebar.open { transform: translateX(0) !important; }
-  .main { margin-left: 0 !important; }
-
-  /* Bigger tap targets */
-  button, .btn-primary, .btn-secondary, a[role=button] {
-    min-height: 44px;
-  }
-
-  /* Container full padding on mobile */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-
-  /* Card padding on mobile */
-  .card, .panel, .settings-card { padding: 18px 16px !important; }
+  .sidebar { display: none; }
+  .desktop-header { display: none; }
+  .mobile-header { display: flex; }
+  .mobile-nav { display: block; }
+  .content { padding: 20px 16px; padding-bottom: calc(90px + var(--sab)); }
+  .hero-top { flex-direction: column; align-items: center; text-align: center; }
+  .hero-bio { max-width: 100%; }
+  .hero-actions { justify-content: center; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .input-row { grid-template-columns: 1fr; }
+  .section-tabs { width: 100%; }
+  .tab-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 0.8rem; }
+  .expert-perks { flex-direction: column; gap: 8px; }
 }
 
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr !important; }
-  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
-  h1 { font-size: 1.5rem !important; }
-}
-</style>
-<style id="ss-per-page-responsive">
-/* Profile mobile fixes */
-@media (max-width: 768px) {
-  .profile-header { flex-direction: column; text-align: center; padding: 24px 16px !important; }
-  .stat-row { grid-template-columns: 1fr 1fr 1fr !important; }
-  .expert-apply-btn { display: block; margin-top: 16px; width: 100%; text-align: center; }
-}
 @media (max-width: 400px) {
-  .stat-row { grid-template-columns: 1fr 1fr !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-name { font-size: 1.3rem; }
 }
 </style>
 </head>
 <body>
 
+<div class="page-wrap">
 
-
-<div class="container">
-    <div class="profile-header">
-        <div class="avatar-wrap">
-            <img id="photo" class="avatar-img" src="" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex'">
-            <div class="avatar-fallback" id="avatarFallback" style="display:none;">U</div>
+  <!-- Sidebar (desktop) -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Skill<span>Swap</span></div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="explore.html" class="nav-item"><i class="fa-solid fa-compass"></i> Explore</a>
+      <a href="trades.html" class="nav-item"><i class="fa-solid fa-arrows-rotate"></i> Trades</a>
+      <a href="messages.html" class="nav-item"><i class="fa-solid fa-message"></i> Messages <span style="margin-left:auto;background:var(--primary);color:white;font-size:0.65rem;padding:2px 6px;border-radius:20px;">3</span></a>
+      <a href="profile.html" class="nav-item active"><i class="fa-solid fa-user"></i> Profile</a>
+      <a href="wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> Wallet</a>
+      <a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">
+          <img id="sidebarAvatarImg" src="" alt="">
+          <span id="sidebarAvatarLetter">U</span>
         </div>
-        <div class="profile-info">
-            <h2 id="name">Loading...</h2>
-            <p id="email">—</p>
-            <span class="badge"><i class="fa-solid fa-medal"></i> Beginner</span>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Loading…</div>
+          <div class="sidebar-user-role">Member</div>
         </div>
+      </div>
     </div>
+  </aside>
 
-    <!-- Stats -->
-    <div class="stat-row" style="margin-bottom:20px;">
-        <div class="stat-item"><div class="val">0</div><div class="lbl">Trades</div></div>
-        <div class="stat-item"><div class="val">0</div><div class="lbl">XP</div></div>
-        <div class="stat-item"><div class="val">₹0</div><div class="lbl">Earned</div></div>
-    </div>
+  <!-- Main -->
+  <div class="main">
 
-    <!-- Skills -->
-    <div class="card">
-        <div class="card-title"><i class="fa-solid fa-code"></i> My Skills</div>
-        <div class="skills-tags">
-            <span class="skill-tag">Java</span>
-            <span class="skill-tag">C++</span>
-            <span class="skill-tag">Web Dev</span>
+    <!-- Desktop header -->
+    <header class="desktop-header">
+      <div class="header-title">My Profile</div>
+      <div class="header-actions">
+        <a href="notifications.html" class="header-btn"><i class="fa-regular fa-bell"></i> Notifications</a>
+        <a href="expert-registration.html" class="header-btn primary-btn"><i class="fa-solid fa-star"></i> Apply as Expert</a>
+      </div>
+    </header>
+
+    <!-- Mobile header -->
+    <header class="mobile-header">
+      <div class="mob-logo">SkillSwap</div>
+      <div style="display:flex;gap:8px;">
+        <a href="notifications.html" class="mob-icon-btn"><i class="fa-regular fa-bell"></i></a>
+        <a href="settings.html" class="mob-icon-btn"><i class="fa-solid fa-gear"></i></a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Profile hero -->
+      <div class="profile-hero">
+        <div class="hero-top">
+          <div class="avatar-wrap">
+            <div class="avatar-ring">
+              <div class="avatar-inner">
+                <img id="userPhoto" src="" alt="">
+                <span class="avatar-letter" id="avatarLetter">U</span>
+              </div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="hero-info">
+            <div class="hero-name" id="userName">Loading…</div>
+            <div class="hero-email" id="userEmail">—</div>
+            <div class="hero-badges">
+              <span class="badge badge-level"><i class="fa-solid fa-bolt"></i> <span id="userLevel">Beginner</span></span>
+              <span class="badge badge-new" id="memberBadge"><i class="fa-solid fa-calendar"></i> New Member</span>
+            </div>
+            <div class="hero-bio" id="userBio">Tell the community a little about yourself and the skills you bring! Edit your bio below.</div>
+          </div>
         </div>
-    </div>
 
-    <!-- Apply as Expert -->
-    <div class="card" style="background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(168,85,247,0.08));border-color:rgba(99,102,241,0.2);">
-        <div class="card-title"><i class="fa-solid fa-star"></i> Become a Verified Expert</div>
-        <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:16px;">Apply to become a verified expert and earn money by teaching your skills.</p>
-        <a href="expert-registration.html" style="display:block;width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:600;font-size:0.95rem;cursor:pointer;transition:0.2s;text-align:center;text-decoration:none;">
-            <i class="fa-solid fa-badge-check"></i> Apply as Expert
-        </a>
-    </div>
-
-    <!-- Bank / UPI -->
-    <div class="card">
-        <div class="card-title"><i class="fa-solid fa-building-columns"></i> Bank / UPI Details</div>
-        <div class="input-group">
-            <label>UPI ID</label>
-            <input id="upiId" placeholder="example@upi" type="text">
+        <!-- XP progress -->
+        <div class="xp-row" style="margin-top:24px;">
+          <div class="xp-label-row">
+            <span class="xp-label"><i class="fa-solid fa-bolt" style="color:var(--primary);margin-right:5px;"></i>Progress to next level</span>
+            <span class="xp-val" id="xpDisplay">0 / 500 XP</span>
+          </div>
+          <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
         </div>
-        <button class="btn-primary" onclick="saveBank()">
-            <i class="fa-solid fa-floppy-disk"></i> Save Details
-        </button>
-    </div>
-</div>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+          <button class="btn btn-outline" onclick="copyProfileLink()"><i class="fa-solid fa-link"></i> Copy Link</button>
+          <button class="btn btn-outline" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card trades">
+          <div class="stat-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+          <div class="stat-val" id="statTrades">0</div>
+          <div class="stat-lbl">Trades Done</div>
+        </div>
+        <div class="stat-card xp">
+          <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="stat-val" id="statXP">0</div>
+          <div class="stat-lbl">Total XP</div>
+        </div>
+        <div class="stat-card earned">
+          <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+          <div class="stat-val" id="statEarned">₹0</div>
+          <div class="stat-lbl">Earned</div>
+        </div>
+        <div class="stat-card rating">
+          <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+          <div class="stat-val" id="statRating">—</div>
+          <div class="stat-lbl">Avg. Rating</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="section-tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-info')">Profile Info</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-skills')">Skills</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-activity')">Activity</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-security')">Security</button>
+      </div>
+
+      <!-- Tab: Profile Info -->
+      <div id="tab-info">
+        <div class="cards-grid">
+          <div class="card full">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-user purple"></i> Personal Information</div>
+            </div>
+            <div class="input-row">
+              <div class="input-group">
+                <label class="input-label">Display Name</label>
+                <input class="input-field" id="editName" type="text" placeholder="Your name">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Username</label>
+                <input class="input-field" id="editUsername" type="text" placeholder="@username">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Bio</label>
+              <input class="input-field" id="editBio" type="text" placeholder="Brief intro about yourself…">
+            </div>
+            <div class="input-row">
+              <div class="input-group">
+                <label class="input-label">Location</label>
+                <input class="input-field" id="editLocation" type="text" placeholder="City, Country">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Website / Portfolio</label>
+                <input class="input-field" id="editWebsite" type="url" placeholder="https://yoursite.com">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank / UPI -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-building-columns blue"></i> Payment Details</div>
+            </div>
+            <div class="bank-icon-row">
+              <button class="bank-opt active" onclick="selectBank(this,'upi')">UPI</button>
+              <button class="bank-opt" onclick="selectBank(this,'bank')">Bank Transfer</button>
+            </div>
+            <div id="upi-section">
+              <div class="input-group">
+                <label class="input-label">UPI ID</label>
+                <input class="input-field" id="upiId" placeholder="name@upi">
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveBank()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Payment Details
+              </button>
+            </div>
+            <div id="bank-section" style="display:none;">
+              <div class="input-group">
+                <label class="input-label">Account Number</label>
+                <input class="input-field" id="bankAccNo" placeholder="Account number">
+              </div>
+              <div class="input-group">
+                <label class="input-label">IFSC Code</label>
+                <input class="input-field" id="bankIFSC" placeholder="IFSC code">
+              </div>
+              <div class="input-group" style="margin-bottom:16px;">
+                <label class="input-label">Account Holder Name</label>
+                <input class="input-field" id="bankName" placeholder="Full name as on bank account">
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveBank()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Bank Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Expert CTA (inline card) -->
+          <div class="card" style="background:linear-gradient(135deg,rgba(124,106,247,0.08),rgba(240,89,199,0.06));border-color:rgba(124,106,247,0.2);">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-star gold"></i> Become Verified Expert</div>
+            </div>
+            <p class="expert-sub">Unlock paid teaching sessions and get a verified badge visible to everyone.</p>
+            <div class="expert-perks">
+              <div class="perk"><i class="fa-solid fa-check-circle"></i> Verified badge</div>
+              <div class="perk"><i class="fa-solid fa-check-circle"></i> Earn real money</div>
+              <div class="perk"><i class="fa-solid fa-check-circle"></i> Priority listing</div>
+            </div>
+            <a href="expert-registration.html" class="btn btn-primary" style="display:flex;justify-content:center;">
+              <i class="fa-solid fa-badge-check"></i> Apply Now
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Skills -->
+      <div id="tab-skills" style="display:none;">
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-code purple"></i> Skills I Offer</div>
+            </div>
+            <div class="skills-wrap" id="offerSkills"></div>
+            <div class="skill-add-row">
+              <input class="input-field" id="offerInput" placeholder="Add a skill (e.g. React)" onkeydown="if(event.key==='Enter') addSkill('offer')">
+              <button class="btn btn-primary" onclick="addSkill('offer')"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-graduation-cap pink"></i> Skills I Want to Learn</div>
+            </div>
+            <div class="skills-wrap" id="wantSkills"></div>
+            <div class="skill-add-row">
+              <input class="input-field" id="wantInput" placeholder="Add a skill (e.g. Piano)" onkeydown="if(event.key==='Enter') addSkill('want')">
+              <button class="btn btn-primary" onclick="addSkill('want')"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+          <div class="card full">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-trophy gold"></i> Certifications & Achievements</div>
+            </div>
+            <div id="achieveList" class="skills-wrap">
+              <span class="skill-chip"><i class="fa-solid fa-medal" style="color:var(--gold);"></i> First Trade</span>
+              <span class="skill-chip"><i class="fa-solid fa-fire" style="color:#fb923c;"></i> Fast Responder</span>
+            </div>
+            <p style="color:var(--muted);font-size:0.8rem;margin-top:10px;"><i class="fa-solid fa-info-circle"></i> Achievements are earned automatically as you complete trades and activities.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Activity -->
+      <div id="tab-activity" style="display:none;">
+        <div class="card full" style="max-width:100%;">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-clock-rotate-left purple"></i> Recent Activity</div>
+          </div>
+          <div class="activity-list" id="activityList">
+            <div class="activity-empty">
+              <i class="fa-solid fa-inbox"></i>
+              No activity yet. Start a trade to see your history here!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Security -->
+      <div id="tab-security" style="display:none;">
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-shield-halved green"></i> Account Security</div>
+            </div>
+            <div class="security-list">
+              <div class="sec-item">
+                <div class="sec-left">
+                  <i class="fa-solid fa-envelope sec-icon"></i>
+                  <div>
+                    <div class="sec-text">Email Verified</div>
+                    <div class="sec-sub" id="secEmail">—</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-check-circle" style="color:var(--success);font-size:1.1rem;"></i>
+              </div>
+              <div class="sec-item">
+                <div class="sec-left">
+                  <i class="fa-solid fa-lock sec-icon"></i>
+                  <div>
+                    <div class="sec-text">Two-Factor Auth</div>
+                    <div class="sec-sub">Adds extra sign-in security</div>
+                  </div>
+                </div>
+                <button class="toggle" id="toggle2fa" onclick="this.classList.toggle('on');showToast(this.classList.contains('on')?'2FA enabled':'2FA disabled')"></button>
+              </div>
+              <div class="sec-item">
+                <div class="sec-left">
+                  <i class="fa-solid fa-bell sec-icon"></i>
+                  <div>
+                    <div class="sec-text">Trade Notifications</div>
+                    <div class="sec-sub">Email alerts for new trades</div>
+                  </div>
+                </div>
+                <button class="toggle on" id="toggleNotif" onclick="this.classList.toggle('on');showToast(this.classList.contains('on')?'Notifications on':'Notifications off')"></button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fa-solid fa-key gold"></i> Password & Access</div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Current Password</label>
+              <input class="input-field" type="password" placeholder="••••••••">
+            </div>
+            <div class="input-group">
+              <label class="input-label">New Password</label>
+              <input class="input-field" type="password" placeholder="••••••••">
+            </div>
+            <div class="input-group" style="margin-bottom:16px;">
+              <label class="input-label">Confirm New Password</label>
+              <input class="input-field" type="password" placeholder="••••••••">
+            </div>
+            <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="showToast('Password update — coming soon!')">
+              <i class="fa-solid fa-key"></i> Update Password
+            </button>
+            <button class="btn btn-danger-outline" style="width:100%;justify-content:center;margin-top:10px;" id="deleteAccountBtn">
+              <i class="fa-solid fa-triangle-exclamation"></i> Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /page-wrap -->
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="index.html" class="m-nav-item"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="explore.html" class="m-nav-item"><i class="fa-solid fa-compass"></i>Explore</a>
+    <a href="trades.html" class="m-nav-item"><i class="fa-solid fa-arrows-rotate"></i>Trades</a>
+    <a href="messages.html" class="m-nav-item"><i class="fa-solid fa-message"></i>Chat</a>
+    <a href="profile.html" class="m-nav-item active"><i class="fa-solid fa-user"></i>Profile</a>
+  </div>
+</nav>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -280,30 +1176,224 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-function showToast(msg){
-    const t = document.getElementById("toast");
-    t.innerText = msg; t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"), 2800);
+let currentUser = null;
+
+// ── Skill state ──
+let offerSkills = ["Java", "C++", "Web Dev"];
+let wantSkills = ["Python", "UI/UX Design"];
+
+function renderSkills() {
+  renderChips('offerSkills', offerSkills, 'offer');
+  renderChips('wantSkills', wantSkills, 'want');
 }
 
-onAuthStateChanged(auth, async (user) => {
-    if(!user){ window.location.href="login.html"; return; }
-    document.getElementById("name").innerText = user.displayName || user.email.split("@")[0];
-    document.getElementById("email").innerText = user.email;
-    document.getElementById("avatarFallback").innerText = (user.displayName||"U")[0].toUpperCase();
-    if(user.photoURL){ document.getElementById("photo").src = user.photoURL; }
-    // Load saved UPI
-    const bankSnap = await getDoc(doc(db,"bankDetails",user.uid));
-    if(bankSnap.exists()){ document.getElementById("upiId").value = bankSnap.data().upiId || ""; }
+function renderChips(elId, arr, type) {
+  const wrap = document.getElementById(elId);
+  wrap.innerHTML = arr.map((s, i) => `
+    <span class="skill-chip">${s}
+      <button class="remove" onclick="removeSkill('${type}',${i})">×</button>
+    </span>`).join('');
+}
+
+window.addSkill = function(type) {
+  const id = type === 'offer' ? 'offerInput' : 'wantInput';
+  const val = document.getElementById(id).value.trim();
+  if (!val) return;
+  if (type === 'offer') offerSkills.push(val);
+  else wantSkills.push(val);
+  document.getElementById(id).value = '';
+  renderSkills();
+};
+
+window.removeSkill = function(type, idx) {
+  if (type === 'offer') offerSkills.splice(idx, 1);
+  else wantSkills.splice(idx, 1);
+  renderSkills();
+};
+
+// ── Tab switching ──
+window.switchTab = function(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['tab-info','tab-skills','tab-activity','tab-security'].forEach(id => {
+    document.getElementById(id).style.display = id === tabId ? '' : 'none';
+  });
+};
+
+// ── Bank section toggle ──
+window.selectBank = function(btn, type) {
+  document.querySelectorAll('.bank-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('upi-section').style.display = type === 'upi' ? '' : 'none';
+  document.getElementById('bank-section').style.display = type === 'bank' ? '' : 'none';
+};
+
+// ── Toast ──
+window.showToast = function(msg, type='') {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 2800);
+};
+
+// ── Copy profile link ──
+window.copyProfileLink = function() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => showToast('✅ Profile link copied!', 'success'));
+};
+
+// ── Save profile ──
+window.saveProfile = async function() {
+  if (!currentUser) return;
+  const data = {
+    displayName: document.getElementById('editName').value.trim(),
+    username: document.getElementById('editUsername').value.trim(),
+    bio: document.getElementById('editBio').value.trim(),
+    location: document.getElementById('editLocation').value.trim(),
+    website: document.getElementById('editWebsite').value.trim(),
+    offerSkills,
+    wantSkills,
+    updatedAt: new Date().toISOString()
+  };
+  document.getElementById('userBio').innerText = data.bio || 'Tell the community a little about yourself!';
+  await setDoc(doc(db, 'profiles', currentUser.uid), data, { merge: true });
+  showToast('✅ Profile saved!', 'success');
+};
+
+// ── Save bank ──
+window.saveBank = async function() {
+  if (!currentUser) return;
+  const upi = document.getElementById('upiId').value.trim();
+  const accNo = document.getElementById('bankAccNo').value.trim();
+  const ifsc = document.getElementById('bankIFSC').value.trim();
+  const bName = document.getElementById('bankName').value.trim();
+  if (!upi && !accNo) { showToast('⚠️ Please enter payment details', 'error'); return; }
+  await setDoc(doc(db, 'bankDetails', currentUser.uid), { upiId: upi, bankAccNo: accNo, bankIFSC: ifsc, bankName: bName });
+  showToast('✅ Payment details saved!', 'success');
+};
+
+// ── Logout ──
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await signOut(auth);
+  window.location.href = 'login.html';
 });
 
-window.saveBank = async function(){
-    const user = auth.currentUser;
-    const upi = document.getElementById("upiId").value.trim();
-    if(!upi){ showToast("Please enter UPI ID"); return; }
-    await setDoc(doc(db,"bankDetails",user.uid),{ upiId:upi });
-    showToast("✅ Bank details saved!");
-};
+// ── Delete account confirm ──
+document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to delete your account? This action is irreversible.')) {
+    showToast('Account deletion requested — contact support.', 'error');
+  }
+});
+
+// ── Level calc ──
+function getLevel(xp) {
+  if (xp >= 2000) return 'Master';
+  if (xp >= 1000) return 'Expert';
+  if (xp >= 500)  return 'Advanced';
+  if (xp >= 200)  return 'Intermediate';
+  return 'Beginner';
+}
+function getNextLevelXP(xp) {
+  if (xp < 200) return 200;
+  if (xp < 500) return 500;
+  if (xp < 1000) return 1000;
+  if (xp < 2000) return 2000;
+  return 2000;
+}
+
+// ── Auth state ──
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  currentUser = user;
+
+  const displayName = user.displayName || user.email.split('@')[0];
+  const letter = displayName[0].toUpperCase();
+
+  document.getElementById('userName').innerText = displayName;
+  document.getElementById('userEmail').innerText = user.email;
+  document.getElementById('avatarLetter').innerText = letter;
+  document.getElementById('sidebarName').innerText = displayName;
+  document.getElementById('sidebarAvatarLetter').innerText = letter;
+  document.getElementById('secEmail').innerText = user.email;
+  document.getElementById('editName').value = displayName;
+
+  if (user.photoURL) {
+    const img = document.getElementById('userPhoto');
+    img.src = user.photoURL;
+    img.onload = () => {
+      img.classList.add('loaded');
+      document.getElementById('avatarLetter').style.display = 'none';
+    };
+    const sImg = document.getElementById('sidebarAvatarImg');
+    sImg.src = user.photoURL;
+    sImg.onload = () => {
+      sImg.style.display = 'block';
+      document.getElementById('sidebarAvatarLetter').style.display = 'none';
+    };
+  }
+
+  // Load Firestore profile
+  const profSnap = await getDoc(doc(db, 'profiles', user.uid));
+  if (profSnap.exists()) {
+    const d = profSnap.data();
+    document.getElementById('editUsername').value = d.username || '';
+    document.getElementById('editBio').value = d.bio || '';
+    document.getElementById('editLocation').value = d.location || '';
+    document.getElementById('editWebsite').value = d.website || '';
+    if (d.bio) document.getElementById('userBio').innerText = d.bio;
+    if (d.offerSkills) offerSkills = d.offerSkills;
+    if (d.wantSkills) wantSkills = d.wantSkills;
+    renderSkills();
+  } else {
+    renderSkills();
+  }
+
+  // Load stats
+  const statsSnap = await getDoc(doc(db, 'stats', user.uid));
+  if (statsSnap.exists()) {
+    const s = statsSnap.data();
+    const xp = s.xp || 0;
+    const trades = s.trades || 0;
+    const earned = s.earned || 0;
+    const rating = s.rating || null;
+    document.getElementById('statTrades').innerText = trades;
+    document.getElementById('statXP').innerText = xp;
+    document.getElementById('statEarned').innerText = '₹' + earned;
+    document.getElementById('statRating').innerText = rating ? rating.toFixed(1) + ' ⭐' : '—';
+    document.getElementById('userLevel').innerText = getLevel(xp);
+    const nextXP = getNextLevelXP(xp);
+    const prevXP = xp >= 1000 ? 500 : xp >= 500 ? 200 : 0;
+    const pct = Math.min(100, Math.round(((xp - prevXP) / (nextXP - prevXP)) * 100));
+    document.getElementById('xpFill').style.width = pct + '%';
+    document.getElementById('xpDisplay').innerText = `${xp} / ${nextXP} XP`;
+    if (trades >= 5) document.getElementById('memberBadge').innerHTML = '<i class="fa-solid fa-shield-check"></i> Trusted Member';
+  }
+
+  // Load bank details
+  const bankSnap = await getDoc(doc(db, 'bankDetails', user.uid));
+  if (bankSnap.exists()) {
+    const b = bankSnap.data();
+    document.getElementById('upiId').value = b.upiId || '';
+    document.getElementById('bankAccNo').value = b.bankAccNo || '';
+    document.getElementById('bankIFSC').value = b.bankIFSC || '';
+    document.getElementById('bankName').value = b.bankName || '';
+  }
+
+  // Load activity
+  const actSnap = await getDoc(doc(db, 'activity', user.uid));
+  if (actSnap.exists() && actSnap.data().items?.length) {
+    const list = actSnap.data().items.slice(-5).reverse();
+    document.getElementById('activityList').innerHTML = list.map(a => `
+      <div class="activity-item">
+        <div class="activity-icon ${a.type || 'trade'}"><i class="fa-solid fa-${a.icon || 'arrows-rotate'}"></i></div>
+        <div class="activity-text">
+          <div class="activity-title">${a.title}</div>
+          <div class="activity-time">${a.time || ''}</div>
+        </div>
+      </div>`).join('');
+  }
+});
 </script>
 </body>
 </html>
