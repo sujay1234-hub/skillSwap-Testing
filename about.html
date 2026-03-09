@@ -1,639 +1,738 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>About - SkillSwap</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#02030a">
+<title>About — SkillSwap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ═════════════════════════════════════════════
+   DESIGN TOKENS
+═════════════════════════════════════════════ */
+:root{
+  --void:#02030a;--deep:#070a18;--surface:#0c1024;--lift:#121630;
+  --glass:rgba(255,255,255,0.028);--glass2:rgba(255,255,255,0.055);
+  --edge:rgba(255,255,255,0.065);--edge2:rgba(255,255,255,0.12);
+  --indigo:#5b5ef7;--violet:#a855f7;--sky:#38bdf8;--mint:#34d399;
+  --ember:#fb923c;--rose:#f43f5e;--gold:#fbbf24;
+  --glow-i:rgba(91,94,247,0.35);--glow-v:rgba(168,85,247,0.25);
+  --snow:#eef2ff;--mist:#8891b4;--fog:#444c6e;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--void);color:var(--snow);overflow-x:hidden;min-height:100vh}
 
-    <style>
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.4);
-            --accent: #a855f7;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-        }
+/* ── CURSOR ── */
+#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:#fff;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference}
+#cur-o{position:fixed;width:32px;height:32px;border-radius:50%;border:1px solid rgba(91,94,247,.6);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+body.hov #cur{transform:translate(-50%,-50%) scale(2.4)}
+body.hov #cur-o{width:50px;height:50px;border-color:rgba(168,85,247,.75)}
+@media(max-width:768px){#cur,#cur-o{display:none}}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── GRAIN ── */
+#grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.028}
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 30%);
-        }
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:800;display:flex;align-items:center;padding:0 6%;height:68px;padding-top:var(--sat);background:rgba(2,3,10,0);border-bottom:1px solid transparent;transition:background .5s,backdrop-filter .5s,border-color .5s}
+.nav.scrolled{background:rgba(2,3,10,.88);backdrop-filter:blur(32px);border-color:var(--edge)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--snow);letter-spacing:-.02em}
+.logo-spark{width:32px;height:32px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,var(--indigo),var(--violet));display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;box-shadow:0 0 18px var(--glow-i);animation:sparkPulse 4s ease-in-out infinite}
+@keyframes sparkPulse{0%,100%{box-shadow:0 0 18px var(--glow-i)}50%{box-shadow:0 0 30px rgba(91,94,247,.55)}}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:4px}
+.nav-a{padding:7px 15px;border-radius:8px;font-size:.875rem;font-weight:500;color:var(--mist);text-decoration:none;transition:.2s}
+.nav-a:hover{color:var(--snow);background:var(--glass)}
+.nav-a.active{color:var(--snow)}
+.nav-btn{margin-left:8px;padding:8px 20px;border-radius:9px;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;text-decoration:none;font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;transition:.3s;box-shadow:0 4px 20px var(--glow-i)}
+.nav-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--glow-i)}
+.mob-nav{display:none;position:fixed;top:0;left:0;right:0;z-index:800;align-items:center;justify-content:space-between;height:56px;padding:0 20px;padding-top:var(--sat);background:rgba(2,3,10,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--edge)}
+.mob-logo{font-family:'Syne',sans-serif;font-size:.98rem;font-weight:800;color:var(--snow);text-decoration:none;display:flex;align-items:center;gap:8px}
+.mob-spark{width:27px;height:27px;border-radius:7px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#fff}
+.mob-cta{padding:6px 16px;border-radius:8px;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;font-family:'Syne',sans-serif}
+.mob-bottom{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;background:rgba(2,3,10,.96);backdrop-filter:blur(24px);border-top:1px solid var(--edge);padding:10px 0 calc(10px + var(--sab));justify-content:space-around}
+.mob-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;color:var(--fog);text-decoration:none;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;transition:.15s}
+.mob-btn i{font-size:1rem}
+.mob-btn.on{color:var(--indigo)}
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            border-bottom: 1px solid var(--border);
-            background: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:130px 6% 110px}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-grid{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:linear-gradient(rgba(91,94,247,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(91,94,247,.07) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 75%)}
+.hero-c{position:relative;z-index:10;max-width:880px}
+.hbadge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;margin-bottom:32px;background:rgba(91,94,247,.1);border:1px solid rgba(91,94,247,.28);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a5b4fc;animation:fadeUp .8s ease both}
+.hbadge-dot{width:6px;height:6px;border-radius:50%;background:var(--indigo);animation:blinkDot 2s infinite}
+@keyframes blinkDot{0%,100%{opacity:1;box-shadow:0 0 0 transparent}50%{opacity:.4;box-shadow:0 0 8px var(--indigo)}}
+.hero-h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,8vw,6.5rem);font-weight:800;letter-spacing:-.05em;line-height:.95;margin-bottom:8px;animation:fadeUp .8s .1s ease both}
+.hero-h1-em{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(2.7rem,7.5vw,6rem);font-weight:400;display:block;margin-top:10px;background:linear-gradient(135deg,#a5b4fc 0%,var(--violet) 50%,#7dd3fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .8s .18s ease both}
+.hero-p{font-size:clamp(1rem,2.2vw,1.2rem);color:var(--mist);max-width:540px;margin:22px auto 42px;line-height:1.8;animation:fadeUp .8s .28s ease both}
+.hero-acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.btn-p{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;text-decoration:none;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;letter-spacing:.01em;box-shadow:0 8px 32px var(--glow-i),inset 0 1px 0 rgba(255,255,255,.14);transition:.35s cubic-bezier(.34,1.56,.64,1)}
+.btn-p:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 18px 48px var(--glow-i)}
+.btn-g{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:12px;background:var(--glass);border:1px solid var(--edge2);color:var(--snow);text-decoration:none;font-size:.92rem;font-weight:600;transition:.25s;backdrop-filter:blur(12px)}
+.btn-g:hover{background:var(--glass2);transform:translateY(-2px)}
+/* floating nodes */
+.fnodes{position:absolute;inset:0;pointer-events:none;z-index:5}
+.fn{position:absolute;display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:99px;background:rgba(255,255,255,.05);backdrop-filter:blur(16px);border:1px solid var(--edge2);font-size:.78rem;font-weight:600;color:var(--snow);white-space:nowrap;animation:fnFloat var(--ft,7s) ease-in-out infinite var(--fd,alternate)}
+.fn-d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+@keyframes fnFloat{0%{transform:translateY(0)}100%{transform:translateY(-18px)}}
+/* scroll cue */
+.s-cue{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--fog);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;animation:fadeUp 1s .8s ease both}
+.s-line{width:1px;height:48px;background:linear-gradient(var(--indigo),transparent);animation:sAnim 2.2s ease-in-out infinite}
+@keyframes sAnim{0%,100%{opacity:0;transform:scaleY(.3) translateY(-14px)}55%{opacity:1;transform:scaleY(1) translateY(0)}}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-            text-decoration: none;
-        }
+/* ── MARQUEE ── */
+.belt{position:relative;z-index:10;overflow:hidden;padding:22px 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);background:rgba(91,94,247,.025)}
+.belt::before,.belt::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+.belt::before{left:0;background:linear-gradient(90deg,var(--void),transparent)}
+.belt::after{right:0;background:linear-gradient(-90deg,var(--void),transparent)}
+.belt-row{display:flex;animation:beltScroll 22s linear infinite;width:max-content}
+.belt-row:hover{animation-play-state:paused}
+.bi{display:inline-flex;align-items:center;gap:10px;padding:0 28px;white-space:nowrap;font-size:.8rem;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em}
+.bi span{color:rgba(91,94,247,.4)}
+@keyframes beltScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-        .logo i {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ── SECTION BASE ── */
+.sec{position:relative;z-index:10;padding:110px 6%}
+.inner{max-width:1140px;margin:0 auto}
+.sec-lbl{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:99px;margin-bottom:18px;background:rgba(91,94,247,.08);border:1px solid rgba(91,94,247,.22);font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#a5b4fc}
+.sec-h2{font-family:'Syne',sans-serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-bottom:16px}
+.sec-p{font-size:1.05rem;color:var(--mist);line-height:1.78;max-width:600px}
 
-        nav { display: flex; gap: 30px; }
-        nav a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            transition: 0.3s;
-        }
-        nav a:hover, nav a.active { color: white; }
+/* ── COUNTER STRIP ── */
+.cstrip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--edge);border-radius:22px;overflow:hidden;background:var(--deep)}
+.ccell{padding:36px 28px;border-right:1px solid var(--edge);position:relative;overflow:hidden;transition:.3s}
+.ccell:last-child{border-right:none}
+.ccell::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:.3s}
+.ccell:hover{background:rgba(255,255,255,.018)}
+.ccell:hover::before{opacity:1}
+.ccell:nth-child(1)::before{background:linear-gradient(90deg,var(--indigo),var(--violet))}
+.ccell:nth-child(2)::before{background:linear-gradient(90deg,var(--violet),var(--sky))}
+.ccell:nth-child(3)::before{background:linear-gradient(90deg,var(--sky),var(--mint))}
+.ccell:nth-child(4)::before{background:linear-gradient(90deg,var(--mint),var(--gold))}
+.cnum{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:-.05em;line-height:1;margin-bottom:8px}
+.clbl{font-size:.75rem;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.cdesc{font-size:.82rem;color:var(--mist)}
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
+/* ── PROBLEMS ── */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pc{background:var(--glass);border:1px solid var(--edge);border-radius:20px;padding:30px;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.pc::after{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(244,63,94,.07),transparent 60%);opacity:0;transition:.3s}
+.pc:hover{transform:translateY(-6px) scale(1.012);border-color:rgba(244,63,94,.3)}
+.pc:hover::after{opacity:1}
+.pc:hover .p-ico{box-shadow:0 0 24px rgba(244,63,94,.35)}
+.p-ico{width:52px;height:52px;border-radius:14px;margin-bottom:18px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;transition:.3s}
+.pc h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:8px}
+.pc p{font-size:.875rem;color:var(--mist);line-height:1.72}
+.pc-num{position:absolute;top:22px;right:24px;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--fog)}
 
-        .hero {
-            text-align: center;
-            margin-bottom: 80px;
-        }
+/* ── HOW IT WORKS ── */
+.how{display:flex;gap:0;position:relative;margin-top:16px}
+.how::before{content:'';position:absolute;top:50px;left:80px;right:80px;height:1px;background:linear-gradient(90deg,transparent 0%,var(--indigo) 20%,var(--violet) 50%,var(--sky) 80%,transparent);z-index:0}
+.hstep{flex:1;text-align:center;padding:0 20px;position:relative;z-index:1;transition:.3s}
+.hstep:hover{transform:translateY(-5px)}
+.hring{width:100px;height:100px;border-radius:50%;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;background:var(--deep);border:1px solid var(--edge2);position:relative;transition:.35s}
+.hring::after{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--indigo) 0%,var(--violet) 50%,transparent 50%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),black calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),black calc(100% - 3px));opacity:0;transition:.3s}
+.hstep:hover .hring::after{opacity:1}
+.hstep:hover .hring{border-color:var(--indigo);box-shadow:0 0 30px rgba(91,94,247,.25)}
+.hn{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--indigo),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hstep h3{font-family:'Syne',sans-serif;font-size:.98rem;font-weight:700;margin-bottom:8px}
+.hstep p{font-size:.84rem;color:var(--mist);line-height:1.68}
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
+/* ── BENTO GRID ── */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.bc{background:var(--glass);border:1px solid var(--edge);border-radius:22px;padding:30px;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.bc::before{content:'';position:absolute;inset:0;border-radius:22px;opacity:0;transition:.3s}
+.bc:hover{transform:translateY(-5px)}
+.bc:hover::before{opacity:1}
+.c7{grid-column:span 7}.c5{grid-column:span 5}.c4{grid-column:span 4}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.vi{border-color:rgba(91,94,247,.1)}.vi::before{background:rgba(91,94,247,.04)}.vi:hover{border-color:rgba(91,94,247,.35)}
+.gr{border-color:rgba(52,211,153,.08)}.gr::before{background:rgba(52,211,153,.04)}.gr:hover{border-color:rgba(52,211,153,.3)}
+.am{border-color:rgba(251,191,36,.08)}.am::before{background:rgba(251,191,36,.04)}.am:hover{border-color:rgba(251,191,36,.3)}
+.sk{border-color:rgba(56,189,248,.08)}.sk::before{background:rgba(56,189,248,.04)}.sk:hover{border-color:rgba(56,189,248,.3)}
+.ro{border-color:rgba(244,63,94,.08)}.ro::before{background:rgba(244,63,94,.04)}.ro:hover{border-color:rgba(244,63,94,.3)}
+.b-ico{width:52px;height:52px;border-radius:14px;margin-bottom:18px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.bc h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.bc p{font-size:.875rem;color:var(--mist);line-height:1.72}
+.bc-big{display:flex;align-items:flex-end;gap:18px;min-height:210px;flex-wrap:wrap}
+.bc-t h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:10px}
+.bc-t p{font-size:.9rem;color:var(--mist);line-height:1.75;max-width:320px}
+.bc-em{width:110px;height:110px;border-radius:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:3rem;animation:emFloat 5s ease-in-out infinite}
+@keyframes emFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
 
-        .hero h1 span {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ── 3D FLIP VALUES ── */
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.vw{perspective:1200px;height:230px;cursor:pointer}
+.vi2{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.4,0,.2,1)}
+.vw:hover .vi2{transform:rotateY(180deg)}
+.vf,.vb{position:absolute;inset:0;border-radius:20px;-webkit-backface-visibility:hidden;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center}
+.vf{background:var(--surface);border:1px solid var(--edge2)}
+.vb{transform:rotateY(180deg);border:1px solid}
+.vem{font-size:2.4rem;margin-bottom:14px}
+.vnm{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800}
+.vb p{font-size:.85rem;line-height:1.68;font-weight:500}
 
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
+/* ── VISION ── */
+.vision{position:relative;border-radius:28px;overflow:hidden;padding:80px 64px;text-align:center;background:linear-gradient(135deg,rgba(91,94,247,.11),rgba(168,85,247,.07),rgba(56,189,248,.04));border:1px solid rgba(255,255,255,.09);isolation:isolate}
+.vision::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 65% 65% at 50% -10%,rgba(91,94,247,.25),transparent 65%);pointer-events:none}
+.vision::after{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}
+.vgrid{position:absolute;inset:-50px;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(91,94,247,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(91,94,247,.08) 1px,transparent 1px);background-size:44px 44px;animation:vgSlide 18s linear infinite;opacity:.5}
+@keyframes vgSlide{from{transform:translate(0,0)}to{transform:translate(44px,44px)}}
+.vision>*{position:relative;z-index:1}
+.vq{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(1.7rem,3.5vw,2.8rem);line-height:1.25;margin-bottom:22px}
+.vq em{font-style:normal;background:linear-gradient(135deg,#a5b4fc,var(--violet),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.vbody{font-size:1rem;color:var(--mist);max-width:620px;margin:0 auto;line-height:1.82}
+.vbody strong{color:var(--snow);font-weight:600}
 
-        .section { margin-bottom: 80px; }
+/* ── FOUNDER ── */
+.flayout{display:grid;grid-template-columns:380px 1fr;gap:56px;align-items:center}
+.fcard{background:var(--surface);border:1px solid var(--edge);border-radius:24px;padding:44px 36px;position:relative;overflow:hidden;transition:.35s}
+.fcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--indigo),var(--violet),var(--sky))}
+.fcard:hover{transform:translateY(-6px);box-shadow:0 30px 70px rgba(0,0,0,.45);border-color:rgba(91,94,247,.3)}
+.fav-w{position:relative;width:96px;margin-bottom:24px}
+.fav{width:96px;height:96px;border-radius:22px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:flex;align-items:center;justify-content:center;font-size:2.8rem;color:#fff;box-shadow:0 14px 38px rgba(91,94,247,.45)}
+.fring{position:absolute;inset:-6px;border-radius:28px;border:1px solid rgba(91,94,247,.3);animation:frPulse 3s ease-in-out infinite}
+@keyframes frPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.04)}}
+.fnm{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:4px;letter-spacing:-.02em}
+.frole{font-family:'DM Mono',monospace;font-size:.75rem;font-weight:500;color:var(--indigo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.fcollege{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--mist);margin-bottom:18px}
+.fbio{font-size:.9rem;color:var(--mist);line-height:1.75}
+.flinks{display:flex;gap:8px;margin-top:22px}
+.flink{width:36px;height:36px;border-radius:9px;background:var(--glass);border:1px solid var(--edge2);color:var(--mist);text-decoration:none;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.flink:hover{color:var(--snow);border-color:var(--indigo);background:rgba(91,94,247,.1);transform:translateY(-2px)}
+.storyh{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3vw,2.3rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:22px}
+.storyh em{font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;background:linear-gradient(135deg,#a5b4fc,var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-size:.95rem;color:var(--mist);line-height:1.82;margin-bottom:16px}
+.sq{border-left:3px solid var(--indigo);border-radius:0 10px 10px 0;background:rgba(91,94,247,.06);padding:18px 22px;margin:26px 0;font-size:.98rem;color:var(--snow);line-height:1.72;font-family:'Instrument Serif',serif;font-style:italic}
+.tchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.tc{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;background:var(--glass);border:1px solid var(--edge);font-size:.78rem;font-weight:600;color:var(--mist);transition:.2s}
+.tc:hover{color:var(--snow);border-color:var(--edge2);transform:translateY(-2px)}
 
-        .section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+/* ── ROADMAP ── */
+.tlgrid{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.tl{position:relative;padding-left:26px}
+.tl::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--indigo),var(--violet),transparent);border-radius:99px}
+.tlr{position:relative;padding-left:26px;margin-bottom:34px}
+.tlr:last-child{margin-bottom:0}
+.tldot{position:absolute;left:-33px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--void);border:2px solid var(--indigo);transition:.25s}
+.tlr:hover .tldot{background:var(--indigo);box-shadow:0 0 14px rgba(91,94,247,.7)}
+.tlr.done .tldot{background:var(--indigo)}
+.tlr.live .tldot{background:var(--mint);border-color:var(--mint);box-shadow:0 0 12px rgba(52,211,153,.6);animation:blinkDot 2s infinite}
+.tltag{display:inline-block;padding:2px 10px;border-radius:6px;margin-bottom:8px;font-family:'DM Mono',monospace;font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.d{background:rgba(91,94,247,.14);color:#a5b4fc}
+.l{background:rgba(52,211,153,.14);color:var(--mint)}
+.n{background:rgba(251,191,36,.1);color:var(--gold)}
+.tlr h4{font-family:'Syne',sans-serif;font-size:.96rem;font-weight:700;margin-bottom:5px}
+.tlr p{font-size:.84rem;color:var(--mist);line-height:1.62}
 
-        .section-header h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
+/* ── CTA ── */
+.cta{position:relative;border-radius:28px;overflow:hidden;padding:96px 64px;text-align:center;background:var(--deep);border:1px solid var(--edge);isolation:isolate}
+.cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% -20%,rgba(91,94,247,.3),transparent 65%),radial-gradient(ellipse 40% 40% at 20% 120%,rgba(168,85,247,.15),transparent 55%),radial-gradient(ellipse 35% 35% at 80% 110%,rgba(56,189,248,.1),transparent 55%);pointer-events:none}
+.cta::after{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent)}
+.cta-lbl{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;color:#a5b4fc;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;position:relative;z-index:1}
+.cta-h{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.04;margin-bottom:18px;position:relative;z-index:1}
+.cta-h em{font-style:normal;background:linear-gradient(135deg,#a5b4fc,var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta-p{font-size:1rem;color:var(--mist);max-width:460px;margin:0 auto 38px;line-height:1.75;position:relative;z-index:1}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
 
-        .section-header h2 i { color: var(--accent); }
+/* ── FOOTER ── */
+footer{position:relative;z-index:10;border-top:1px solid var(--edge);padding:28px 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--fog)}
+.ft-logo{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--snow);text-decoration:none}
+.ft-spark{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff}
+.ft-links{display:flex;gap:16px}
+.ft-links a{color:var(--fog);text-decoration:none;transition:.2s}
+.ft-links a:hover{color:var(--snow)}
 
-        .section-header p {
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.7;
-        }
+/* ── SCROLL REVEAL ── */
+.rv{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s cubic-bezier(.34,1.56,.64,1)}
+.rv.in{opacity:1;transform:translateY(0)}
+.sc{opacity:0;transform:scale(.9);transition:opacity .6s ease,transform .6s cubic-bezier(.34,1.56,.64,1)}
+.sc.in{opacity:1;transform:scale(1)}
 
-        .problem-grid, .solution-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .problem-card, .solution-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            transition: 0.3s ease;
-        }
-
-        .problem-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(239, 68, 68, 0.3);
-            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.1);
-        }
-
-        .solution-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(16, 185, 129, 0.3);
-            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
-        }
-
-        .problem-icon, .solution-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.8rem;
-        }
-
-        .problem-icon { background: rgba(239, 68, 68, 0.1); }
-        .solution-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-
-        .problem-card h3, .solution-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .problem-card p, .solution-card p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .vision-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 50px;
-            text-align: center;
-        }
-
-        .vision-card h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .vision-card p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.7;
-        }
-
-        .founder-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 50px;
-            text-align: center;
-            max-width: 400px;
-            margin: 0 auto;
-            transition: 0.3s ease;
-        }
-
-        .founder-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-
-        .founder-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            border-radius: 24px 24px 0 0;
-        }
-
-        .founder-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 30px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 2.5rem;
-            color: white;
-        }
-
-        .founder-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
-        .founder-role { color: var(--primary); font-weight: 500; margin-bottom: 8px; }
-        .founder-college { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
-        .founder-bio { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
-
-        .cta-section {
-            text-align: center;
-            padding: 60px 40px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-        }
-
-        .cta-section h2 { font-size: 2rem; font-weight: 700; margin-bottom: 16px; }
-        .cta-section p { color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem; }
-
-        .cta-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-
-        .btn-primary {
-            padding: 16px 32px;
-            border-radius: 14px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px var(--primary-glow);
-        }
-
-        .btn-secondary {
-            padding: 16px 32px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-            margin-top: 60px;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            header { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .hero h1 { font-size: 2.2rem; }
-            .vision-card, .founder-card { padding: 30px 20px; }
-            .cta-buttons { flex-direction: column; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-        }
-    </style>
-
-<style id="mob">
-.mobile-back-btn{display:none;position:fixed;top:72px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .c7,.c5{grid-column:span 6}.c4{grid-column:span 6}.c8{grid-column:span 12}
+  .flayout{grid-template-columns:1fr;gap:36px}
+  .cstrip{grid-template-columns:1fr 1fr}
+  .vals{grid-template-columns:repeat(3,1fr)}
+  .tlgrid{grid-template-columns:1fr;gap:36px}
+}
 @media(max-width:768px){
-.mobile-back-btn{display:flex;}
-header{padding:15px 20px;}
-nav{gap:16px;}
-nav a{font-size:0.85rem;}
-.container{padding:60px 16px 40px;}
-.hero h1{font-size:2rem;}
-.hero p{font-size:1rem;}
-.problem-grid,.solution-grid{grid-template-columns:1fr 1fr;gap:12px;}
-.problem-card,.solution-card{padding:18px 14px;}
-.vision-card{padding:30px 20px;}
-.founder-card{padding:30px 20px;}
-.cta-section{padding:40px 20px;}
-.cta-buttons{flex-direction:column;}
-.btn-primary,.btn-secondary{width:100%;justify-content:center;}
+  .nav{display:none}.mob-nav{display:flex}.mob-bottom{display:flex}
+  body{padding-top:56px;padding-bottom:calc(68px + var(--sab))}
+  .hero{padding:60px 5% 80px;min-height:auto}
+  .fn{display:none}
+  .sec{padding:64px 5%}
+  .bento{display:block}.bc{margin-bottom:12px}
+  .pgrid{grid-template-columns:1fr}
+  .how{flex-direction:column;gap:24px}.how::before{display:none}
+  .vals{grid-template-columns:1fr}
+  .vision{padding:44px 24px}
+  .cta{padding:52px 24px}
+  .cstrip{grid-template-columns:1fr 1fr}
+  .ccell{border-right:none;border-bottom:1px solid var(--edge)}
+  .tlgrid{grid-template-columns:1fr;gap:28px}
+  .bc-big{flex-direction:column;min-height:auto}
+  .bc-em{width:72px;height:72px;font-size:2rem}
 }
-@media(max-width:400px){
-.problem-grid,.solution-grid{grid-template-columns:1fr;}
-}
-</style>
-<style id="ss-universal-responsive">
-/* ══════════════════════════════════════════
-   UNIVERSAL RESPONSIVE FIXES — SkillSwap
-   Applied to all pages for consistent UX
-══════════════════════════════════════════ */
-
-/* Safe area support */
-:root {
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sat: env(safe-area-inset-top, 0px);
-}
-
-/* Remove legacy floating back buttons */
-.mobile-back-btn { display: none !important; }
-
-/* ── Smooth scrolling & selection ── */
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-
-/* ── Universal input fixes for mobile ── */
-input, textarea, select {
-  font-size: 16px !important; /* Prevents iOS zoom */
-  -webkit-appearance: none;
-  border-radius: 10px;
-}
-
-/* ── Focus ring ── */
-input:focus, textarea:focus, select:focus, button:focus-visible {
-  outline: none;
-}
-
-/* ── Prevent horizontal overflow ── */
-body { overflow-x: hidden; }
-img, video { max-width: 100%; }
-
-/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
-.ss-mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(9,9,11,0.97);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 10px 4px;
-  padding-bottom: calc(10px + var(--sab));
-  z-index: 500;
-}
-.ss-mobile-nav-inner {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.ss-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
-  color: #71717a;
-  font-size: 0.62rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: color 0.2s, background 0.2s;
-  text-decoration: none;
-  min-width: 52px;
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-.ss-nav-item i { font-size: 1.2rem; }
-.ss-nav-item.active { color: #6366f1; }
-.ss-nav-item.active i { color: #6366f1; }
-
-/* ── Universal Mobile Header ── */
-.ss-mobile-header {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 400;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  padding-top: calc(14px + var(--sat));
-  background: rgba(9,9,11,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.ss-mob-logo {
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: flex; align-items: center; gap: 8px;
-}
-.ss-mob-btn {
-  width: 40px; height: 40px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.04);
-  color: #a1a1aa;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 1rem;
-  text-decoration: none; transition: background 0.2s;
-}
-.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
-
-@media (max-width: 768px) {
-  .ss-mobile-nav { display: block; }
-  .ss-mobile-header { display: flex; }
-
-  /* Extra bottom padding so content not hidden behind nav */
-  body { padding-bottom: calc(70px + var(--sab)) !important; }
-
-  /* Hide desktop sidebars on mobile */
-  .sidebar { transform: translateX(-100%) !important; }
-  .sidebar.open { transform: translateX(0) !important; }
-  .main { margin-left: 0 !important; }
-
-  /* Bigger tap targets */
-  button, .btn-primary, .btn-secondary, a[role=button] {
-    min-height: 44px;
-  }
-
-  /* Container full padding on mobile */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-
-  /* Card padding on mobile */
-  .card, .panel, .settings-card { padding: 18px 16px !important; }
-}
-
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr !important; }
-  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
-  h1 { font-size: 1.5rem !important; }
-}
-</style>
-<style id="ss-page-grid-fix">
-@media (max-width: 768px) {
-  .experts-grid, .cards-grid, .grid-3, .grid-4,
-  [style*="grid-template-columns: repeat(3"],
-  [style*="grid-template-columns: repeat(4"] {
-    grid-template-columns: 1fr !important;
-  }
-  [style*="grid-template-columns: repeat(2"] {
-    grid-template-columns: 1fr 1fr !important;
-  }
-  .hero-section, .hero { padding: 40px 16px !important; }
-  header { padding: 14px 16px !important; }
-  .header-nav, nav ul { display: none !important; }
-}
-@media (max-width: 480px) {
-  [style*="grid-template-columns: repeat(2"] {
-    grid-template-columns: 1fr !important;
-  }
+@media(max-width:480px){
+  .hero-h1{font-size:2.6rem}
+  .hero-acts{flex-direction:column;align-items:center}
+  .vals{grid-template-columns:1fr}
+  .sec-h2{font-size:1.8rem}
 }
 </style>
 </head>
 <body>
 
+<div id="cur"></div>
+<div id="cur-o"></div>
+<canvas id="grain"></canvas>
 
-    <!-- Header -->
-    <header>
-        <a href="index.html" class="logo">
-            <i class="fa-solid fa-bolt"></i> SkillSwap
-        </a>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="explore.html">Explore</a>
-            <a href="about.html" class="active">About</a>
-        </nav>
-    </header>
+<!-- NAV -->
+<header class="nav" id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-spark"><i class="fa-solid fa-bolt"></i></div>
+    SkillSwap
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-a">Home</a>
+    <a href="explore.html" class="nav-a">Explore</a>
+    <a href="about.html" class="nav-a active">About</a>
+    <a href="explore.html" class="nav-btn">Get Started</a>
+  </div>
+</header>
 
-    <div class="container">
-        <!-- Hero -->
-        <div class="hero">
-            <h1>About <span>SkillSwap</span></h1>
-            <p>Trade Skills. Not Money. Building the future of peer-to-peer learning.</p>
-        </div>
+<div class="mob-nav">
+  <a href="index.html" class="mob-logo"><div class="mob-spark"><i class="fa-solid fa-bolt"></i></div> SkillSwap</a>
+  <a href="explore.html" class="mob-cta">Explore</a>
+</div>
 
-        <!-- Problem Section -->
-        <div class="section">
-            <div class="section-header">
-                <h2><i class="fa-solid fa-triangle-exclamation"></i> The Problem</h2>
-                <p>Millions of students want to learn but face significant barriers.</p>
-            </div>
-            <div class="problem-grid">
-                <div class="problem-card">
-                    <div class="problem-icon">💸</div>
-                    <h3>Expensive Education</h3>
-                    <p>Quality courses cost thousands, making learning inaccessible for many students.</p>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon">🎓</div>
-                    <h3>Underutilized Knowledge</h3>
-                    <p>Students have valuable skills but lack a platform to share and monetize them.</p>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon">🤝</div>
-                    <h3>Trust Issues</h3>
-                    <p>Finding reliable peers for skill exchange is difficult and time-consuming.</p>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon">🌍</div>
-                    <h3>Unequal Access</h3>
-                    <p>Opportunities are not equally distributed across regions and backgrounds.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Solution Section -->
-        <div class="section">
-            <div class="section-header">
-                <h2><i class="fa-solid fa-lightbulb"></i> Our Solution</h2>
-                <p>A student-powered marketplace where knowledge becomes currency.</p>
-            </div>
-            <div class="solution-grid">
-                <div class="solution-card">
-                    <div class="solution-icon">🔄</div>
-                    <h3>Skill Exchange</h3>
-                    <p>Trade your expertise for what you want to learn. No money required.</p>
-                </div>
-                <div class="solution-card">
-                    <div class="solution-icon">👥</div>
-                    <h3>Peer Learning</h3>
-                    <p>Learn from fellow students who understand your context and goals.</p>
-                </div>
-                <div class="solution-card">
-                    <div class="solution-icon">⭐</div>
-                    <h3>Reputation System</h3>
-                    <p>Build trust through ratings, reviews, and verified exchanges.</p>
-                </div>
-                  <div class="solution-card">
-                    <div class="solution-icon">📚</div>
-                    <h3>Practical Skills</h3>
-                    <p>Focus on real-world skills that matter in the job market.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vision Section -->
-        <div class="section">
-            <div class="section-header">
-                <h2><i class="fa-solid fa-eye"></i> Our Vision</h2>
-            </div>
-            <div class="vision-card">
-                <h3>Democratize Education</h3>
-                <p>We aim to build the world's largest knowledge-sharing network where education is free, collaborative, and powered by community — not money.</p>
-            </div>
-        </div>
-
-        <!-- Founder Section -->
-        <div class="section">
-            <div class="section-header">
-                <h2><i class="fa-solid fa-user"></i> Built By</h2>
-            </div>
-            <div class="founder-card">
-                <div class="founder-avatar">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-                <h3>Sujay Banarjee</h3>
-                <div class="founder-role">Founder & Developer</div>
-                <div class="founder-college">B.Tech CSE — LPU</div>
-                <p class="founder-bio">Passionate about building products that solve real problems for students and revolutionize education.</p>
-            </div>
-        </div>
-
-        <!-- CTA Section -->
-        <div class="cta-section">
-            <h2>Join the Movement</h2>
-            <p>Start learning, teaching, and growing — without spending money.</p>
-            <div class="cta-buttons">
-                <a href="explore.html" class="btn-primary">
-                    <i class="fa-solid fa-compass"></i> Explore Skills
-                </a>
-                <a href="index.html" class="btn-secondary">
-                    <i class="fa-solid fa-house"></i> Go Home
-                </a>
-            </div>
-        </div>
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grid"></div>
+  <div class="fnodes" aria-hidden="true">
+    <div class="fn" style="top:22%;left:7%;--ft:6s;--fd:alternate"><div class="fn-d" style="background:#5b5ef7;box-shadow:0 0 7px #5b5ef7"></div>Python</div>
+    <div class="fn" style="top:28%;right:8%;--ft:8s;--fd:alternate-reverse"><div class="fn-d" style="background:#34d399;box-shadow:0 0 7px #34d399"></div>UI Design</div>
+    <div class="fn" style="bottom:28%;left:9%;--ft:7s;--fd:alternate"><div class="fn-d" style="background:#fbbf24;box-shadow:0 0 7px #fbbf24"></div>Guitar</div>
+    <div class="fn" style="bottom:24%;right:9%;--ft:9s;--fd:alternate-reverse"><div class="fn-d" style="background:#a855f7;box-shadow:0 0 7px #a855f7"></div>Data Science</div>
+    <div class="fn" style="top:55%;left:5%;--ft:5s;--fd:alternate"><div class="fn-d" style="background:#38bdf8;box-shadow:0 0 7px #38bdf8"></div>Finance</div>
+    <div class="fn" style="top:50%;right:6%;--ft:6.5s;--fd:alternate-reverse"><div class="fn-d" style="background:#fb923c;box-shadow:0 0 7px #fb923c"></div>Writing</div>
+  </div>
+  <div class="hero-c">
+    <div class="hbadge"><div class="hbadge-dot"></div>India's first skill exchange platform</div>
+    <h1 class="hero-h1">Trade Skills.<span class="hero-h1-em">Not Money.</span></h1>
+    <p class="hero-p">SkillSwap is a peer-to-peer learning marketplace where students exchange knowledge freely — built by a student, for every student.</p>
+    <div class="hero-acts">
+      <a href="explore.html" class="btn-p"><i class="fa-solid fa-compass"></i> Explore Skills</a>
+      <a href="#mission" class="btn-g"><i class="fa-solid fa-arrow-down"></i> Our Story</a>
     </div>
+  </div>
+  <div class="s-cue" aria-hidden="true"><div class="s-line"></div>Scroll</div>
+</section>
 
-    <!-- Footer -->
-    <footer>
-        &copy; 2026 SkillSwap — Trade Skills. Not Money.
-    </footer>
+<!-- MARQUEE -->
+<div class="belt" aria-hidden="true">
+  <div class="belt-row">
+    <span class="bi"><i class="fa-solid fa-bolt"></i>Peer Learning<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-code"></i>Programming<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-music"></i>Music<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-palette"></i>Design<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-language"></i>Languages<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-chart-line"></i>Finance<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-brain"></i>Data Science<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-dumbbell"></i>Fitness<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-pen-nib"></i>Writing<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-flask"></i>Chemistry<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-bolt"></i>Peer Learning<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-code"></i>Programming<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-music"></i>Music<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-palette"></i>Design<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-language"></i>Languages<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-chart-line"></i>Finance<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-brain"></i>Data Science<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-dumbbell"></i>Fitness<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-pen-nib"></i>Writing<span>·</span></span>
+    <span class="bi"><i class="fa-solid fa-flask"></i>Chemistry<span>·</span></span>
+  </div>
+</div>
 
+<!-- ══ STATS ══ -->
+<section class="sec"><div class="inner">
+  <div class="cstrip rv">
+    <div class="ccell">
+      <div class="cnum" style="color:#a5b4fc" data-to="10000">0</div>
+      <div class="clbl">Students</div><div class="cdesc">Active learners &amp; teachers</div>
+    </div>
+    <div class="ccell">
+      <div class="cnum" style="color:#d8b4fe" data-to="500">0</div>
+      <div class="clbl">Skill Categories</div><div class="cdesc">From code to music</div>
+    </div>
+    <div class="ccell">
+      <div class="cnum" style="color:#7dd3fc" data-to="25000">0</div>
+      <div class="clbl">Sessions Done</div><div class="cdesc">Hours of knowledge shared</div>
+    </div>
+    <div class="ccell">
+      <div class="cnum" style="background:linear-gradient(135deg,#34d399,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">&#8377;0</div>
+      <div class="clbl">Cost to Learn</div><div class="cdesc">Free forever, by design</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ PROBLEM ══ -->
+<section class="sec" id="mission"><div class="inner">
+  <div class="rv" style="margin-bottom:56px">
+    <div class="sec-lbl"><i class="fa-solid fa-triangle-exclamation"></i> The Problem</div>
+    <h2 class="sec-h2">Education is<br>quietly broken.</h2>
+    <p class="sec-p">Millions of talented students have the skills to teach — but no platform to share them. Meanwhile others can't afford quality learning. Both sides lose.</p>
+  </div>
+  <div class="pgrid">
+    <div class="pc rv" style="transition-delay:.05s">
+      <div class="pc-num">01</div>
+      <div class="p-ico"><i class="fa-solid fa-indian-rupee-sign" style="color:#f43f5e"></i></div>
+      <h3>Education Costs a Fortune</h3>
+      <p>Premium courses run &#8377;10,000&#8211;&#8377;1,00,000+. Quality tutoring costs lakhs. Good education has become a privilege, locked behind a paywall most students can't cross.</p>
+    </div>
+    <div class="pc rv" style="transition-delay:.1s">
+      <div class="pc-num">02</div>
+      <div class="p-ico"><i class="fa-solid fa-ghost" style="color:#f43f5e"></i></div>
+      <h3>Skills Die Unused</h3>
+      <p>Students master Python, music, design, finance — but have no platform to teach, share, or earn from their hard-won expertise. Knowledge that could change lives sits idle.</p>
+    </div>
+    <div class="pc rv" style="transition-delay:.15s">
+      <div class="pc-num">03</div>
+      <div class="p-ico"><i class="fa-solid fa-shield-halved" style="color:#f43f5e"></i></div>
+      <h3>Zero Trust Ecosystem</h3>
+      <p>Finding a reliable peer tutor is a minefield. Scams, no-shows, unqualified teachers — without accountability, peer learning never scales past word-of-mouth.</p>
+    </div>
+    <div class="pc rv" style="transition-delay:.2s">
+      <div class="pc-num">04</div>
+      <div class="p-ico"><i class="fa-solid fa-earth-asia" style="color:#f43f5e"></i></div>
+      <h3>Geography Limits Potential</h3>
+      <p>The best teachers cluster in metro cities. Students in tier-2 and tier-3 towns get the leftovers. Your ZIP code should never decide your destiny.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="sec" style="background:linear-gradient(rgba(91,94,247,.04),transparent)"><div class="inner">
+  <div class="rv" style="margin-bottom:56px;text-align:center">
+    <div class="sec-lbl" style="margin:0 auto 18px"><i class="fa-solid fa-arrows-spin"></i> How It Works</div>
+    <h2 class="sec-h2" style="text-align:center">Three steps to<br>unlock any skill</h2>
+  </div>
+  <div class="how rv">
+    <div class="hstep">
+      <div class="hring"><div class="hn">01</div></div>
+      <h3>Post Your Skill</h3>
+      <p>List what you're good at — coding, music, design, languages. Set a rate or offer it as a free swap.</p>
+    </div>
+    <div class="hstep">
+      <div class="hring"><div class="hn">02</div></div>
+      <h3>Match &amp; Connect</h3>
+      <p>Browse verified experts, read real reviews, and book a live session in seconds.</p>
+    </div>
+    <div class="hstep">
+      <div class="hring"><div class="hn">03</div></div>
+      <h3>Learn &amp; Grow</h3>
+      <p>Exchange skills, earn reputation, build your network — all on one platform.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ SOLUTION BENTO ══ -->
+<section class="sec"><div class="inner">
+  <div class="rv" style="margin-bottom:56px">
+    <div class="sec-lbl"><i class="fa-solid fa-lightbulb"></i> Our Solution</div>
+    <h2 class="sec-h2">A marketplace where<br>knowledge is the currency.</h2>
+    <p class="sec-p">Every feature is designed to remove barriers between the person who knows and the person who wants to learn.</p>
+  </div>
+  <div class="bento rv">
+    <div class="bc c7 vi bc-big">
+      <div class="bc-t">
+        <div class="b-ico" style="background:rgba(91,94,247,.12);color:#a5b4fc"><i class="fa-solid fa-arrows-rotate"></i></div>
+        <h3>Skill-for-Skill Exchange</h3>
+        <p>Teach what you know, learn what you don't. Trade Python for Guitar. Trade Design for Finance. Your skill IS the currency — no rupees needed.</p>
+      </div>
+      <div class="bc-em" style="background:rgba(91,94,247,.1);border:1px solid rgba(91,94,247,.2)">&#128260;</div>
+    </div>
+    <div class="bc c5 gr">
+      <div class="b-ico" style="background:rgba(52,211,153,.12);color:#34d399"><i class="fa-solid fa-shield-check"></i></div>
+      <h3>Verified Experts</h3>
+      <p>Every expert is manually reviewed — certificates, portfolios, skill tests. The badge means something real.</p>
+    </div>
+    <div class="bc c4 am">
+      <div class="b-ico" style="background:rgba(251,191,36,.12);color:#fbbf24"><i class="fa-solid fa-star"></i></div>
+      <h3>Reputation System</h3>
+      <p>Every session earns reviews. Build your profile one star at a time — students and teachers alike.</p>
+    </div>
+    <div class="bc c4 vi">
+      <div class="b-ico" style="background:rgba(168,85,247,.12);color:#d8b4fe"><i class="fa-solid fa-trophy"></i></div>
+      <h3>XP &amp; Levels</h3>
+      <p>Earn XP with every session. Level up from Beginner to Master. Your profile tells your full learning story.</p>
+    </div>
+    <div class="bc c4 sk">
+      <div class="b-ico" style="background:rgba(56,189,248,.12);color:#38bdf8"><i class="fa-solid fa-mobile-screen"></i></div>
+      <h3>Mobile-First</h3>
+      <p>Designed for students on the go. Full-featured experience, no app download required.</p>
+    </div>
+    <div class="bc c8 ro bc-big">
+      <div class="bc-t">
+        <div class="b-ico" style="background:rgba(244,63,94,.12);color:#f43f5e"><i class="fa-solid fa-infinity"></i></div>
+        <h3>Free to Learn, Forever</h3>
+        <p>SkillSwap will never charge students to learn. The core exchange model is free — always. Every student always has the swap option.</p>
+      </div>
+      <div class="bc-em" style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.18)">&#9854;&#65039;</div>
+    </div>
+    <div class="bc c4 vi">
+      <div class="b-ico" style="background:rgba(91,94,247,.12);color:#a5b4fc"><i class="fa-solid fa-users"></i></div>
+      <h3>Real Community</h3>
+      <p>10,000+ students across India. A network of real people — every connection is a door to new knowledge.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ VALUES ══ -->
+<section class="sec"><div class="inner">
+  <div class="rv" style="text-align:center;margin-bottom:52px">
+    <div class="sec-lbl" style="margin:0 auto 18px"><i class="fa-solid fa-heart"></i> Our Values</div>
+    <h2 class="sec-h2" style="text-align:center">What we stand for</h2>
+    <p style="color:var(--mist);font-size:.95rem;margin-top:12px">Hover each card to see what it really means.</p>
+  </div>
+  <div class="vals">
+    <div class="vw rv" style="transition-delay:.04s">
+      <div class="vi2">
+        <div class="vf"><div class="vem">&#127760;</div><div class="vnm">Open Access</div></div>
+        <div class="vb" style="background:linear-gradient(135deg,rgba(91,94,247,.22),rgba(91,94,247,.08));border-color:rgba(91,94,247,.35)">
+          <p>Knowledge belongs to everyone. No paywall should stand between a student and their potential. We build for access, never exclusion.</p>
+        </div>
+      </div>
+    </div>
+    <div class="vw rv" style="transition-delay:.1s">
+      <div class="vi2">
+        <div class="vf"><div class="vem">&#129309;</div><div class="vnm">Radical Trust</div></div>
+        <div class="vb" style="background:linear-gradient(135deg,rgba(52,211,153,.2),rgba(52,211,153,.06));border-color:rgba(52,211,153,.35)">
+          <p>Our verification system, review layer, and community standards make every exchange trustworthy. Trust is infrastructure, not a feature.</p>
+        </div>
+      </div>
+    </div>
+    <div class="vw rv" style="transition-delay:.16s">
+      <div class="vi2">
+        <div class="vf"><div class="vem">&#9889;</div><div class="vnm">Student-Powered</div></div>
+        <div class="vb" style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.05));border-color:rgba(251,191,36,.35)">
+          <p>Built by a student, for students. Every product decision starts with one question: does this help a student learn better? Nothing else.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ VISION ══ -->
+<section class="sec"><div class="inner">
+  <div class="vision rv sc">
+    <div class="vgrid"></div>
+    <div class="sec-lbl" style="margin-bottom:26px"><i class="fa-solid fa-eye"></i> Our Vision</div>
+    <div class="vq">Build the world's largest<br><em>student-powered learning network</em><br>where education is free,<br>collaborative, and deeply human.</div>
+    <p class="vbody">We don't believe education should be gated behind a credit card. <strong>The smartest, most effective teachers are often the students who learned it just last year</strong> — and we're building the infrastructure to let them reach every corner of India, and eventually the world.</p>
+  </div>
+</div></section>
+
+<!-- ══ FOUNDER ══ -->
+<section class="sec"><div class="inner">
+  <div class="rv" style="margin-bottom:52px">
+    <div class="sec-lbl"><i class="fa-solid fa-user-astronaut"></i> The Builder</div>
+    <h2 class="sec-h2">Built by one student,<br>for all of them.</h2>
+  </div>
+  <div class="flayout">
+    <div class="fcard rv">
+      <div class="fav-w"><div class="fav"><i class="fa-solid fa-user"></i></div><div class="fring"></div></div>
+      <div class="fnm">Sujay Banarjee</div>
+      <div class="frole">Founder &amp; Developer</div>
+      <div class="fcollege">B.Tech CSE &#8212; Lovely Professional University</div>
+      <p class="fbio">A developer obsessed with solving real student problems. Started SkillSwap from a hostel room after struggling to find affordable tutors &#8212; and realising the perfect teacher was sitting in the next classroom.</p>
+      <div class="flinks">
+        <a href="#" class="flink" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="#" class="flink" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="#" class="flink" title="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+      </div>
+    </div>
+    <div class="rv" style="transition-delay:.14s">
+      <h3 class="storyh">Why I built<br><em>SkillSwap</em></h3>
+      <p class="sl">In my first semester, I needed help with DSA. Every coaching centre wanted &#8377;15,000 upfront. I couldn't afford it &#8212; but my senior Ashish could teach DSA, and I could teach her Figma. We swapped. It changed everything.</p>
+      <div class="sq">"What if every student had a Ashish? What if every student with a skill had someone to teach &#8212; and earn from &#8212; at zero friction?"</div>
+      <p class="sl">SkillSwap is the answer to that question. Shipped entirely solo, growing by word of mouth, because the idea just makes sense for a generation priced out of traditional education.</p>
+      <div style="margin-top:6px">
+        <div style="font-size:.68rem;font-weight:800;color:var(--fog);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Built with</div>
+        <div class="tchips">
+          <span class="tc"><i class="fa-brands fa-html5" style="color:#e44d26"></i> HTML5</span>
+          <span class="tc"><i class="fa-brands fa-css3-alt" style="color:#2965f1"></i> CSS3</span>
+          <span class="tc"><i class="fa-brands fa-js" style="color:#f7df1e"></i> JavaScript</span>
+          <span class="tc"><i class="fa-solid fa-fire" style="color:#ffca28"></i> Firebase</span>
+          <span class="tc"><i class="fa-solid fa-mobile-screen" style="color:var(--indigo)"></i> PWA Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ ROADMAP ══ -->
+<section class="sec" style="background:linear-gradient(rgba(91,94,247,.03),transparent)"><div class="inner">
+  <div class="rv" style="margin-bottom:52px">
+    <div class="sec-lbl"><i class="fa-solid fa-map"></i> Roadmap</div>
+    <h2 class="sec-h2">Where we're headed</h2>
+    <p class="sec-p">Transparent about the journey. Here's what's shipped, live, and coming next.</p>
+  </div>
+  <div class="tlgrid">
+    <div class="tl rv">
+      <div class="tlr done"><div class="tldot"></div><span class="tltag d">Shipped</span><h4>Core Skill Exchange</h4><p>Browse, post, and request skills. Matching and in-app messaging.</p></div>
+      <div class="tlr done"><div class="tldot"></div><span class="tltag d">Shipped</span><h4>Expert Verification</h4><p>Document upload, admin review, and the verified badge on profiles.</p></div>
+      <div class="tlr done"><div class="tldot"></div><span class="tltag d">Shipped</span><h4>Reviews &amp; Ratings</h4><p>Post-session feedback with star ratings and written reviews.</p></div>
+      <div class="tlr live"><div class="tldot"></div><span class="tltag l">Live Now</span><h4>Expert Dashboard</h4><p>Full earnings tracking, session management, and payout requests.</p></div>
+    </div>
+    <div class="tl rv" style="transition-delay:.15s">
+      <div class="tlr"><div class="tldot"></div><span class="tltag n">Coming Soon</span><h4>Live Video Sessions</h4><p>In-platform video calling &#8212; sessions stay on SkillSwap.</p></div>
+      <div class="tlr"><div class="tldot"></div><span class="tltag n">Coming Soon</span><h4>Skill Credits Economy</h4><p>Universal credits: teach to earn them, spend them to learn anything.</p></div>
+      <div class="tlr"><div class="tldot"></div><span class="tltag n">Coming Soon</span><h4>College Chapters</h4><p>Campus communities &#8212; find peers from your own college first.</p></div>
+      <div class="tlr"><div class="tldot"></div><span class="tltag n">Coming Soon</span><h4>AI-Powered Matching</h4><p>Smarter pairings based on learning style, schedule, and goals.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ══ CTA ══ -->
+<section class="sec"><div class="inner">
+  <div class="cta rv sc">
+    <div class="cta-lbl"><i class="fa-solid fa-bolt" style="margin-right:6px"></i>Free forever &#183; No credit card</div>
+    <h2 class="cta-h">Ready to swap<br>your <em>first skill?</em></h2>
+    <p class="cta-p">Join 10,000+ students already learning, teaching, and growing on SkillSwap &#8212; at zero cost.</p>
+    <div class="cta-row">
+      <a href="explore.html" class="btn-p" style="font-size:.96rem;padding:15px 34px"><i class="fa-solid fa-compass"></i> Explore Skills</a>
+      <a href="expert-registration.html" class="btn-g" style="font-size:.96rem;padding:15px 34px"><i class="fa-solid fa-star"></i> Become an Expert</a>
+    </div>
+  </div>
+</div></section>
+
+<footer>
+  <a href="index.html" class="ft-logo"><div class="ft-spark"><i class="fa-solid fa-bolt"></i></div> SkillSwap</a>
+  <span>&#169; 2026 SkillSwap &#8212; Trade Skills. Not Money.</span>
+  <div class="ft-links">
+    <a href="index.html">Home</a><a href="explore.html">Explore</a>
+    <a href="about.html" style="color:var(--snow)">About</a><a href="profile.html">Profile</a>
+  </div>
+</footer>
+
+<nav class="mob-bottom">
+  <a href="index.html" class="mob-btn"><i class="fa-solid fa-house"></i>Home</a>
+  <a href="explore.html" class="mob-btn"><i class="fa-solid fa-compass"></i>Explore</a>
+  <a href="about.html" class="mob-btn on"><i class="fa-solid fa-circle-info"></i>About</a>
+  <a href="profile.html" class="mob-btn"><i class="fa-solid fa-user"></i>Profile</a>
+</nav>
+
+<script>
+/* GRAIN */
+(function(){
+  const c=document.getElementById('grain'),x=c.getContext('2d');
+  let W,H;
+  const r=()=>{c.width=W=innerWidth;c.height=H=innerHeight};
+  r();addEventListener('resize',r);
+  const t=()=>{const d=x.createImageData(W,H),b=d.data;for(let i=0;i<b.length;i+=4){const v=Math.random()*255|0;b[i]=b[i+1]=b[i+2]=v;b[i+3]=12;}x.putImageData(d,0,0);requestAnimationFrame(t)};
+  t();
+})();
+
+/* WEBGL PARTICLES */
+(function(){
+  const cv=document.getElementById('hero-canvas');
+  const gl=cv.getContext('webgl')||cv.getContext('experimental-webgl');
+  if(!gl)return;
+  const resize=()=>{cv.width=cv.parentElement.offsetWidth;cv.height=cv.parentElement.offsetHeight;gl.viewport(0,0,cv.width,cv.height)};
+  resize();addEventListener('resize',resize);
+  const N=180;
+  const pos=new Float32Array(N*2),vel=new Float32Array(N*2),clr=new Float32Array(N*3),sz=new Float32Array(N);
+  const pal=[[.36,.37,.97],[.66,.33,.97],[.22,.83,.93],[.20,.83,.60]];
+  for(let i=0;i<N;i++){
+    pos[i*2]=Math.random()*2-1;pos[i*2+1]=Math.random()*2-1;
+    const a=Math.random()*Math.PI*2,s=.0003+Math.random()*.0006;
+    vel[i*2]=Math.cos(a)*s;vel[i*2+1]=Math.sin(a)*s;
+    const p=pal[Math.floor(Math.random()*pal.length)];
+    clr[i*3]=p[0];clr[i*3+1]=p[1];clr[i*3+2]=p[2];
+    sz[i]=2+Math.random()*4;
+  }
+  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
+  const vs=`attribute vec2 a_p;attribute vec3 a_c;attribute float a_s;varying vec3 v_c;varying float v_d;void main(){v_c=a_c;v_d=length(a_p);gl_Position=vec4(a_p,0.,1.);gl_PointSize=a_s*(1.-v_d*.5);}`;
+  const fs=`precision mediump float;varying vec3 v_c;varying float v_d;void main(){vec2 c=gl_PointCoord-.5;if(length(c)>.5)discard;float a=(1.-length(c)*2.)*(1.-v_d*.6)*.65;gl_FragColor=vec4(v_c,a);}`;
+  const prog=gl.createProgram();
+  gl.attachShader(prog,mk(gl.VERTEX_SHADER,vs));
+  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(prog);gl.useProgram(prog);
+  const pb=gl.createBuffer(),cb=gl.createBuffer(),sb=gl.createBuffer();
+  const ap=gl.getAttribLocation(prog,'a_p'),ac=gl.getAttribLocation(prog,'a_c'),as_=gl.getAttribLocation(prog,'a_s');
+  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  let mx=0,my=0;
+  cv.parentElement.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)/r.width*2-1;my=-((e.clientY-r.top)/r.height*2-1)});
+  const draw=()=>{
+    for(let i=0;i<N;i++){
+      pos[i*2]+=vel[i*2];pos[i*2+1]+=vel[i*2+1];
+      if(pos[i*2]>1.2)pos[i*2]=-1.2;if(pos[i*2]<-1.2)pos[i*2]=1.2;
+      if(pos[i*2+1]>1.2)pos[i*2+1]=-1.2;if(pos[i*2+1]<-1.2)pos[i*2+1]=1.2;
+      const dx=pos[i*2]-mx,dy=pos[i*2+1]-my,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<.25){const f=(.25-d)/.25*.006;vel[i*2]+=dx/d*f;vel[i*2+1]+=dy/d*f}
+      vel[i*2]*=.999;vel[i*2+1]*=.999;
+    }
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,pos,gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,2,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,cb);gl.bufferData(gl.ARRAY_BUFFER,clr,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(ac);gl.vertexAttribPointer(ac,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,sb);gl.bufferData(gl.ARRAY_BUFFER,sz,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(as_);gl.vertexAttribPointer(as_,1,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.POINTS,0,N);
+    requestAnimationFrame(draw);
+  };
+  draw();
+})();
+
+/* CURSOR */
+(function(){
+  const c=document.getElementById('cur'),o=document.getElementById('cur-o');
+  let mx=0,my=0,rx=0,ry=0;
+  addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  document.querySelectorAll('a,button,.vw,.bc,.pc,.hstep').forEach(el=>{
+    el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));
+    el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));
+  });
+  const t=()=>{
+    c.style.left=mx+'px';c.style.top=my+'px';
+    rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+    o.style.left=rx+'px';o.style.top=ry+'px';
+    requestAnimationFrame(t);
+  };
+  t();
+})();
+
+/* NAV SCROLL */
+addEventListener('scroll',()=>document.getElementById('mainNav').classList.toggle('scrolled',scrollY>60));
+
+/* SCROLL REVEAL */
+(function(){
+  const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -36px 0px'});
+  document.querySelectorAll('.rv,.sc').forEach(el=>io.observe(el));
+})();
+
+/* COUNTERS */
+(function(){
+  const io=new IntersectionObserver(en=>{
+    en.forEach(e=>{
+      if(!e.isIntersecting)return;
+      const el=e.target,target=parseInt(el.dataset.to),big=target>=10000;
+      let st=0;
+      const t=ts=>{if(!st)st=ts;const p=Math.min((ts-st)/2000,1),ease=1-Math.pow(1-p,4),cur=Math.floor(ease*target);el.textContent=big?Math.round(cur/1000)+'K+':(cur+'+');if(p<1)requestAnimationFrame(t);else el.textContent=big?(Math.round(target/1000)+'K+'):(target+'+')};
+      requestAnimationFrame(t);io.unobserve(el);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('[data-to]').forEach(el=>io.observe(el));
+})();
+</script>
 </body>
 </html>
