@@ -792,6 +792,26 @@ if (!user || user.role !== "admin") {
   </div>
 </div>
 
+<!-- FILE PREVIEW MODAL -->
+<div class="modal-overlay" id="filePreviewModal" onclick="if(event.target===this)closeFilePreview()">
+  <div class="modal" style="max-width:820px;width:95vw">
+    <div class="modal-header">
+      <div class="nav-icon" style="background:rgba(79,142,255,0.15);color:var(--primary)"><i class="fas fa-file-alt"></i></div>
+      <span class="modal-title" id="filePreviewTitle">Document</span>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <a id="filePreviewDownload" href="#" download class="btn btn-primary btn-sm" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <a id="filePreviewOpen" href="#" target="_blank" class="btn btn-ghost btn-sm">
+          <i class="fas fa-external-link-alt"></i> Open
+        </a>
+        <button class="modal-close" onclick="closeFilePreview()"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="modal-body" id="filePreviewBody" style="padding:16px;min-height:200px"></div>
+  </div>
+</div>
+
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
@@ -1831,9 +1851,9 @@ window.renderExpertApps = function() {
   }
   tbody.innerHTML = data.map(a => {
     const docsBadges = [
-      (a.certificateURL || a.certificate?.data) ? `<span title="Certificate" style="color:var(--emerald)"><i class="fas fa-certificate"></i></span>` : '',
-      (a.resumeURL || a.resume?.data) ? `<span title="Resume" style="color:var(--primary)"><i class="fas fa-file-lines"></i></span>` : '',
-      (a.sampleURL || a.workSample?.data) ? `<span title="Work Sample" style="color:var(--cyan)"><i class="fas fa-image"></i></span>` : '',
+      (a.certificateURL || a.certificate?.name) ? `<span title="Certificate: ${a.certificate?.name||''}" style="color:var(--emerald)"><i class="fas fa-certificate"></i></span>` : '',
+      (a.resumeURL || a.resume?.name) ? `<span title="Resume: ${a.resume?.name||''}" style="color:var(--primary)"><i class="fas fa-file-lines"></i></span>` : '',
+      (a.sampleURL || a.workSample?.name) ? `<span title="Work Sample: ${a.workSample?.name||''}" style="color:var(--cyan)"><i class="fas fa-image"></i></span>` : '',
     ].filter(Boolean).join(' ');
     const levelColor = a.level==='Expert'?'var(--violet)':a.level==='Advanced'?'var(--primary)':'var(--amber)';
     return `<tr>
@@ -1870,20 +1890,31 @@ window.viewExpertApp = function(id) {
     a.github && `<a href="${a.github}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fab fa-github"></i> GitHub</a>`,
     a.youtube && `<a href="${a.youtube}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fab fa-youtube"></i> YouTube</a>`,
   ].filter(Boolean).join('<span style="color:var(--muted);margin:0 4px">·</span>');
-  // Helper: make download link from either URL or base64
+  // Helper: render a clickable file button that opens a preview/download modal
   const docLink = (field, urlField, label, icon, cls) => {
-    if (urlField) return `<a href="${urlField}" target="_blank" class="btn ${cls} btn-sm"><i class="fas fa-${icon}"></i> ${label}</a>`;
-    if (field?.data) {
-      const ext = field.name?.split('.').pop() || 'file';
-      return `<a href="${field.data}" download="${field.name||label+'.'+ext}" class="btn ${cls} btn-sm"><i class="fas fa-${icon}"></i> ${label} <i class="fas fa-download" style="font-size:0.65rem;opacity:0.7"></i></a>`;
+    if (!urlField && !field?.name) return '';
+    const sizeKB  = field?.size ? ' · ' + Math.round(field.size / 1024) + ' KB' : '';
+    const fname   = field?.name || label;
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fname);
+    const isPdf   = /\.pdf$/i.test(fname);
+    if (urlField) {
+      // We have a real URL — show View + Download buttons
+      const viewBtn = isImage
+        ? `<button class="btn ${cls} btn-sm" onclick="previewFile('${urlField}','image','${fname}')" title="Preview ${fname}${sizeKB}"><i class="fas fa-${icon}"></i> ${label}</button>`
+        : isPdf
+          ? `<button class="btn ${cls} btn-sm" onclick="previewFile('${urlField}','pdf','${fname}')" title="Preview ${fname}${sizeKB}"><i class="fas fa-${icon}"></i> ${label}</button>`
+          : `<a href="${urlField}" target="_blank" class="btn ${cls} btn-sm" title="${fname}${sizeKB}"><i class="fas fa-${icon}"></i> ${label}</a>`;
+      const dlBtn = `<a href="${urlField}" download="${fname}" target="_blank" class="btn btn-ghost btn-sm" title="Download ${fname}"><i class="fas fa-download"></i></a>`;
+      return viewBtn + dlBtn;
     }
-    return '';
+    // No URL yet — show greyed-out label (upload may still be processing)
+    return `<span class="btn btn-ghost btn-sm" style="opacity:0.5;cursor:default" title="${fname}${sizeKB} — upload URL not yet available"><i class="fas fa-${icon}"></i> ${label} <i class="fas fa-clock" style="font-size:0.6rem;margin-left:2px"></i></span>`;
   };
   const docs = [
     docLink(a.certificate, a.certificateURL, 'Certificate', 'certificate', 'btn-success'),
-    docLink(a.resume, a.resumeURL, 'Resume', 'file-lines', 'btn-primary'),
-    docLink(a.workSample, a.sampleURL, 'Sample', 'image', 'btn-ghost'),
-  ].filter(Boolean).join('');
+    docLink(a.resume,      a.resumeURL,      'Resume',      'file-lines',  'btn-primary'),
+    docLink(a.workSample,  a.sampleURL,      'Sample',      'image',       'btn-violet'),
+  ].filter(Boolean).join(' ');
   const extraSkills = Array.isArray(a.extraSkills) && a.extraSkills.length
     ? a.extraSkills.map(s=>`<span style="padding:2px 10px;border-radius:99px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#818cf8;font-size:0.75rem;font-weight:600">${s}</span>`).join(' ')
     : '<span style="color:var(--muted);font-size:0.8rem">None added</span>';
@@ -1976,7 +2007,39 @@ window.exportExperts = function() {
   URL.revokeObjectURL(url);
 };
 
-// ─── REFRESH ───
+// ─── FILE PREVIEW ───
+window.previewFile = function(url, type, name) {
+  const modal   = document.getElementById('filePreviewModal');
+  const title   = document.getElementById('filePreviewTitle');
+  const body    = document.getElementById('filePreviewBody');
+  const dlBtn   = document.getElementById('filePreviewDownload');
+  const openBtn = document.getElementById('filePreviewOpen');
+  title.textContent = name || 'Document';
+  dlBtn.href        = url;
+  dlBtn.download    = name || 'document';
+  openBtn.href      = url;
+  if (type === 'image') {
+    body.innerHTML = `<img src="${url}" alt="${name}"
+      style="max-width:100%;max-height:70vh;border-radius:10px;display:block;margin:0 auto;"
+      onerror="this.outerHTML='<div style=\'color:var(--rose);text-align:center;padding:40px\'>&#x26A0; Could not load image.</div>'">`;
+  } else {
+    // PDF — embed in iframe; fallback link if browser blocks it
+    body.innerHTML = `
+      <iframe src="${url}" style="width:100%;height:70vh;border:none;border-radius:10px;background:#fff"
+        onerror="this.outerHTML='<div style=\'text-align:center;padding:40px;color:var(--muted2)\'>Browser blocked inline PDF. Use the Download button above.</div>'">
+      </iframe>
+      <div style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--muted)">
+        If the PDF does not appear, <a href="${url}" target="_blank" style="color:var(--primary)">open in a new tab</a> or use the Download button.
+      </div>`;
+  }
+  modal.classList.add('open');
+};
+window.closeFilePreview = function() {
+  const modal = document.getElementById('filePreviewModal');
+  modal.classList.remove('open');
+  document.getElementById('filePreviewBody').innerHTML = '';
+};
+
 window.refreshAll = function() {
   showToast('Data refreshing (live)...','info');
 }

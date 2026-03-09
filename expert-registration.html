@@ -208,7 +208,7 @@ nav, .hero-banner, .steps-bar, .form-outer, .success-view, .toast-wrap {
 .field label span.req { color:var(--rose); margin-left:2px; }
 .field-hint { font-size:.72rem; color:var(--muted); margin-top:-3px; }
 
-input, textarea, select {
+input:not([type=checkbox]):not([type=radio]), textarea, select {
   padding:12px 14px;
   background:rgba(255,255,255,.04);
   border:1px solid var(--border);
@@ -221,13 +221,26 @@ input, textarea, select {
   -webkit-appearance:none;
   width:100%;
 }
-input::placeholder, textarea::placeholder { color:var(--muted); }
-input:focus, textarea:focus, select:focus {
+
+/* Checkboxes — keep native appearance so they actually work */
+input[type=checkbox], input[type=radio] {
+  -webkit-appearance: auto;
+  appearance: auto;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--primary);
+  margin: 0;
+}
+input:not([type=checkbox]):not([type=radio])::placeholder, textarea::placeholder { color:var(--muted); }
+input:not([type=checkbox]):not([type=radio]):focus, textarea:focus, select:focus {
   border-color:rgba(99,102,241,.5);
   background:rgba(99,102,241,.04);
   box-shadow:0 0 0 3px rgba(99,102,241,.1);
 }
-input.error { border-color:rgba(244,63,94,.5); background:rgba(244,63,94,.04); }
+input:not([type=checkbox]):not([type=radio]).error { border-color:rgba(244,63,94,.5); background:rgba(244,63,94,.04); }
 textarea { min-height:120px; resize:vertical; }
 select { cursor:pointer; }
 select option { background:var(--bg2); color:var(--text); }
@@ -332,10 +345,9 @@ select option { background:var(--bg2); color:var(--text); }
 }
 .agreement-box strong { color:var(--text); }
 .check-row { display:flex; align-items:flex-start; gap:12px; margin-top:14px; cursor:pointer; position:relative; z-index:10; }
-.check-row input[type=checkbox] { width:20px; height:20px; min-width:20px; flex-shrink:0; margin-top:2px; accent-color:var(--primary); cursor:pointer; border-radius:5px; position:relative; z-index:11; }
-.check-row span { font-size:.82rem; color:var(--muted2); line-height:1.6; cursor:pointer; }
-.check-row span a { color:var(--primary2); text-decoration:none; }
-.check-row span a:hover { text-decoration:underline; }
+.check-row label { font-size:.82rem; color:var(--muted2); line-height:1.6; cursor:pointer; }
+.check-row label a { color:var(--primary2); text-decoration:none; }
+.check-row label a:hover { text-decoration:underline; }
 
 /* ─── BUTTONS ─── */
 .btn-row { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-top:24px; }
@@ -460,8 +472,14 @@ select option { background:var(--bg2); color:var(--text); }
   <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
 </nav>
 
+<!-- LOADING SCREEN (shown while auth/status check runs) -->
+<div id="loadingScreen" style="position:fixed;inset:0;background:#06080f;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="width:48px;height:48px;border-radius:50%;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;animation:spin 0.8s linear infinite;"></div>
+  <div style="font-size:.85rem;color:#6b7280;font-weight:500;">Checking your status&hellip;</div>
+</div>
+
 <!-- HERO -->
-<div class="hero-banner" id="heroSection">
+<div class="hero-banner" id="heroSection" style="display:none;">
   <div class="hero-eyebrow"><i class="fa-solid fa-star"></i> Expert Program</div>
   <h1>Share Your Mastery,<br><span>Earn What You Deserve</span></h1>
   <p>Apply to become a verified SkillSwap Expert. Teach what you've mastered, set your own rates, and build a real reputation in your field.</p>
@@ -474,7 +492,7 @@ select option { background:var(--bg2); color:var(--text); }
 </div>
 
 <!-- PROGRESS STEPS -->
-<div class="steps-bar" id="stepsBar">
+<div class="steps-bar" id="stepsBar" style="display:none;">
   <div class="step active" id="step1">
     <div class="step-circle">1</div>
     <span class="step-label">Profile</span>
@@ -497,7 +515,7 @@ select option { background:var(--bg2); color:var(--text); }
 </div>
 
 <!-- FORM -->
-<div class="form-outer" id="formOuter">
+<div class="form-outer" id="formOuter" style="display:none;">
 
   <!-- STEP 1: Basic Profile -->
   <div class="form-step active" id="fstep1">
@@ -824,7 +842,8 @@ select option { background:var(--bg2); color:var(--text); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
@@ -835,120 +854,393 @@ const firebaseConfig = {
   appId: "1:668466292157:web:9be85414fc752b67779ed4"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// FIX 2: Renamed to firebaseApp to avoid shadowing in showStatusScreen(appData)
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 let currentUser = null;
 
-onAuthStateChanged(auth, user => {
-  if (!user) { window.location.href = "login.html"; }
-  else { currentUser = user; }
-});
+// ── Upload a file to Firebase Storage, return download URL ─────────────
+// Path: expertDocs/{uid}/{docId}/{filename}
+// Shows live progress on the submit button label.
+async function uploadFile(file, path, onProgress) {
+  return new Promise(function(resolve, reject) {
+    const storageRef = ref(storage, path);
+    const task = uploadBytesResumable(storageRef, file);
+    task.on('state_changed',
+      function(snap) {
+        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+        if (onProgress) onProgress(pct);
+      },
+      function(err) { reject(err); },
+      async function() {
+        try { resolve(await getDownloadURL(task.snapshot.ref)); }
+        catch(e) { reject(e); }
+      }
+    );
+  });
+}
 
-window.submitApplication = async function() {
-  // --- Checkbox validation ---
-  const termsChecked = document.getElementById('agreeTerms').checked;
-  const accurateChecked = document.getElementById('agreeAccurate').checked;
-  if (!termsChecked || !accurateChecked) {
-    showToast('Please tick both agreement checkboxes before submitting', 'error');
-    return; // Button never gets disabled here
+// ── DOM helpers ────────────────────────────────────────────────────────
+function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+function show(id, d = 'block') { const el = document.getElementById(id); if (el) el.style.display = d; }
+
+// FIX 3 + 10 + 11: Hide loading screen, show requested section
+function doneLoading() { hide('loadingScreen'); }
+function showForm() {
+  doneLoading();
+  show('heroSection');
+  show('stepsBar', 'flex');
+  show('formOuter');
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Status screen ──────────────────────────────────────────────────────
+// FIX 2: parameter renamed appData (not 'app') — no more Firebase shadowing
+function showStatusScreen(appData) {
+  hide('heroSection'); hide('stepsBar'); hide('formOuter'); hide('successView');
+  doneLoading();
+
+  // Remove any previous status view
+  const old = document.getElementById('statusView');
+  if (old) old.remove();
+
+  const status = appData.status || 'pending';
+  const isRejected = status === 'rejected';
+  const isPending  = status === 'pending';
+  const isApproved = status === 'approved';
+
+  const meta = {
+    pending:  { color:'#f59e0b', bg:'rgba(245,158,11,0.08)',  border:'rgba(245,158,11,0.28)',  icon:'fa-hourglass-half', label:'Under Review',  textColor:'#fcd34d' },
+    approved: { color:'#10b981', bg:'rgba(16,185,129,0.08)',  border:'rgba(16,185,129,0.3)',   icon:'fa-shield-check',   label:'Approved',      textColor:'#6ee7b7' },
+    rejected: { color:'#f43f5e', bg:'rgba(244,63,94,0.08)',   border:'rgba(244,63,94,0.28)',   icon:'fa-circle-xmark',   label:'Not Approved',  textColor:'#fca5a5' },
+  };
+  const m = meta[status] || meta.pending;
+
+  // FIX 5: Build progress steps with string concat (no nested template literals)
+  const progressDefs = [
+    { icon:'fa-paper-plane',      label:'Application Submitted',  subPending:'',                             subApproved:'',                    forceActive: true },
+    { icon:'fa-magnifying-glass', label:'Document Verification',  subPending:'Usually 2&#8211;3 business days', subApproved:'',                 forceActive: false },
+    { icon:'fa-user-check',       label:'Final Review',           subPending:'',                             subApproved:'',                    forceActive: false },
+    { icon:'fa-badge-check',      label:'Expert Badge Granted',   subPending:'',                             subApproved:'Your profile is live!', forceActive: false },
+  ];
+
+  let stepsHtml = '';
+  for (let idx = 0; idx < progressDefs.length; idx++) {
+    const s = progressDefs[idx];
+    const done = s.forceActive || isApproved;
+    const active = isPending && idx === 1;
+    const bgColor = done ? 'rgba(16,185,129,0.15)' : active ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)';
+    const borderColor = done ? '#10b981' : active ? '#f59e0b' : 'rgba(255,255,255,0.08)';
+    const iconCls = active ? 'fa-spinner fa-spin' : done ? 'fa-check' : s.icon;
+    const iconColor = done ? '#10b981' : active ? '#f59e0b' : '#6b7280';
+    const labelColor = done ? '#f0f4ff' : active ? '#fcd34d' : '#6b7280';
+    const sep = idx < progressDefs.length - 1 ? 'border-bottom:1px solid rgba(255,255,255,0.05)' : '';
+    const sub = active && s.subPending ? '<div style="font-size:.72rem;color:#9ca3af;margin-top:2px">' + s.subPending + '</div>' :
+                isApproved && s.subApproved ? '<div style="font-size:.72rem;color:#6ee7b7;margin-top:2px">' + s.subApproved + '</div>' : '';
+    const tick = done ? '<i class="fa-solid fa-check-circle" style="margin-left:auto;color:#10b981;font-size:.9rem;"></i>' : '';
+    stepsHtml += '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;' + sep + '">'
+      + '<div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:' + bgColor + ';border:1.5px solid ' + borderColor + ';">'
+      + '<i class="fa-solid ' + iconCls + '" style="font-size:.78rem;color:' + iconColor + '"></i></div>'
+      + '<div><div style="font-size:.84rem;font-weight:600;color:' + labelColor + '">' + s.label + '</div>' + sub + '</div>'
+      + tick + '</div>';
   }
 
-  const certFile = document.getElementById('certificate').files[0];
-  if (!certFile) { showToast('Certificate upload is required', 'error'); return; }
+  // FIX 6: Apostrophes escaped as HTML entities, no raw ' in innerHTML
+  const headlineText = isApproved ? 'Application Approved!' : isRejected ? 'Not Approved' : 'Under Review';
+  const subtitleText = isApproved
+    ? 'Congratulations! You are now a verified SkillSwap Expert.'
+    : isRejected
+      ? 'Your application did not meet our requirements. Review the feedback and reapply.'
+      : 'Our team is carefully reviewing your application. We&#39;ll notify you by email within 3&#8211;5 business days.';
 
-  // --- Lock button ---
-  const btn = document.getElementById('submitBtn');
-  const originalBtnHTML = btn.innerHTML;
-  const resetBtn = () => { btn.disabled = false; btn.innerHTML = originalBtnHTML; };
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
+  // FIX 7: null-safe extraSkills
+  const extraSkillsSafe = Array.isArray(appData.extraSkills) ? appData.extraSkills : [];
+  let extraSkillsHtml = '';
+  if (extraSkillsSafe.length) {
+    let chips = '';
+    for (let i = 0; i < extraSkillsSafe.length; i++) {
+      chips += '<span style="padding:3px 11px;border-radius:99px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.22);color:#818cf8;font-size:.75rem;font-weight:600;">' + extraSkillsSafe[i] + '</span>';
+    }
+    extraSkillsHtml = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">'
+      + '<div style="font-size:.68rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">Additional Skills</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + chips + '</div></div>';
+  }
+
+  // FIX 5: Summary grid with string concat, no nested template literal
+  const summaryRows = [
+    { label: 'Full Name',    val: appData.fullName   || '&mdash;' },
+    { label: 'Primary Skill',val: appData.skill      || '&mdash;' },
+    { label: 'Category',     val: appData.category   || '&mdash;' },
+    { label: 'Experience',   val: (appData.experience || '&mdash;') + ' yr(s)' },
+    { label: 'Hourly Rate',  val: '&#8377;' + (appData.rate || '&mdash;') + '/hr' },
+    { label: 'City',         val: appData.city        || '&mdash;' },
+  ];
+  let summaryHtml = '';
+  for (let i = 0; i < summaryRows.length; i++) {
+    summaryHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:11px 13px;">'
+      + '<div style="font-size:.68rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">' + summaryRows[i].label + '</div>'
+      + '<div style="font-size:.86rem;font-weight:600;color:#f0f4ff;">' + summaryRows[i].val + '</div></div>';
+  }
+
+  // Admin note
+  const adminNoteHtml = appData.adminNote
+    ? '<div style="margin-bottom:16px;padding:14px 16px;background:' + (isRejected ? 'rgba(244,63,94,0.07)' : 'rgba(16,185,129,0.07)') + ';border:1px solid ' + (isRejected ? 'rgba(244,63,94,0.22)' : 'rgba(16,185,129,0.22)') + ';border-radius:12px;">'
+      + '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' + (isRejected ? '#f43f5e' : '#10b981') + ';margin-bottom:6px;"><i class="fa-solid fa-comment-dots" style="margin-right:5px;"></i>' + (isRejected ? 'Rejection Reason' : 'Admin Note') + '</div>'
+      + '<div style="font-size:.86rem;color:#d1d5db;line-height:1.6">' + appData.adminNote + '</div></div>'
+    : '';
+
+  // FIX 8: Reapply only if rejected AND total apps < 2
+  // appData._totalApps is set by the caller
+  const canReapply = isRejected && (appData._totalApps || 0) < 2;
+  const reapplyHtml = canReapply
+    ? '<div style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:18px 20px;margin-bottom:16px;">'
+      + '<div style="font-weight:700;font-size:.88rem;color:#a5b4fc;margin-bottom:10px;"><i class="fa-solid fa-lightbulb" style="margin-right:6px;color:#f59e0b;"></i>Tips Before Reapplying</div>'
+      + '<div style="display:flex;flex-direction:column;gap:7px;">'
+      + ['Review the rejection reason above carefully', 'Add stronger proof &mdash; certificates, GitHub, portfolio', 'Write a more detailed bio (min 80 characters)', 'Make sure all documents are valid and readable'].map(function(t) {
+          return '<div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:#9ca3af"><i class="fa-solid fa-circle-check" style="color:#10b981;font-size:.75rem;flex-shrink:0;"></i>' + t + '</div>';
+        }).join('')
+      + '</div></div>'
+      + '<button onclick="startReapply()" style="width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-family:\'Syne\',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 6px 24px rgba(99,102,241,0.3);margin-bottom:12px;">'
+      + '<i class="fa-solid fa-rotate-right"></i> Reapply as Expert</button>'
+    : isRejected
+      ? '<div style="padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-align:center;margin-bottom:12px;">'
+        + '<div style="font-size:.82rem;color:#6b7280;"><i class="fa-solid fa-ban" style="margin-right:6px;color:#f43f5e;"></i>You have reached the maximum number of applications (2). No further reapplications are allowed.</div></div>'
+      : '';
+
+  const approvedActionsHtml = isApproved
+    ? '<a href="expert-dashboard.html" style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:13px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-family:\'Syne\',sans-serif;font-size:.92rem;font-weight:700;text-decoration:none;box-shadow:0 6px 24px rgba(16,185,129,0.3);margin-bottom:12px;">'
+      + '<i class="fa-solid fa-chart-line"></i> Go to Expert Dashboard</a>'
+    : '';
+
+  const backLink = !isApproved
+    ? '<a href="profile.html" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:#9ca3af;text-decoration:none;font-size:.88rem;font-weight:600;">'
+      + '<i class="fa-solid fa-arrow-left"></i> Back to Profile</a>'
+    : '<a href="profile.html" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:13px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:#9ca3af;text-decoration:none;font-size:.88rem;font-weight:600;">'
+      + '<i class="fa-solid fa-user"></i> View Profile</a>';
+
+  // FIX 9: statusView gets z-index:50 to stay above bg-layer and fixed nav
+  const sv = document.createElement('div');
+  sv.id = 'statusView';
+  sv.style.cssText = 'max-width:640px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:50;';
+
+  sv.innerHTML = ''
+    // Header
+    + '<div style="text-align:center;padding:40px 0 28px;">'
+    + '<div style="display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:99px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.22);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#818cf8;margin-bottom:20px;"><i class="fa-solid fa-star" style="font-size:.7rem;"></i> Expert Program</div>'
+    + '<div style="width:72px;height:72px;border-radius:50%;background:' + m.bg + ';border:2px solid ' + m.border + ';display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i class="fa-solid ' + m.icon + '" style="font-size:1.6rem;color:' + m.color + ';' + (isPending ? 'animation:spin 3s linear infinite' : '') + '"></i></div>'
+    + '<h2 style="font-family:\'Syne\',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;">Application ' + headlineText + '</h2>'
+    + '<p style="color:#9ca3af;font-size:.9rem;max-width:400px;margin:0 auto;">' + subtitleText + '</p>'
+    + '</div>'
+    // Status banner
+    + '<div style="background:' + m.bg + ';border:1px solid ' + m.border + ';border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:16px;">'
+    + '<div style="width:44px;height:44px;border-radius:12px;background:' + m.bg + ';border:1px solid ' + m.border + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid ' + m.icon + '" style="color:' + m.color + ';font-size:1.1rem;"></i></div>'
+    + '<div style="flex:1;"><div style="font-weight:700;font-size:.9rem;color:' + m.textColor + ';">Status: ' + m.label + '</div>'
+    + '<div style="font-size:.76rem;color:#9ca3af;margin-top:2px;">Applied ' + fmtDate(appData.appliedAt) + ' &bull; ' + (appData.skill || '&mdash;') + ' &bull; &#8377;' + (appData.rate || '&mdash;') + '/hr</div></div>'
+    + '<span style="padding:4px 12px;border-radius:99px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:' + m.bg + ';border:1px solid ' + m.border + ';color:' + m.color + ';">' + status + '</span>'
+    + '</div>'
+    // Summary
+    + '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:16px;">'
+    + '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;margin-bottom:14px;">Application Summary</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' + summaryHtml + '</div>'
+    + extraSkillsHtml + '</div>'
+    // Progress
+    + '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:16px;">'
+    + '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;margin-bottom:4px;">Review Progress</div>'
+    + stepsHtml + '</div>'
+    + adminNoteHtml
+    + reapplyHtml
+    + approvedActionsHtml
+    + backLink;
+
+  document.body.appendChild(sv);
+}
+
+// ── Reapply: hide status, reveal form ─────────────────────────────────
+window.startReapply = function() {
+  const sv = document.getElementById('statusView');
+  if (sv) sv.remove();
+  showForm();
+};
+
+// ── Auth check + initial status fetch ─────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  currentUser = user;
 
   try {
-    // --- Convert files to base64 (avoids Firebase Storage CORS issues) ---
-    const toBase64 = (file) => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve({ data: reader.result, name: file.name, type: file.type, size: file.size });
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+    const q = query(collection(db, 'expertApplications'), where('userId', '==', user.uid));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      // No application — show the form
+      showForm();
+      return;
+    }
+
+    // Sort by date, newest first
+    const apps = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    apps.sort(function(a, b) {
+      return (b.appliedAt && b.appliedAt.seconds ? b.appliedAt.seconds : 0)
+           - (a.appliedAt && a.appliedAt.seconds ? a.appliedAt.seconds : 0);
     });
+    const latest = apps[0];
+    // FIX 8: pass total app count so status screen can enforce 2-app limit
+    latest._totalApps = apps.length;
 
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing files…';
-    const certData = await toBase64(certFile);
+    showStatusScreen(latest);
 
-    let resumeData = null, sampleData = null;
-    const resumeFile = document.getElementById('resume').files[0];
-    if (resumeFile) {
-      if (resumeFile.size > 3 * 1024 * 1024) { showToast('Resume must be under 3MB', 'error'); resetBtn(); return; }
-      resumeData = await toBase64(resumeFile);
-    }
-    const sampleFile = document.getElementById('workSample').files[0];
-    if (sampleFile) {
-      if (sampleFile.size > 3 * 1024 * 1024) { showToast('Work sample must be under 3MB', 'error'); resetBtn(); return; }
-      sampleData = await toBase64(sampleFile);
-    }
+  } catch (e) {
+    console.error('Status check error:', e.code, e.message);
+    // Fail open — show the form so user isn't stuck
+    showForm();
+  }
+});
 
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to database…';
+// ── Submit application ─────────────────────────────────────────────────
+window.submitApplication = async function() {
+  if (!document.getElementById('agreeTerms').checked || !document.getElementById('agreeAccurate').checked) {
+    window.showToast('Please tick both agreement checkboxes before submitting', 'error');
+    return;
+  }
+  const certFile    = document.getElementById('certificate').files[0];
+  const resumeFile  = document.getElementById('resume').files[0];
+  const sampleFile  = document.getElementById('workSample').files[0];
+  if (!certFile) { window.showToast('Certificate upload is required', 'error'); return; }
 
+  const btn = document.getElementById('submitBtn');
+  const origHTML = btn.innerHTML;
+  btn.disabled = true;
+  const resetBtn = function() { btn.disabled = false; btn.innerHTML = origHTML; };
+
+  const setLabel = function(text) {
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + text;
+  };
+
+  try {
     const selectedLevel = document.querySelector('input[name="level"]:checked');
-    const activeDays = Array.from(document.querySelectorAll('.day-btn.on')).map(d => d.textContent.trim());
-    const tagEls = document.querySelectorAll('.skill-tag');
-    const extraSkills = Array.from(tagEls).map(t => t.dataset.val);
+    const activeDays    = Array.from(document.querySelectorAll('.day-btn.on')).map(function(d) { return d.textContent.trim(); });
+    const extraSkills   = Array.from(document.querySelectorAll('.skill-tag')).map(function(t) { return t.dataset.val; });
+    const fileMeta      = function(f) { return f ? { name: f.name, size: f.size, type: f.type } : null; };
 
-    await addDoc(collection(db, 'expertApplications'), {
-      userId: currentUser.uid,
-      userEmail: currentUser.email,
-      fullName: document.getElementById('fullName').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      college: document.getElementById('college').value.trim(),
-      city: document.getElementById('city').value.trim(),
-      bio: document.getElementById('bio').value.trim(),
-      skill: document.getElementById('skill').value.trim(),
-      category: document.getElementById('category').value,
-      experience: document.getElementById('experience').value,
-      rate: Number(document.getElementById('rate').value),
-      level: selectedLevel ? selectedLevel.value : '',
-      extraSkills,
-      availability: activeDays,
-      linkedin: document.getElementById('linkedin').value.trim(),
-      portfolio: document.getElementById('portfolio').value.trim(),
-      github: document.getElementById('github').value.trim(),
-      youtube: document.getElementById('youtube').value.trim(),
-      // Files stored as metadata + base64 (no Storage CORS needed)
-      certificate: certData,
-      resume: resumeData,
-      workSample: sampleData,
-      // Legacy URL fields for admin compatibility
-      certificateURL: '', resumeURL: '', sampleURL: '',
-      status: 'pending',
-      isVerified: false,
-      adminNote: '',
-      appliedAt: serverTimestamp()
+    // ── Step 1: Create Firestore doc first to get a stable ID for the storage path ──
+    setLabel('Creating application&hellip;');
+    const docRef = await addDoc(collection(db, 'expertApplications'), {
+      userId:         currentUser.uid,
+      userEmail:      currentUser.email,
+      fullName:       document.getElementById('fullName').value.trim(),
+      phone:          document.getElementById('phone').value.trim(),
+      college:        document.getElementById('college').value.trim(),
+      city:           document.getElementById('city').value.trim(),
+      bio:            document.getElementById('bio').value.trim(),
+      skill:          document.getElementById('skill').value.trim(),
+      category:       document.getElementById('category').value,
+      experience:     document.getElementById('experience').value,
+      rate:           Number(document.getElementById('rate').value),
+      level:          selectedLevel ? selectedLevel.value : '',
+      extraSkills:    extraSkills,
+      availability:   activeDays,
+      linkedin:       document.getElementById('linkedin').value.trim(),
+      portfolio:      document.getElementById('portfolio').value.trim(),
+      github:         document.getElementById('github').value.trim(),
+      youtube:        document.getElementById('youtube').value.trim(),
+      // Metadata saved regardless — useful if upload fails
+      certificate:    fileMeta(certFile),
+      resume:         fileMeta(resumeFile),
+      workSample:     fileMeta(sampleFile),
+      // URLs start empty, filled after upload below
+      certificateURL: '',
+      resumeURL:      '',
+      sampleURL:      '',
+      status:         'pending',
+      isVerified:     false,
+      adminNote:      '',
+      appliedAt:      serverTimestamp()
     });
 
-    // --- Success ---
-    document.getElementById('heroSection').style.display = 'none';
-    document.getElementById('stepsBar').style.display = 'none';
-    document.getElementById('formOuter').style.display = 'none';
-    document.getElementById('successView').classList.add('show');
+    const appId  = docRef.id;
+    const uid    = currentUser.uid;
+    const base   = 'expertDocs/' + uid + '/' + appId + '/';
 
-  } catch(err) {
-    console.error('Submit error:', err);
+    // ── Step 2: Upload files to Firebase Storage ──────────────────────
+    // Certificate (required)
+    setLabel('Uploading certificate (1/3)&hellip;');
+    const certURL = await uploadFile(certFile, base + 'certificate_' + certFile.name,
+      function(p) { setLabel('Uploading certificate&hellip; ' + p + '%'); });
+
+    // Resume (optional)
+    let resumeURL = '';
+    if (resumeFile) {
+      setLabel('Uploading resume (2/3)&hellip;');
+      resumeURL = await uploadFile(resumeFile, base + 'resume_' + resumeFile.name,
+        function(p) { setLabel('Uploading resume&hellip; ' + p + '%'); });
+    }
+
+    // Work sample (optional)
+    let sampleURL = '';
+    if (sampleFile) {
+      setLabel('Uploading work sample (3/3)&hellip;');
+      sampleURL = await uploadFile(sampleFile, base + 'sample_' + sampleFile.name,
+        function(p) { setLabel('Uploading sample&hellip; ' + p + '%'); });
+    }
+
+    // ── Step 3: Update Firestore doc with real download URLs ───────────
+    setLabel('Saving&hellip;');
+    const { updateDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await updateDoc(doc(db, 'expertApplications', appId), {
+      certificateURL: certURL,
+      resumeURL:      resumeURL,
+      sampleURL:      sampleURL
+    });
+
+    console.log('Application submitted with files:', appId);
+
+    // ── Step 4: Show status screen ────────────────────────────────────
+    showStatusScreen({
+      fullName:    document.getElementById('fullName').value.trim(),
+      skill:       document.getElementById('skill').value.trim(),
+      category:    document.getElementById('category').value,
+      experience:  document.getElementById('experience').value,
+      rate:        Number(document.getElementById('rate').value),
+      city:        document.getElementById('city').value.trim(),
+      extraSkills: extraSkills,
+      status:      'pending',
+      appliedAt:   { seconds: Date.now() / 1000 },
+      adminNote:   '',
+      _totalApps:  1
+    });
+
+  } catch (err) {
+    console.error('Submit error:', err.code, err.message);
     let msg = 'Something went wrong. Please try again.';
-    if (err.code === 'permission-denied') msg = 'Permission denied — please log in again.';
-    if (err.message && err.message.includes('quota')) msg = 'File too large. Please use smaller files.';
-    showToast(msg, 'error');
+    if (err.code === 'permission-denied')  msg = 'Permission denied — please log out and back in.';
+    else if (err.code === 'unavailable')   msg = 'No internet connection. Please check your network.';
+    else if (err.code === 'unauthenticated') msg = 'Session expired. Please log in again.';
+    else if (err.code === 'storage/unauthorized') msg = 'File upload blocked — check Firebase Storage rules.';
+    else if (err.code === 'storage/quota-exceeded') msg = 'Storage quota exceeded. Contact support.';
+    else msg = 'Error: ' + err.message;
+    window.showToast(msg, 'error');
     resetBtn();
   }
 };
 
-window.showToast = function(msg, type='info') {
+window.showToast = function(msg, type) {
+  type = type || 'info';
   const el = document.getElementById('toastMsg');
   const icon = el.querySelector('i');
   document.getElementById('toastText').textContent = msg;
   el.className = 'toast-msg show ' + type;
-  icon.className = type === 'error' ? 'fa-solid fa-circle-xmark' : type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-info';
-  setTimeout(() => el.classList.remove('show'), 3500);
+  icon.className = type === 'error' ? 'fa-solid fa-circle-xmark'
+                 : type === 'success' ? 'fa-solid fa-circle-check'
+                 : 'fa-solid fa-circle-info';
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove('show'); }, 3500);
 };
 </script>
 
