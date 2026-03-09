@@ -728,6 +728,13 @@ if (!user || user.role !== "admin") {
   window.location.href = "index.html";
 }
 </script>
+    <div class="nav-label">Experts</div>
+    <div class="nav-item" onclick="showSection('expertApps')">
+      <div class="nav-icon"><i class="fas fa-user-check"></i></div>
+      Expert Applications
+      <span class="badge" id="expertBadge">0</span>
+    </div>
+
     <div class="nav-label">System</div>
     <div class="nav-item" onclick="showSection('activity')">
       <div class="nav-icon"><i class="fas fa-clock-rotate-left"></i></div>
@@ -770,6 +777,18 @@ if (!user || user.role !== "admin") {
     </div>
     <div class="modal-body" id="walletModalBody"></div>
     <div class="modal-footer" id="walletModalFooter"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="expertModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="nav-icon" style="background:rgba(139,92,246,0.15);color:var(--violet)"><i class="fas fa-user-check"></i></div>
+      <span class="modal-title">Expert Application</span>
+      <button class="modal-close" onclick="closeModal('expertModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="expertModalBody"></div>
+    <div class="modal-footer" id="expertModalFooter"></div>
   </div>
 </div>
 
@@ -1120,6 +1139,89 @@ if (!user || user.role !== "admin") {
             <th>Actions</th>
           </tr></thead>
           <tbody id="reportsBody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span>Loading reports...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ EXPERT APPLICATIONS ═══════════════ -->
+  <div class="section" id="sec-expertApps">
+    <!-- Stats row -->
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card violet">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-value" id="exp-pending">0</div>
+        <div class="stat-sub">Awaiting decision</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+        <div class="stat-label">Approved</div>
+        <div class="stat-value" id="exp-approved">0</div>
+        <div class="stat-sub">Active experts</div>
+      </div>
+      <div class="stat-card rose">
+        <div class="stat-icon"><i class="fas fa-circle-xmark"></i></div>
+        <div class="stat-label">Rejected</div>
+        <div class="stat-value" id="exp-rejected">0</div>
+        <div class="stat-sub">Did not qualify</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-label">Total Applications</div>
+        <div class="stat-value" id="exp-total">0</div>
+        <div class="stat-sub">All time</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-user-check" style="color:var(--violet)"></i>
+        <span class="card-title">Expert Applications</span>
+        <span class="card-count" id="expertAppsCount">0</span>
+        <div class="card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="exportExperts()"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input class="filter-input" id="expertSearch" placeholder="Search by name, skill, email…" oninput="renderExpertApps()">
+        </div>
+        <select class="filter-select" id="expertStatusFilter" onchange="renderExpertApps()">
+          <option value="all">All Statuses</option>
+          <option value="pending">⏳ Pending</option>
+          <option value="approved">✅ Approved</option>
+          <option value="rejected">❌ Rejected</option>
+        </select>
+        <select class="filter-select" id="expertCategoryFilter" onchange="renderExpertApps()">
+          <option value="">All Categories</option>
+          <option>Programming & Tech</option>
+          <option>Design & Creative</option>
+          <option>Data Science & AI</option>
+          <option>Business & Finance</option>
+          <option>Marketing & Growth</option>
+          <option>Languages</option>
+          <option>Music & Arts</option>
+          <option>Academic Subjects</option>
+          <option>Fitness & Wellness</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Applicant</th>
+            <th>Skill / Category</th>
+            <th>Experience</th>
+            <th>Rate</th>
+            <th>Level</th>
+            <th>Documents</th>
+            <th>Status</th>
+            <th>Applied</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="expertAppsBody"><tr class="loading-row"><td colspan="9"><span class="spinner"></span>Loading applications…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1683,6 +1785,197 @@ window.banUser = async function(uid, name) {
   } catch(e) { showToast('Error: '+e.message,'error'); }
 }
 
+// ─── EXPERT APPLICATIONS ───
+window.expertAppsData = [];
+
+onSnapshot(collection(db,'expertApplications'), snapshot => {
+  window.expertAppsData = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+  const pending = window.expertAppsData.filter(a=>a.status==='pending').length;
+  const approved = window.expertAppsData.filter(a=>a.status==='approved').length;
+  const rejected = window.expertAppsData.filter(a=>a.status==='rejected').length;
+  document.getElementById('expertAppsCount').textContent = snapshot.size;
+  document.getElementById('exp-total').textContent = snapshot.size;
+  document.getElementById('exp-pending').textContent = pending;
+  document.getElementById('exp-approved').textContent = approved;
+  document.getElementById('exp-rejected').textContent = rejected;
+  document.getElementById('expertBadge').textContent = pending;
+  document.getElementById('expertBadge').style.display = pending > 0 ? '' : 'none';
+  renderExpertApps();
+});
+
+window.renderExpertApps = function() {
+  const q = (document.getElementById('expertSearch')?.value||'').toLowerCase();
+  const sf = document.getElementById('expertStatusFilter')?.value||'all';
+  const cf = document.getElementById('expertCategoryFilter')?.value||'';
+  let data = window.expertAppsData.filter(a => {
+    if (sf!=='all' && a.status!==sf) return false;
+    if (cf && a.category!==cf) return false;
+    if (q && !(
+      (a.fullName||'').toLowerCase().includes(q) ||
+      (a.skill||'').toLowerCase().includes(q) ||
+      (a.userEmail||'').toLowerCase().includes(q) ||
+      (a.city||'').toLowerCase().includes(q)
+    )) return false;
+    return true;
+  });
+  // Sort: pending first, then by date desc
+  data.sort((a,b)=>{
+    if(a.status==='pending'&&b.status!=='pending') return -1;
+    if(b.status==='pending'&&a.status!=='pending') return 1;
+    return 0;
+  });
+  const tbody = document.getElementById('expertAppsBody');
+  if(!data.length) {
+    tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="fas fa-user-check"></i><p>No applications found</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(a => {
+    const docsBadges = [
+      (a.certificateURL || a.certificate?.data) ? `<span title="Certificate" style="color:var(--emerald)"><i class="fas fa-certificate"></i></span>` : '',
+      (a.resumeURL || a.resume?.data) ? `<span title="Resume" style="color:var(--primary)"><i class="fas fa-file-lines"></i></span>` : '',
+      (a.sampleURL || a.workSample?.data) ? `<span title="Work Sample" style="color:var(--cyan)"><i class="fas fa-image"></i></span>` : '',
+    ].filter(Boolean).join(' ');
+    const levelColor = a.level==='Expert'?'var(--violet)':a.level==='Advanced'?'var(--primary)':'var(--amber)';
+    return `<tr>
+      <td>${userCell(a.fullName||'Unknown', a.userEmail||'')}</td>
+      <td>
+        <div style="font-weight:600;font-size:0.87rem">${a.skill||'—'}</div>
+        <div style="font-size:0.72rem;color:var(--muted)">${a.category||'—'}</div>
+      </td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.78rem">${a.experience||'—'} yr(s)</td>
+      <td><span class="money pos">₹${a.rate||0}/hr</span></td>
+      <td><span style="color:${levelColor};font-size:0.78rem;font-weight:700">${a.level||'—'}</span></td>
+      <td>
+        <div style="display:flex;gap:8px;font-size:1rem">${docsBadges||'<span style="color:var(--muted);font-size:0.78rem">None</span>'}</div>
+      </td>
+      <td><span class="badge badge-${a.status||'pending'}">${a.status||'pending'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.75rem">${fmtDate(a.appliedAt)}</td>
+      <td><div class="action-row">
+        <button class="btn btn-primary btn-sm" onclick="viewExpertApp('${a.id}')"><i class="fas fa-eye"></i> Review</button>
+        ${a.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveExpert('${a.id}')"><i class="fas fa-check"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="rejectExpert('${a.id}')"><i class="fas fa-times"></i></button>`:''}
+      </div></td>
+    </tr>`;
+  }).join('');
+};
+
+window.viewExpertApp = function(id) {
+  const a = window.expertAppsData.find(x=>x.id===id);
+  if(!a) return;
+  const c = avatarColor(a.fullName||'?');
+  const initials_ = initials(a.fullName||'?');
+  const links = [
+    a.linkedin && `<a href="${a.linkedin}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fab fa-linkedin"></i> LinkedIn</a>`,
+    a.portfolio && `<a href="${a.portfolio}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fas fa-globe"></i> Portfolio</a>`,
+    a.github && `<a href="${a.github}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fab fa-github"></i> GitHub</a>`,
+    a.youtube && `<a href="${a.youtube}" target="_blank" style="color:var(--primary2);text-decoration:none;font-size:0.8rem"><i class="fab fa-youtube"></i> YouTube</a>`,
+  ].filter(Boolean).join('<span style="color:var(--muted);margin:0 4px">·</span>');
+  // Helper: make download link from either URL or base64
+  const docLink = (field, urlField, label, icon, cls) => {
+    if (urlField) return `<a href="${urlField}" target="_blank" class="btn ${cls} btn-sm"><i class="fas fa-${icon}"></i> ${label}</a>`;
+    if (field?.data) {
+      const ext = field.name?.split('.').pop() || 'file';
+      return `<a href="${field.data}" download="${field.name||label+'.'+ext}" class="btn ${cls} btn-sm"><i class="fas fa-${icon}"></i> ${label} <i class="fas fa-download" style="font-size:0.65rem;opacity:0.7"></i></a>`;
+    }
+    return '';
+  };
+  const docs = [
+    docLink(a.certificate, a.certificateURL, 'Certificate', 'certificate', 'btn-success'),
+    docLink(a.resume, a.resumeURL, 'Resume', 'file-lines', 'btn-primary'),
+    docLink(a.workSample, a.sampleURL, 'Sample', 'image', 'btn-ghost'),
+  ].filter(Boolean).join('');
+  const extraSkills = Array.isArray(a.extraSkills) && a.extraSkills.length
+    ? a.extraSkills.map(s=>`<span style="padding:2px 10px;border-radius:99px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#818cf8;font-size:0.75rem;font-weight:600">${s}</span>`).join(' ')
+    : '<span style="color:var(--muted);font-size:0.8rem">None added</span>';
+  const availability = Array.isArray(a.availability) ? a.availability.join(', ') : '—';
+  document.getElementById('expertModalBody').innerHTML = `
+    <div class="profile-hero" style="margin-bottom:16px">
+      <div class="profile-avatar-lg" style="background:${c}20;color:${c};border:1.5px solid ${c}40">${initials_}</div>
+      <div>
+        <div class="profile-name">${a.fullName||'Unknown'}</div>
+        <div class="profile-email">${a.userEmail||'—'}</div>
+        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge badge-${a.status||'pending'}">${a.status||'pending'}</span>
+          ${a.level?`<span class="badge badge-tutor">${a.level}</span>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-item-label">Primary Skill</div><div class="info-item-value">${a.skill||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Category</div><div class="info-item-value">${a.category||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Hourly Rate</div><div class="info-item-value" style="color:var(--emerald)">₹${a.rate||0}/hr</div></div>
+      <div class="info-item"><div class="info-item-label">Experience</div><div class="info-item-value">${a.experience||'—'} yr(s)</div></div>
+      <div class="info-item"><div class="info-item-label">Phone</div><div class="info-item-value" style="font-family:'DM Mono',monospace;font-size:0.82rem">${a.phone||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">City</div><div class="info-item-value">${a.city||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">College</div><div class="info-item-value">${a.college||'—'}</div></div>
+      <div class="info-item"><div class="info-item-label">Available Days</div><div class="info-item-value" style="font-size:0.8rem">${availability}</div></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="info-item-label" style="margin-bottom:8px;font-size:0.67rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Bio</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:0.85rem;color:var(--muted2);line-height:1.7">${a.bio||'No bio provided'}</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="info-item-label" style="margin-bottom:8px;font-size:0.67rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Additional Skills</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${extraSkills}</div>
+    </div>
+    ${links?`<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px">${links}</div>`:''}
+    <div style="margin-bottom:6px">
+      <div class="info-item-label" style="margin-bottom:8px;font-size:0.67rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Submitted Documents</div>
+      <div class="action-row">${docs||'<span style="color:var(--muted);font-size:0.82rem">No documents uploaded</span>'}</div>
+    </div>
+    ${a.adminNote?`<div style="margin-top:14px;padding:12px 14px;background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.2);border-radius:10px;font-size:0.82rem;color:var(--muted2)"><strong style="color:var(--rose)">Admin Note:</strong> ${a.adminNote}</div>`:''}
+    <div style="margin-top:16px">
+      <div class="info-item-label" style="margin-bottom:6px;font-size:0.67rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Admin Note (optional)</div>
+      <textarea class="form-input" id="adminNoteInput" rows="2" placeholder="Add a note for rejection reason, interview request, etc…" style="resize:vertical">${a.adminNote||''}</textarea>
+    </div>`;
+  document.getElementById('expertModalFooter').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal('expertModal')">Close</button>
+    <button class="btn btn-danger" onclick="rejectExpert('${id}',true)"><i class="fas fa-times"></i> Reject</button>
+    <button class="btn btn-success" onclick="approveExpert('${id}',true)"><i class="fas fa-check"></i> Approve Expert</button>`;
+  document.getElementById('expertModal').classList.add('open');
+};
+
+window.approveExpert = async function(id, fromModal=false) {
+  if(!confirm('Approve this application? The user will be granted Expert status.')) return;
+  const note = fromModal ? (document.getElementById('adminNoteInput')?.value||'') : '';
+  try {
+    const a = window.expertAppsData.find(x=>x.id===id);
+    await updateDoc(doc(db,'expertApplications',id),{status:'approved',isVerified:true,adminNote:note,reviewedAt:new Date()});
+    if(a?.userId) await updateDoc(doc(db,'users',a.userId),{isExpert:true,isVerified:true,expertSince:new Date()}).catch(()=>{});
+    showToast('Expert approved successfully ✓','success');
+    logActivity(`✅ Expert approved: ${a?.fullName||id}`,'var(--emerald)');
+    if(fromModal) closeModal('expertModal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+window.rejectExpert = async function(id, fromModal=false) {
+  const reason = fromModal
+    ? (document.getElementById('adminNoteInput')?.value || prompt('Rejection reason (shown to applicant):','Did not meet requirements'))
+    : prompt('Rejection reason:','Did not meet requirements');
+  if (reason === null) return;
+  try {
+    const a = window.expertAppsData.find(x=>x.id===id);
+    await updateDoc(doc(db,'expertApplications',id),{status:'rejected',adminNote:reason,reviewedAt:new Date()});
+    showToast('Application rejected','info');
+    logActivity(`❌ Expert rejected: ${a?.fullName||id}`,'var(--rose)');
+    if(fromModal) closeModal('expertModal');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+window.exportExperts = function() {
+  const headers = ['Name','Email','Skill','Category','Experience','Rate','Level','Status','City','LinkedIn','Applied'];
+  const rows = window.expertAppsData.map(a=>[
+    a.fullName||'',a.userEmail||'',a.skill||'',a.category||'',
+    a.experience||'',a.rate||'',a.level||'',a.status||'',a.city||'',
+    a.linkedin||'',fmtDate(a.appliedAt)
+  ]);
+  const csv = [headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='expert-applications.csv'; a.click();
+  URL.revokeObjectURL(url);
+};
+
 // ─── REFRESH ───
 window.refreshAll = function() {
   showToast('Data refreshing (live)...','info');
@@ -1690,6 +1983,7 @@ window.refreshAll = function() {
 
 // ─── INIT ───
 logActivity('🛡️ Admin panel loaded','var(--primary)');
+
 </script>
 </body>
 </html>

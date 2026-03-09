@@ -172,16 +172,60 @@ nav{
 }
 .btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--glow),0 4px 12px var(--glow-coral)}
 
-/* User pill */
-.upill{
-  display:none;align-items:center;gap:8px;
+/* ── Professional User Menu ── */
+.upill-pro{
+  display:none;align-items:center;gap:10px;
+  padding:5px 14px 5px 5px;border-radius:99px;cursor:pointer;
   background:rgba(255,255,255,.04);border:1px solid var(--border);
-  padding:4px 12px 4px 4px;border-radius:99px;cursor:pointer;transition:all .25s;
+  transition:all .25s;position:relative;
+  -webkit-tap-highlight-color:transparent;
 }
-.upill:hover{border-color:rgba(97,87,255,.4);background:rgba(97,87,255,.07);box-shadow:0 0 0 3px rgba(97,87,255,.1)}
-.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(97,87,255,.4)}
-.upill img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--p);display:none}
-.upill span{font-size:.82rem;font-weight:500;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upill-pro:hover{border-color:rgba(97,87,255,.4);background:rgba(97,87,255,.07)}
+.upill-pro .uav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;color:#fff;font-family:var(--fh);flex-shrink:0;border:2px solid rgba(97,87,255,.4)}
+.upill-pro img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--p)}
+.upill-info{display:flex;flex-direction:column;gap:1px;line-height:1.1}
+.upill-name{font-size:.82rem;font-weight:600;color:var(--txt);max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upill-role{font-size:.65rem;color:var(--p2);font-weight:500}
+.upill-caret{font-size:.6rem;color:var(--muted);margin-left:2px;transition:transform .2s}
+.upill-pro:hover .upill-caret{transform:rotate(180deg)}
+
+/* Dropdown */
+.upill-drop{
+  position:absolute;top:calc(100% + 10px);right:0;
+  width:230px;
+  background:#0d0d1c;border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;padding:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(97,87,255,.1);
+  opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);
+  transition:all .22s cubic-bezier(.22,1,.36,1);
+  z-index:900;
+}
+.upill-pro.drop-open .upill-drop{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.upill-pro.drop-open .upill-caret{transform:rotate(180deg)}
+
+.udrop-header{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px 14px;
+}
+.udrop-av{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-weight:800;font-size:1.1rem;color:#fff;
+}
+.udrop-name{font-size:.9rem;font-weight:700;color:var(--txt)}
+.udrop-email{font-size:.72rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.udrop-divider{height:1px;background:rgba(255,255,255,.07);margin:4px 0}
+.udrop-item{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 12px;border-radius:12px;
+  color:var(--muted2);font-size:.84rem;font-weight:500;
+  text-decoration:none;transition:all .18s;cursor:pointer;
+}
+.udrop-item i{width:16px;text-align:center;font-size:.9rem;flex-shrink:0}
+.udrop-item:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.udrop-danger{color:#ff6b6b !important}
+.udrop-danger:hover{background:rgba(255,80,80,.1) !important;color:var(--red) !important}
 
 /* Hamburger mobile */
 .mbtn{display:none;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;color:var(--txt);padding:9px 11px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:var(--fb)}
@@ -336,32 +380,178 @@ nav{
 }
 .slbl{font-size:.76rem;color:var(--muted);margin-top:3px;font-weight:400}
 
-/* Quick links bar */
+/* ═══════════════════ HERO QUICKLINKS — UPGRADED ═══════════════════ */
 .hero-quicklinks{
-  display:flex;align-items:center;justify-content:center;
-  gap:0;margin-top:28px;
-  background:rgba(255,255,255,.025);
-  border:1px solid var(--border);
-  border-radius:18px;overflow:hidden;
-  max-width:620px;margin-left:auto;margin-right:auto;
+  display:flex;align-items:stretch;justify-content:center;
+  gap:10px;margin-top:32px;
+  max-width:680px;margin-left:auto;margin-right:auto;
   animation:fadeUp .6s .5s ease both;
-  backdrop-filter:blur(20px);
+  flex-wrap:wrap;
+}
+
+/* ── EXPLORE: solo hero button ── */
+.hql-explore{
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:18px 22px;text-decoration:none;
+  border-radius:20px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--p) 0%,#9b35ff 50%,var(--a) 100%);
+  box-shadow:0 8px 32px var(--glow),0 2px 12px var(--glow-coral);
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s;
+  flex:1;min-width:180px;
+  border:none;
+}
+.hql-explore::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 60%);
+  border-radius:20px;
+}
+.hql-explore::after{
+  content:'';position:absolute;bottom:-20px;right:-20px;
+  width:90px;height:90px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+  transition:transform .5s;
+}
+.hql-explore:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 18px 48px var(--glow),0 8px 24px var(--glow-coral)}
+.hql-explore:hover::after{transform:scale(1.4)}
+.hql-explore-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;position:relative;z-index:1}
+.hql-explore-icon{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;color:#fff;flex-shrink:0;
+  backdrop-filter:blur(8px);
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.hql-explore-label{font-family:var(--fh);font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.3px;position:relative;z-index:1}
+.hql-explore-sub{font-size:.75rem;color:rgba(255,255,255,.75);font-weight:400;position:relative;z-index:1;margin-bottom:4px}
+.hql-explore-chips{display:flex;gap:6px;flex-wrap:wrap;position:relative;z-index:1}
+.hql-explore-chip{
+  font-size:.65rem;font-weight:600;padding:3px 9px;border-radius:99px;
+  background:rgba(255,255,255,.18);color:rgba(255,255,255,.9);
+  letter-spacing:.02em;backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.25);
+}
+.hql-explore-arrow{
+  position:absolute;top:16px;right:16px;
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(255,255,255,.18);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;
+  transition:transform .3s;
+  backdrop-filter:blur(4px);
+}
+.hql-explore:hover .hql-explore-arrow{transform:translate(3px,-3px)}
+
+/* ── Other quicklink items ── */
+.hql-others{
+  display:flex;flex-direction:column;gap:8px;
+  flex:1;min-width:160px;
 }
 .hql-item{
-  flex:1;display:flex;align-items:center;gap:10px;
-  padding:14px 16px;text-decoration:none;color:var(--txt);
-  transition:all .25s;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;text-decoration:none;color:var(--txt);
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--border);
+  border-radius:14px;
+  transition:all .25s;flex:1;
 }
-.hql-item:hover{background:rgba(255,255,255,.04)}
-.hql-div{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.hql-item:hover{background:rgba(255,255,255,.05);border-color:var(--border-h);transform:translateX(3px)}
 .hql-icon{
   width:32px;height:32px;border-radius:9px;
   background:rgba(97,87,255,.1);color:var(--p2);
-  display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0;
 }
-.hql-text{display:flex;flex-direction:column;gap:1px}
+.hql-text{display:flex;flex-direction:column;gap:1px;flex:1}
 .hql-label{font-size:.8rem;font-weight:600;letter-spacing:-.1px}
-.hql-sub{font-size:.68rem;color:var(--muted);font-weight:400}
+.hql-sub{font-size:.67rem;color:var(--muted);font-weight:400}
+.hql-chevron{color:var(--muted);font-size:.6rem;transition:transform .2s;flex-shrink:0}
+.hql-item:hover .hql-chevron{transform:translateX(3px);color:var(--p2)}
+
+/* ── Live skill ticker ── */
+.hero-ticker{
+  display:flex;align-items:center;gap:10px;
+  max-width:680px;margin:10px auto 0;
+  background:rgba(255,255,255,.018);border:1px solid var(--border);
+  border-radius:12px;padding:8px 14px;
+  animation:fadeUp .6s .62s ease both;
+  overflow:hidden;
+}
+.ticker-label{
+  font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--p2);white-space:nowrap;flex-shrink:0;
+  background:rgba(97,87,255,.12);border:1px solid rgba(97,87,255,.2);
+  padding:3px 9px;border-radius:99px;
+}
+.ticker-scroll{flex:1;overflow:hidden;position:relative}
+.ticker-inner{display:flex;gap:28px;animation:tickerMove 18s linear infinite;width:max-content}
+.ticker-inner:hover{animation-play-state:paused}
+.ticker-item{font-size:.76rem;color:var(--muted2);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.ticker-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── Featured Skills Quick Section ── */
+.home-featured{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;max-width:680px;margin:14px auto 0;
+  animation:fadeUp .6s .72s ease both;
+}
+.hf-card{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;border-radius:16px;
+  background:rgba(255,255,255,.025);border:1px solid var(--border);
+  text-decoration:none;color:var(--txt);
+  transition:all .3s cubic-bezier(.22,1,.36,1);
+  position:relative;overflow:hidden;
+}
+.hf-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--hf-color,var(--p)),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.hf-card:hover{transform:translateY(-3px);border-color:var(--border-h);background:rgba(255,255,255,.04)}
+.hf-card:hover::before{opacity:1}
+.hf-ico{
+  width:38px;height:38px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;flex-shrink:0;
+  background:var(--hf-bg,rgba(97,87,255,.12));
+  color:var(--hf-color,var(--p2));
+}
+.hf-info{flex:1;min-width:0}
+.hf-name{font-size:.82rem;font-weight:600;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hf-meta{font-size:.68rem;color:var(--muted);margin-top:2px}
+.hf-badge{
+  font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;
+  background:var(--hf-bg,rgba(97,87,255,.12));
+  color:var(--hf-color,var(--p2));
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* ── Search bar widget in hero ── */
+.hero-search{
+  display:flex;align-items:center;gap:0;
+  max-width:680px;margin:20px auto 0;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  animation:fadeUp .6s .38s ease both;
+  transition:border-color .2s,box-shadow .2s;
+}
+.hero-search:focus-within{border-color:rgba(97,87,255,.4);box-shadow:0 0 0 3px rgba(97,87,255,.1)}
+.hero-search-icon{padding:14px 16px;color:var(--muted);font-size:.9rem;flex-shrink:0}
+.hero-search input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--txt);font-family:var(--fb);font-size:.92rem;
+  padding:14px 0;
+}
+.hero-search input::placeholder{color:var(--muted)}
+.hero-search-btn{
+  padding:10px 18px;margin:7px 7px;border-radius:11px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  color:#fff;border:none;font-family:var(--fh);font-size:.82rem;font-weight:700;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  box-shadow:0 4px 12px var(--glow);
+}
+.hero-search-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--glow)}
 
 /* Scroll hint */
 .scroll-hint{
@@ -718,34 +908,132 @@ footer{
 img,video{max-width:100%}
 input,textarea,select{font-size:16px !important;-webkit-appearance:none;border-radius:10px}
 input:focus,textarea:focus,select:focus,button:focus-visible{outline:none}
-.ss-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,18,.97);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:10px 4px;padding-bottom:calc(10px + var(--sab));z-index:500}
-.ss-mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;max-width:480px;margin:0 auto}
-.ss-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;color:#71717a;font-size:.62rem;font-weight:600;cursor:pointer;border-radius:12px;transition:color .2s,background .2s;text-decoration:none;min-width:52px;text-align:center;letter-spacing:.02em}
-.ss-nav-item i{font-size:1.2rem}
+/* ═══════════════════ MOBILE APP HEADER ═══════════════════ */
+.ss-mobile-header{
+  display:none;position:sticky;top:0;z-index:600;
+  align-items:center;justify-content:space-between;
+  padding:0 16px;
+  padding-top:var(--sat);
+  height:calc(60px + var(--sat));
+  background:rgba(3,3,10,.96);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.ss-mob-left{display:flex;align-items:center;gap:10px}
+.ss-mob-logo{
+  font-family:var(--fh);font-weight:800;font-size:1.18rem;
+  color:#ffffff;
+  display:flex;align-items:center;gap:10px;text-decoration:none;
+  letter-spacing:-.3px;
+}
+.ss-mob-logo span{
+  background:linear-gradient(135deg,#fff 40%,var(--p2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.ss-mob-logo-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;color:#fff;flex-shrink:0;
+  box-shadow:0 0 14px var(--glow);
+}
+.ss-mob-right{display:flex;align-items:center;gap:8px}
+.ss-mob-btn{
+  width:40px;height:40px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.05);
+  color:#9090b8;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.95rem;text-decoration:none;
+  transition:all .2s;position:relative;flex-shrink:0;
+}
+.ss-mob-btn:hover,.ss-mob-btn:active{background:rgba(97,87,255,.18);color:var(--p2);border-color:rgba(97,87,255,.3)}
+.ss-mob-btn .mob-dot{
+  position:absolute;top:7px;right:7px;width:7px;height:7px;
+  background:var(--red);border-radius:50%;border:1.5px solid rgba(3,3,10,.96);
+}
+/* Mobile user avatar in header */
+.ss-mob-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--p),var(--a));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-weight:800;font-size:.85rem;color:#fff;
+  border:2px solid rgba(97,87,255,.45);cursor:pointer;
+  flex-shrink:0;overflow:hidden;position:relative;
+}
+.ss-mob-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+/* Mini dropdown on avatar tap */
+.ss-mob-avatar-menu{
+  position:absolute;top:calc(100% + 8px);right:0;
+  width:200px;background:#0d0d1c;
+  border:1px solid rgba(255,255,255,.1);border-radius:16px;
+  padding:6px;box-shadow:0 16px 48px rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);
+  transition:all .22s cubic-bezier(.22,1,.36,1);z-index:700;
+}
+.ss-mob-avatar.menu-open .ss-mob-avatar-menu{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.ss-mob-avatar-menu a{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border-radius:10px;color:var(--muted2);font-size:.84rem;font-weight:500;
+  text-decoration:none;transition:all .15s;
+}
+.ss-mob-avatar-menu a i{width:16px;text-align:center;color:var(--muted);font-size:.85rem}
+.ss-mob-avatar-menu a:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.ss-mob-avatar-menu .mob-menu-divider{height:1px;background:rgba(255,255,255,.07);margin:4px 0}
+.ss-mob-avatar-menu .mob-menu-danger{color:#ff6b6b !important}
+.ss-mob-avatar-menu .mob-menu-danger i{color:#ff6b6b !important}
+
+/* ═══════════════════ MOBILE BOTTOM NAV ═══════════════════ */
+.ss-mobile-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:rgba(5,5,15,.97);
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  padding:8px 4px;
+  padding-bottom:calc(8px + var(--sab));
+  z-index:500;
+}
+.ss-mobile-nav-inner{
+  display:flex;justify-content:space-around;align-items:center;
+  max-width:500px;margin:0 auto;
+}
+.ss-nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 12px;color:#5a5a7a;
+  font-size:.58rem;font-weight:700;cursor:pointer;
+  border-radius:14px;transition:all .2s;text-decoration:none;
+  min-width:56px;text-align:center;letter-spacing:.04em;text-transform:uppercase;
+  position:relative;
+}
+.ss-nav-item i{font-size:1.22rem;transition:transform .2s}
+.ss-nav-item:active i{transform:scale(.88)}
 .ss-nav-item.active{color:var(--p2)}
-.ss-mobile-header{display:none;position:sticky;top:0;z-index:400;align-items:center;justify-content:space-between;padding:14px 18px;padding-top:calc(14px + var(--sat));background:rgba(3,3,10,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07)}
-.ss-mob-logo{font-weight:800;font-size:1.1rem;background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px}
-.ss-mob-btn{width:40px;height:40px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:#a1a1aa;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;text-decoration:none;transition:background .2s}
-.ss-mob-btn:hover{background:rgba(97,87,255,.2);color:var(--p2)}
+.ss-nav-item.active i{color:var(--p2)}
+/* Active pill indicator */
+.ss-nav-item.active::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:28px;height:3px;background:linear-gradient(90deg,var(--p),var(--a));
+  border-radius:0 0 4px 4px;
+}
+/* Settings tab special style */
+.ss-nav-item.nav-settings i{color:#9090b8}
+.ss-nav-item.nav-settings.active i{color:var(--p2)}
 
 /* ═══════════════════ RESPONSIVE ═══════════════════ */
 @media(max-width:768px){
-  .nav-c,.nav-desk-only{display:none!important}
-  .mbtn{display:flex!important}
-  .mmenu{display:flex!important}
-  .mob-ibtn{padding:7px 9px;font-size:.82rem;border-radius:10px}
-  .mob-icons{display:none;align-items:center;gap:6px}
+  /* Hide desktop nav entirely on mobile */
+  nav{display:none!important}
+  /* Show mobile header + bottom nav */
   .ss-mobile-nav{display:block}
   .ss-mobile-header{display:flex}
-  body{padding-bottom:calc(70px + var(--sab))!important}
+  body{padding-bottom:calc(72px + var(--sab))!important}
   .sidebar{transform:translateX(-100%)!important}
   .sidebar.open{transform:translateX(0)!important}
   .main{margin-left:0!important}
   button,.btn-primary,.btn-secondary,a[role=button]{min-height:44px}
   .container{padding-left:16px!important;padding-right:16px!important}
   .card,.panel,.settings-card{padding:18px 16px!important}
-  nav{padding:12px 16px!important;height:auto}
-  .hero{padding:80px 5% 70px}
+  .hero{padding:72px 5% 60px}
   .hero h1{letter-spacing:-1px}
   .hero-btns{flex-direction:column;align-items:stretch}
   .bh{justify-content:center}
@@ -765,7 +1053,19 @@ input:focus,textarea:focus,select:focus,button:focus-visible{outline:none}
   .how-grid{gap:8px}
   .how-card{border-radius:16px!important;padding:28px 24px}
   .tgrid{grid-template-columns:1fr}
-  .hero-quicklinks{display:none}
+  .hero-quicklinks{flex-direction:column;gap:8px;max-width:100%}
+  .hql-explore{min-width:100%;flex-direction:row;align-items:center;padding:16px 18px}
+  .hql-explore-top{margin-bottom:0;margin-right:auto}
+  .hql-explore-chips{display:none}
+  .hql-explore-sub{display:none}
+  .hql-others{flex-direction:row;gap:8px;min-width:100%}
+  .hql-item{flex:1;min-width:0}
+  .hql-label{font-size:.72rem}
+  .hero-ticker{display:none}
+  .home-featured{grid-template-columns:1fr 1fr}
+  .hero-search{margin-top:16px}
+  /* Dropdown not used on mobile — avatar menu handles it */
+  .upill-drop{display:none!important}
 }
 @media(max-width:480px){
   .form-grid{grid-template-columns:1fr!important}
@@ -789,6 +1089,47 @@ body{padding-bottom:0!important}
 <div class="orb o2"></div>
 <div class="orb o3"></div>
 <div class="dot-grid"></div>
+
+<!-- ══ MOBILE APP HEADER (shown only on mobile) ══ -->
+<header class="ss-mobile-header" id="mobHeader">
+  <div class="ss-mob-left">
+    <a href="index.html" class="ss-mob-logo">
+      <div class="ss-mob-logo-mark"><i class="fa-solid fa-bolt"></i></div>
+      <span>SkillSwap</span>
+    </a>
+  </div>
+  <div class="ss-mob-right">
+    <!-- Notification bell (logged in only) -->
+    <button class="ss-mob-btn mm-logged-section" id="mobNotifBtn" onclick="toggleNotif()" title="Notifications" style="display:none">
+      <i class="fa-solid fa-bell"></i>
+      <span class="mob-dot" id="mobNotifDot" style="display:none"></span>
+    </button>
+    <!-- Settings — always visible, direct link -->
+    <a href="setting.html" class="ss-mob-btn mm-logged-section" title="Settings" style="display:none">
+      <i class="fa-solid fa-gear"></i>
+    </a>
+    <!-- User avatar with dropdown (logged in) -->
+    <div class="ss-mob-avatar mm-logged-section" id="mobAvatar" style="display:none" onclick="toggleMobAvatarMenu(event)">
+      <span id="mobAvatarInitial">S</span>
+      <img id="mobAvatarImg" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+      <!-- Avatar dropdown -->
+      <div class="ss-mob-avatar-menu" id="mobAvatarMenu">
+        <a href="profile.html"><i class="fa-solid fa-user"></i>My Profile</a>
+        <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i>Dashboard</a>
+        <a href="trades.html"><i class="fa-solid fa-arrows-rotate"></i>My Trades</a>
+        <div class="mob-menu-divider"></div>
+        <a href="setting.html"><i class="fa-solid fa-gear"></i>Settings</a>
+        <a href="reputation.html"><i class="fa-solid fa-medal"></i>Badges</a>
+        <div class="mob-menu-divider"></div>
+        <a href="#" class="mob-menu-danger" onclick="logout();return false"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log Out</a>
+      </div>
+    </div>
+    <!-- Login button (guest) -->
+    <a href="login.html" class="ss-mob-btn mm-guest-section" title="Login" style="font-size:.78rem;font-weight:700;width:auto;padding:0 16px;color:var(--p2);border-color:rgba(97,87,255,.35);background:rgba(97,87,255,.08)">
+      Log In
+    </a>
+  </div>
+</header>
 
 <!-- FAB -->
 <a href="chat.html" class="cfab" title="Chat"><i class="fa-solid fa-comments"></i></a>
@@ -1093,30 +1434,58 @@ body{padding-bottom:0!important}
     SkillSwap
   </a>
   <ul class="nav-c">
-    <li><a href="explore.html">Explore</a></li>
-    <li><a href="leaderboard.html">Leaderboard</a></li>
+  
     <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="trades.html">Trades</a></li>
+    <li><a href="trades.html">My Trades</a></li>
     <li><a href="about.html">About Us</a></li>
   </ul>
   <div class="nav-r">
-    <button class="ibtn nav-desk-only" id="nbtn" onclick="toggleNotif()" style="display:none"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span></button>
-    <button class="ibtn nav-desk-only" id="sbtn" onclick="openSettings()" style="display:none"><i class="fa-solid fa-sliders"></i></button>
+
+    <!-- Guest: shown when logged out -->
     <div id="abtns" style="display:flex;gap:8px">
       <a href="login.html" class="btn-ghost">Log In</a>
       <a href="login.html" class="btn-cta">Sign Up Free</a>
     </div>
-    <div id="upill" class="upill" onclick="openSettings()" title="Account Settings">
+
+    <!-- Logged-in: notification bell -->
+    <button class="ibtn nav-desk-only" id="nbtn" onclick="toggleNotif()" style="display:none" title="Notifications">
+      <i class="fa-solid fa-bell"></i><span class="dot" id="ndot"></span>
+    </button>
+
+    <!-- Logged-in: user avatar + dropdown -->
+    <div id="upill" class="upill-pro" style="display:none" title="Account">
       <div class="uav" id="uav">S</div>
-      <img id="uph" src="" alt="You">
-      <span id="unm">Student</span>
-      <i class="fa-solid fa-chevron-down" style="font-size:.6rem;color:var(--muted);margin-left:2px"></i>
+      <img id="uph" src="" alt="You" style="display:none">
+      <div class="upill-info nav-desk-only">
+        <span id="unm" class="upill-name">Student</span>
+        <span class="upill-role">Member</span>
+      </div>
+      <i class="fa-solid fa-chevron-down upill-caret nav-desk-only"></i>
+
+      <!-- Dropdown menu -->
+      <div class="upill-drop" id="upillDrop">
+        <div class="udrop-header">
+          <div class="udrop-av" id="udropAv">S</div>
+          <div>
+            <div class="udrop-name" id="udropName">Student</div>
+            <div class="udrop-email" id="udropEmail">student@skillswap.in</div>
+          </div>
+        </div>
+        <div class="udrop-divider"></div>
+        <a class="udrop-item" href="profile.html"><i class="fa-solid fa-user"></i>My Profile</a>
+        <a class="udrop-item" href="dashboard.html"><i class="fa-solid fa-chart-line"></i>Dashboard</a>
+        <a class="udrop-item" href="trades.html"><i class="fa-solid fa-arrows-rotate"></i>My Trades</a>
+        <a class="udrop-item" href="schedule.html"><i class="fa-solid fa-calendar-days"></i>Schedule</a>
+        <div class="udrop-divider"></div>
+        <a class="udrop-item" href="setting.html"><i class="fa-solid fa-gear"></i>Settings</a>
+        <a class="udrop-item" href="reputation.html"><i class="fa-solid fa-medal"></i>Reputation & Badges</a>
+        <div class="udrop-divider"></div>
+        <a class="udrop-item udrop-danger" href="#" onclick="logout();return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log Out</a>
+      </div>
     </div>
-    <div class="mob-icons" id="mob-icons" style="display:none">
-      <button class="ibtn mob-ibtn" onclick="toggleNotif()" title="Notifications"><i class="fa-solid fa-bell"></i><span class="dot" id="ndot2"></span></button>
-      <button class="ibtn mob-ibtn" onclick="openSettings()" title="Settings"><i class="fa-solid fa-sliders"></i></button>
-    </div>
-    <button class="mbtn ibtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
+
+    <!-- Mobile hamburger (guest only, logged-in uses mobile nav) -->
+    <button class="mbtn ibtn" id="mobMenuBtn" onclick="openMob()"><i class="fa-solid fa-bars"></i></button>
   </div>
 </nav>
 
@@ -1159,25 +1528,96 @@ body{padding-bottom:0!important}
     </div>
   </div>
 
+  <!-- Live skill ticker -->
+  <div class="hero-ticker">
+    <span class="ticker-label">🔴 Live</span>
+    <div class="ticker-scroll">
+      <div class="ticker-inner" id="tickerInner">
+        <span class="ticker-item">Python Tutoring — Arjun matched!</span>
+        <span class="ticker-item">UI/UX ↔ React swap live</span>
+        <span class="ticker-item">Priya added Spanish lessons</span>
+        <span class="ticker-item">3 new Experts joined today</span>
+        <span class="ticker-item">Data Science session in 10 min</span>
+        <span class="ticker-item">Rohan completed Level 7 🎖️</span>
+        <span class="ticker-item">New skill: Machine Learning basics</span>
+        <span class="ticker-item">Python Tutoring — Arjun matched!</span>
+        <span class="ticker-item">UI/UX ↔ React swap live</span>
+        <span class="ticker-item">Priya added Spanish lessons</span>
+        <span class="ticker-item">3 new Experts joined today</span>
+        <span class="ticker-item">Data Science session in 10 min</span>
+        <span class="ticker-item">Rohan completed Level 7 🎖️</span>
+        <span class="ticker-item">New skill: Machine Learning basics</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="hero-search">
+    <span class="hero-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+    <input type="text" placeholder="Search skills — Python, Design, Music…" id="heroSearchInput" onkeydown="if(event.key==='Enter'){window.location.href='explore.html?q='+encodeURIComponent(this.value)}">
+    <button class="hero-search-btn" onclick="window.location.href='explore.html?q='+encodeURIComponent(document.getElementById('heroSearchInput').value)">Search →</button>
+  </div>
+
+  <!-- Quicklinks: Explore hero + others -->
   <div class="hero-quicklinks" id="heroQuickLinks">
-    <a class="hql-item" href="explore.html">
-      <div class="hql-icon"><i class="fa-solid fa-compass"></i></div>
-      <div class="hql-text"><span class="hql-label">Explore</span><span class="hql-sub">Browse all skills</span></div>
+
+    <!-- EXPLORE — solo hero tile -->
+    <a class="hql-explore" href="explore.html">
+      <div class="hql-explore-arrow"><i class="fa-solid fa-arrow-up-right"></i></div>
+      <div class="hql-explore-top">
+        <div class="hql-explore-icon"><i class="fa-solid fa-compass"></i></div>
+        <span class="hql-explore-label">Explore Skills</span>
+      </div>
+      <div class="hql-explore-sub">500+ skills across 20+ categories</div>
+      <div class="hql-explore-chips">
+        <span class="hql-explore-chip">🐍 Python</span>
+        <span class="hql-explore-chip">🎨 Design</span>
+        <span class="hql-explore-chip">🎸 Music</span>
+        <span class="hql-explore-chip">+more</span>
+      </div>
     </a>
-    <div class="hql-div"></div>
-    <a class="hql-item" href="chat.html">
-      <div class="hql-icon" style="background:rgba(168,85,247,0.12);color:#c084fc"><i class="fa-solid fa-message"></i></div>
-      <div class="hql-text"><span class="hql-label">Messages</span><span class="hql-sub">Chat with peers</span></div>
+
+    <!-- Action-oriented links -->
+    <div class="hql-others">
+      <a class="hql-item" href="expert-registration.html">
+        <div class="hql-icon" style="background:rgba(255,185,48,0.14);color:var(--amber)"><i class="fa-solid fa-crown"></i></div>
+        <div class="hql-text"><span class="hql-label">Become an Expert</span><span class="hql-sub">Earn ₹300–₹1,000+/hr</span></div>
+        <i class="fa-solid fa-chevron-right hql-chevron"></i>
+      </a>
+      <a class="hql-item" href="skill-exchange.html">
+        <div class="hql-icon" style="background:rgba(0,212,255,0.12);color:var(--cyan)"><i class="fa-solid fa-arrows-rotate"></i></div>
+        <div class="hql-text"><span class="hql-label">Post a Skill Swap</span><span class="hql-sub">Trade what you know</span></div>
+        <i class="fa-solid fa-chevron-right hql-chevron"></i>
+      </a>
+      <a class="hql-item" href="leaderboard.html">
+        <div class="hql-icon" style="background:rgba(0,229,160,0.12);color:var(--green)"><i class="fa-solid fa-ranking-star"></i></div>
+        <div class="hql-text"><span class="hql-label">Leaderboard</span><span class="hql-sub">See top students</span></div>
+        <i class="fa-solid fa-chevron-right hql-chevron"></i>
+      </a>
+    </div><!-- /hql-others -->
+  </div><!-- /hero-quicklinks -->
+
+  <!-- Trending Today cards -->
+  <div class="home-featured reveal">
+    <a class="hf-card" href="explore.html?cat=programming" style="--hf-bg:rgba(97,87,255,.12);--hf-color:var(--p2)">
+      <div class="hf-ico"><i class="fa-brands fa-python"></i></div>
+      <div class="hf-info"><div class="hf-name">Python &amp; ML</div><div class="hf-meta">84 active learners</div></div>
+      <span class="hf-badge">🔥 Hot</span>
     </a>
-    <div class="hql-div"></div>
-    <a class="hql-item" href="paid-help.html">
-      <div class="hql-icon" style="background:rgba(255,185,48,0.12);color:var(--amber)"><i class="fa-solid fa-star"></i></div>
-      <div class="hql-text"><span class="hql-label">Experts</span><span class="hql-sub">Get paid help</span></div>
+    <a class="hf-card" href="explore.html?cat=design" style="--hf-bg:rgba(255,92,124,.1);--hf-color:var(--a2)">
+      <div class="hf-ico"><i class="fa-solid fa-pen-nib"></i></div>
+      <div class="hf-info"><div class="hf-name">UI/UX Design</div><div class="hf-meta">61 active learners</div></div>
+      <span class="hf-badge">✦ New</span>
     </a>
-    <div class="hql-div"></div>
-    <a class="hql-item" href="#contact" onclick="document.getElementById('contactSection').scrollIntoView({behavior:'smooth'});return false;">
-      <div class="hql-icon" style="background:rgba(0,229,160,0.12);color:var(--green)"><i class="fa-solid fa-envelope"></i></div>
-      <div class="hql-text"><span class="hql-label">Contact Us</span><span class="hql-sub">Get in touch</span></div>
+    <a class="hf-card" href="explore.html?cat=languages" style="--hf-bg:rgba(0,212,255,.1);--hf-color:var(--cyan)">
+      <div class="hf-ico"><i class="fa-solid fa-language"></i></div>
+      <div class="hf-info"><div class="hf-name">Languages</div><div class="hf-meta">47 active learners</div></div>
+      <span class="hf-badge">↑ Rising</span>
+    </a>
+    <a class="hf-card" href="leaderboard.html" style="--hf-bg:rgba(255,185,48,.1);--hf-color:var(--amber)">
+      <div class="hf-ico"><i class="fa-solid fa-trophy"></i></div>
+      <div class="hf-info"><div class="hf-name">Leaderboard</div><div class="hf-meta">Top this week</div></div>
+      <span class="hf-badge">👑 Live</span>
     </a>
   </div>
 
@@ -1316,7 +1756,7 @@ body{padding-bottom:0!important}
     </button>
     <div class="contact-links">
       <a class="contact-link" href="#">
-        <i class="fa-solid fa-envelope"></i> hello@skillswap.in
+        <i class="fa-solid fa-envelope"></i> <span class="__cf_email__" data-cfemail="d8b0bdb4b4b798abb3b1b4b4abafb9a8f6b1b6">[email&#160;protected]</span>
       </a>
       <a class="contact-link" href="#">
         <i class="fa-brands fa-instagram"></i> @skillswap
@@ -1370,19 +1810,26 @@ body{padding-bottom:0!important}
   </div>
 </footer>
 
-<!-- MOBILE BOTTOM NAV (app pages) -->
-<div class="ss-mobile-nav">
+<!-- MOBILE BOTTOM NAV -->
+<div class="ss-mobile-nav" id="mobileBottomNav">
   <div class="ss-mobile-nav-inner">
-    <a href="index.html" class="ss-nav-item active"><i class="fa-solid fa-house"></i>Home</a>
-    <a href="explore.html" class="ss-nav-item"><i class="fa-solid fa-compass"></i>Explore</a>
-    <a href="dashboard.html" class="ss-nav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
-    <a href="chat.html" class="ss-nav-item"><i class="fa-solid fa-message"></i>Messages</a>
-    <a href="profile.html" class="ss-nav-item"><i class="fa-solid fa-user"></i>Profile</a>
+    <a href="index.html"      class="ss-nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="explore.html"    class="ss-nav-item"><i class="fa-solid fa-compass"></i>Explore</a>
+    <a href="dashboard.html"  class="ss-nav-item mm-logged-section" style="display:none"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+    <a href="chat.html"       class="ss-nav-item mm-logged-section" style="display:none">
+      <i class="fa-solid fa-message"></i>Messages
+      <span style="position:absolute;top:6px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid rgba(5,5,15,.97)" id="mobMsgDot"></span>
+    </a>
+    <a href="profile.html"    class="ss-nav-item mm-logged-section" style="display:none"><i class="fa-solid fa-user"></i>Profile</a>
+    <a href="setting.html"    class="ss-nav-item nav-settings mm-logged-section" style="display:none"><i class="fa-solid fa-gear"></i>Settings</a>
+    <!-- Guest: show login + signup -->
+    <a href="login.html"      class="ss-nav-item mm-guest-section"><i class="fa-solid fa-right-to-bracket"></i>Login</a>
+    <a href="login.html"      class="ss-nav-item mm-guest-section" style="color:var(--p2)"><i class="fa-solid fa-rocket"></i>Sign Up</a>
   </div>
 </div>
 
 <!-- FIREBASE + APP SCRIPTS -->
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -1390,24 +1837,33 @@ const cfg={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswa
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 window._auth=auth;window._db=db;
 onAuthStateChanged(auth,u=>{
-  const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn"),sb=document.getElementById("sbtn");
+  const ab=document.getElementById("abtns"),up=document.getElementById("upill"),nb=document.getElementById("nbtn");
   const mmProfile=document.getElementById("mmProfile");
   const mmAv=document.getElementById("mmAv");
   const mmName=document.getElementById("mmName");
   const mmSub=document.getElementById("mmSub");
-  const mmAuth=document.getElementById("mmAuth");
   const mmLoggedEls=document.querySelectorAll(".mm-logged-section");
   const mmGuestEls=document.querySelectorAll(".mm-guest-section");
   if(u){
-    ab.style.display="none";up.style.display="flex";nb.style.display="flex";sb.style.display="flex";
-    const mi=document.getElementById("mob-icons");if(mi)mi.style.display="flex";
+    ab.style.display="none";
+    if(up){up.style.display="flex";}
+    if(nb){nb.style.display="flex";}
     const uph=document.getElementById("uph"),uav=document.getElementById("uav");
     const name=u.displayName||u.email||"Student";
     const initial=(u.displayName||u.email||"S").charAt(0).toUpperCase();
-    if(u.photoURL){uph.src=u.photoURL;uph.style.display="block";if(uav)uav.style.display="none";}
-    else{if(uav){uav.textContent=initial;uav.style.display="flex";}uph.style.display="none";}
-    document.getElementById("unm").textContent=name.split(" ")[0];
-    document.getElementById("sav").textContent=initial;
+    if(u.photoURL){if(uph){uph.src=u.photoURL;uph.style.display="block";}if(uav)uav.style.display="none";}
+    else{if(uav){uav.textContent=initial;uav.style.display="flex";}if(uph)uph.style.display="none";}
+    // Populate dropdown
+    const udropAv=document.getElementById("udropAv"),udropName=document.getElementById("udropName"),udropEmail=document.getElementById("udropEmail");
+    if(udropAv)udropAv.textContent=initial;
+    if(udropName)udropName.textContent=name;
+    if(udropEmail)udropEmail.textContent=u.email||"";
+    if(document.getElementById("unm"))document.getElementById("unm").textContent=name.split(" ")[0];
+    if(document.getElementById("sav"))document.getElementById("sav").textContent=initial;
+    // Mobile header avatar
+    const mobAv=document.getElementById("mobAvatarInitial"),mobAvImg=document.getElementById("mobAvatarImg");
+    if(mobAv)mobAv.textContent=initial;
+    if(u.photoURL&&mobAvImg){mobAvImg.src=u.photoURL;mobAvImg.style.display="block";if(mobAv)mobAv.style.display="none";}
     document.getElementById("hbtns").innerHTML=`<a href="dashboard.html" class="bh bh-fill"><i class="fa-solid fa-chart-line"></i>My Dashboard</a><a href="trades.html" class="bh bh-line"><i class="fa-solid fa-compass"></i>My Trades</a>`;
     if(mmProfile){ mmProfile.classList.remove("hidden"); }
     if(mmAv){
@@ -1416,11 +1872,19 @@ onAuthStateChanged(auth,u=>{
     }
     if(mmName){ mmName.textContent=name; }
     if(mmSub){ mmSub.textContent="⚡ View Profile & Stats"; }
-    mmLoggedEls.forEach(el=>el.style.display="");
+    mmLoggedEls.forEach(el=>{
+      // Use flex for buttons/avatars, block for links/dividers
+      const tag=el.tagName.toLowerCase();
+      el.style.display=(tag==='a'||tag==='button'||el.classList.contains('ss-mob-avatar'))?'flex':'block';
+    });
     mmGuestEls.forEach(el=>el.style.display="none");
+    // hide hamburger on mobile when logged in (mobile nav handles navigation)
+    const mbb=document.getElementById("mobMenuBtn");if(mbb)mbb.style.display="none";
   } else {
-    ab.style.display="flex";up.style.display="none";nb.style.display="none";sb.style.display="none";
-    const mi=document.getElementById("mob-icons");if(mi)mi.style.display="none";
+    ab.style.display="flex";
+    if(up)up.style.display="none";
+    if(nb)nb.style.display="none";
+    const mbb=document.getElementById("mobMenuBtn");if(mbb)mbb.style.display="flex";
     if(mmProfile) mmProfile.classList.add("hidden");
     mmLoggedEls.forEach(el=>el.style.display="none");
     mmGuestEls.forEach(el=>el.style.display="");
@@ -1475,6 +1939,31 @@ function closeMob(){
   setTimeout(()=>{o.style.display="none";},320);
   document.body.style.overflow="";
 }
+
+// ── Professional user dropdown ──
+const upillEl=document.getElementById("upill");
+if(upillEl){
+  upillEl.addEventListener("click",function(e){
+    e.stopPropagation();
+    this.classList.toggle("drop-open");
+  });
+}
+document.addEventListener("click",function(e){
+  if(upillEl && !upillEl.contains(e.target)){
+    upillEl.classList.remove("drop-open");
+  }
+});
+
+// ── Mobile avatar menu ──
+window.toggleMobAvatarMenu = function(e){
+  e.stopPropagation();
+  const el=document.getElementById("mobAvatar");
+  if(el) el.classList.toggle("menu-open");
+};
+document.addEventListener("click",function(e){
+  const el=document.getElementById("mobAvatar");
+  if(el && !el.contains(e.target)) el.classList.remove("menu-open");
+});
 function openSettings(){
   document.getElementById("spanel").classList.add("open");
   document.getElementById("sbg").classList.add("open");
@@ -1571,10 +2060,11 @@ const io = new IntersectionObserver(entries=>{
 },{threshold:.1});
 document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 
-// Keyboard accessibility
-document.querySelectorAll(".fc[role='button']").forEach(c=>c.addEventListener("keydown",e=>{
-  if(e.key==="Enter"||e.key===" "){e.preventDefault();c.click();}
-}));
+// Keyboard accessibility for interactive cards
+document.querySelectorAll('.fc[role="button"]').forEach(el=>{
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click();}});
+});
+
 </script>
 </body>
 </html>

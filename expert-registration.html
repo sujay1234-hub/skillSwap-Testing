@@ -3,418 +3,1104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Expert Registration - SkillSwap</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-
+<meta name="theme-color" content="#06080f">
+<title>Become an Expert — SkillSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{
---bg:#09090b;
---primary:#6366f1;
---accent:#a855f7;
---border:rgba(255,255,255,0.08);
---muted:#a1a1aa;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-font-family:'Plus Jakarta Sans',sans-serif;
-background:var(--bg);
-color:white;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-padding:50px 20px;
-}
-
-.card{
-background:rgba(255,255,255,0.03);
-border:1px solid var(--border);
-border-radius:20px;
-padding:40px;
-}
-
-h1{
-margin-bottom:30px;
-}
-
-.form-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
-
-.input-group{
-display:flex;
-flex-direction:column;
-}
-
-.input-group.full{
-grid-column:1/-1;
-}
-
-label{
-margin-bottom:6px;
-font-size:0.9rem;
-color:var(--muted);
-}
-
-input,textarea,select{
-padding:14px;
-border-radius:10px;
-border:1px solid var(--border);
-background:rgba(0,0,0,0.3);
-color:white;
-}
-
-textarea{
-min-height:120px;
-resize:vertical;
-}
-
-button{
-margin-top:25px;
-width:100%;
-padding:16px;
-border:none;
-border-radius:12px;
-background:linear-gradient(135deg,var(--primary),var(--accent));
-color:white;
-font-weight:600;
-cursor:pointer;
-}
-
-@media(max-width:768px){
-.form-grid{grid-template-columns:1fr;}
-}
-</style>
-
-<style id="mob">
-.mobile-back-btn{display:none;position:fixed;top:16px;left:16px;z-index:9999;width:44px;height:44px;background:rgba(9,9,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:white;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);}
-.mobile-back-btn:hover{background:rgba(99,102,241,0.3);}
-@media(max-width:768px){
-.mobile-back-btn{display:flex;}
-.container{padding:70px 14px 30px;}
-.card{padding:24px 16px;}
-h1{font-size:1.4rem;}
-.form-grid{grid-template-columns:1fr !important;}
-input,textarea,select{font-size:16px !important;}
-button{padding:16px;}
-}
-</style>
-<style id="ss-universal-responsive">
-/* ══════════════════════════════════════════
-   UNIVERSAL RESPONSIVE FIXES — SkillSwap
-   Applied to all pages for consistent UX
-══════════════════════════════════════════ */
-
-/* Safe area support */
 :root {
+  --bg: #06080f;
+  --bg2: #0c0f1a;
+  --bg3: #111527;
+  --card: rgba(255,255,255,0.035);
+  --border: rgba(255,255,255,0.08);
+  --border-h: rgba(255,255,255,0.15);
+  --primary: #6366f1;
+  --primary2: #818cf8;
+  --accent: #a855f7;
+  --glow: rgba(99,102,241,0.25);
+  --cyan: #22d3ee;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --text: #f0f4ff;
+  --muted: #6b7280;
+  --muted2: #9ca3af;
   --sab: env(safe-area-inset-bottom, 0px);
   --sat: env(safe-area-inset-top, 0px);
 }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body {
+  font-family:'DM Sans', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+}
 
-/* Remove legacy floating back buttons */
-.mobile-back-btn { display: none !important; }
+/* ─── AMBIENT BG — using divs not pseudo-elements to avoid stacking context bugs ─── */
+.bg-layer {
+  position:fixed; inset:0; pointer-events:none !important;
+  z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% -10%, rgba(99,102,241,.14) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(168,85,247,.1) 0%, transparent 55%),
+    var(--bg);
+}
 
-/* ── Smooth scrolling & selection ── */
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* All real content sits above bg layers */
+nav, .hero-banner, .steps-bar, .form-outer, .success-view, .toast-wrap {
+  position:relative; z-index:10;
+}
 
-/* ── Universal input fixes for mobile ── */
+/* ─── NAV ─── */
+.topnav {
+  position:sticky; top:0; z-index:200;
+  display:flex; align-items:center; gap:12px;
+  padding:0 24px; height:62px;
+  padding-top:var(--sat);
+  background:rgba(6,8,15,.88);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800;
+  text-decoration:none; color:var(--text);
+}
+.nav-logo-mark {
+  width:32px; height:32px; border-radius:9px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.78rem; color:#fff;
+  box-shadow:0 0 16px var(--glow);
+}
+.nav-back {
+  margin-left:auto;
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.82rem; color:var(--muted2); text-decoration:none;
+  padding:6px 14px; border-radius:9px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  transition:.2s;
+}
+.nav-back:hover { color:var(--text); border-color:var(--border-h); }
+
+/* ─── HERO BANNER ─── */
+.hero-banner {
+  padding:52px 24px 44px;
+  max-width:860px; margin:0 auto;
+  text-align:center;
+}
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:99px;
+  background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.22);
+  font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--primary2); margin-bottom:20px;
+}
+.hero-eyebrow i { font-size:.7rem; }
+.hero-banner h1 {
+  font-family:'Syne',sans-serif; font-size:clamp(2rem,5vw,2.9rem);
+  font-weight:800; letter-spacing:-.03em; line-height:1.1;
+  margin-bottom:14px;
+}
+.hero-banner h1 span {
+  background:linear-gradient(135deg,var(--primary2),var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hero-banner p {
+  color:var(--muted2); font-size:1rem; max-width:540px; margin:0 auto 32px;
+  font-weight:300; line-height:1.8;
+}
+.hero-perks {
+  display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+}
+.perk-chip {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 16px; border-radius:99px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  font-size:.8rem; font-weight:500; color:var(--muted2);
+}
+.perk-chip i { font-size:.75rem; }
+
+/* ─── PROGRESS STEPS ─── */
+.steps-bar {
+  display:flex; align-items:center; justify-content:center;
+  gap:0; max-width:600px; margin:0 auto 40px;
+  padding:0 24px;
+}
+.step {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  flex:1;
+}
+.step-circle {
+  width:36px; height:36px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.78rem; font-weight:700;
+  background:var(--bg3); border:2px solid var(--border);
+  color:var(--muted); transition:.3s;
+  position:relative; z-index:1;
+}
+.step.active .step-circle { background:linear-gradient(135deg,var(--primary),var(--accent)); border-color:transparent; color:#fff; box-shadow:0 0 20px var(--glow); }
+.step.done .step-circle { background:rgba(16,185,129,.15); border-color:var(--emerald); color:var(--emerald); }
+.step-label { font-size:.66rem; font-weight:600; color:var(--muted); text-align:center; text-transform:uppercase; letter-spacing:.05em; }
+.step.active .step-label { color:var(--primary2); }
+.step.done .step-label { color:var(--emerald); }
+.step-line {
+  flex:1; height:1px;
+  background:linear-gradient(90deg, var(--border) 0%, var(--border) 100%);
+  margin:0 -1px; margin-bottom:22px;
+  position:relative; z-index:0;
+  transition:.3s;
+}
+.step-line.done { background:linear-gradient(90deg,var(--emerald),rgba(16,185,129,.3)); }
+
+/* ─── FORM WRAPPER ─── */
+.form-outer {
+  max-width:860px; margin:0 auto;
+  padding:0 20px 80px;
+}
+
+/* ─── FORM STEP PANELS ─── */
+.form-step { display:none; }
+.form-step.active { display:block; animation:fadeUp .35s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── SECTION CARD ─── */
+.form-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px 28px;
+  margin-bottom:16px;
+  position:relative; overflow:visible; z-index:1;
+}
+.form-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.4),transparent);
+}
+.form-card-title {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+  margin-bottom:4px;
+}
+.form-card-title .card-icon {
+  width:32px; height:32px; border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.8rem; flex-shrink:0;
+}
+.form-card-sub { font-size:.82rem; color:var(--muted); margin-bottom:24px; padding-left:42px; }
+
+/* ─── FORM GRID ─── */
+.fg { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.fg-3 { grid-template-columns:1fr 1fr 1fr; }
+.full { grid-column:1/-1; }
+
+/* ─── FIELD ─── */
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label {
+  font-size:.78rem; font-weight:600; color:var(--muted2);
+  letter-spacing:.01em;
+}
+.field label span.req { color:var(--rose); margin-left:2px; }
+.field-hint { font-size:.72rem; color:var(--muted); margin-top:-3px; }
+
 input, textarea, select {
-  font-size: 16px !important; /* Prevents iOS zoom */
-  -webkit-appearance: none;
-  border-radius: 10px;
+  padding:12px 14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px !important;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s, background .2s;
+  -webkit-appearance:none;
+  width:100%;
 }
-
-/* ── Focus ring ── */
-input:focus, textarea:focus, select:focus, button:focus-visible {
-  outline: none;
+input::placeholder, textarea::placeholder { color:var(--muted); }
+input:focus, textarea:focus, select:focus {
+  border-color:rgba(99,102,241,.5);
+  background:rgba(99,102,241,.04);
+  box-shadow:0 0 0 3px rgba(99,102,241,.1);
 }
+input.error { border-color:rgba(244,63,94,.5); background:rgba(244,63,94,.04); }
+textarea { min-height:120px; resize:vertical; }
+select { cursor:pointer; }
+select option { background:var(--bg2); color:var(--text); }
 
-/* ── Prevent horizontal overflow ── */
-body { overflow-x: hidden; }
-img, video { max-width: 100%; }
-
-/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
-.ss-mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(9,9,11,0.97);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 10px 4px;
-  padding-bottom: calc(10px + var(--sab));
-  z-index: 500;
+/* Input with icon */
+.input-icon-wrap { position:relative; }
+.input-icon-wrap i {
+  position:absolute; left:13px; top:50%; transform:translateY(-50%);
+  font-size:.8rem; color:var(--muted); pointer-events:none;
 }
-.ss-mobile-nav-inner {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 480px;
-  margin: 0 auto;
+.input-icon-wrap input { padding-left:36px; }
+
+/* Char counter */
+.field-footer { display:flex; justify-content:space-between; margin-top:4px; }
+.char-count { font-size:.7rem; color:var(--muted); font-family:monospace; }
+
+/* ─── FILE UPLOAD ─── */
+.file-upload {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px;
+  padding:28px 20px;
+  border:2px dashed var(--border);
+  border-radius:14px;
+  cursor:pointer;
+  transition:.25s;
+  text-align:center;
+  background:rgba(255,255,255,.02);
+  position:relative;
 }
-.ss-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
-  color: #71717a;
-  font-size: 0.62rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: color 0.2s, background 0.2s;
-  text-decoration: none;
-  min-width: 52px;
-  text-align: center;
-  letter-spacing: 0.02em;
+.file-upload:hover, .file-upload.dragover {
+  border-color:rgba(99,102,241,.5);
+  background:rgba(99,102,241,.05);
 }
-.ss-nav-item i { font-size: 1.2rem; }
-.ss-nav-item.active { color: #6366f1; }
-.ss-nav-item.active i { color: #6366f1; }
-
-/* ── Universal Mobile Header ── */
-.ss-mobile-header {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 400;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  padding-top: calc(14px + var(--sat));
-  background: rgba(9,9,11,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+.file-upload input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.file-upload-icon {
+  width:44px; height:44px; border-radius:12px;
+  background:rgba(99,102,241,.12); color:var(--primary2);
+  display:flex; align-items:center; justify-content:center; font-size:1.1rem;
 }
-.ss-mob-logo {
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: flex; align-items: center; gap: 8px;
+.file-upload-label { font-size:.85rem; font-weight:600; color:var(--text); }
+.file-upload-hint { font-size:.75rem; color:var(--muted); }
+.file-selected {
+  display:none; align-items:center; gap:10px;
+  padding:10px 14px; border-radius:10px;
+  background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2);
+  margin-top:8px; font-size:.82rem;
 }
-.ss-mob-btn {
-  width: 40px; height: 40px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.04);
-  color: #a1a1aa;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 1rem;
-  text-decoration: none; transition: background 0.2s;
+.file-selected i { color:var(--emerald); }
+.file-selected span { color:var(--emerald); font-weight:500; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file-selected .file-remove { color:var(--muted); cursor:pointer; flex-shrink:0; font-size:.8rem; transition:.2s; }
+.file-selected .file-remove:hover { color:var(--rose); }
+
+/* ─── SKILL TAGS ─── */
+.skill-tags-wrap {
+  display:flex; flex-wrap:wrap; gap:8px;
+  padding:10px; border:1px solid var(--border);
+  border-radius:12px; background:rgba(255,255,255,.03);
+  min-height:50px; cursor:text;
 }
-.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
-
-@media (max-width: 768px) {
-  .ss-mobile-nav { display: block; }
-  .ss-mobile-header { display: flex; }
-
-  /* Extra bottom padding so content not hidden behind nav */
-  body { padding-bottom: calc(70px + var(--sab)) !important; }
-
-  /* Hide desktop sidebars on mobile */
-  .sidebar { transform: translateX(-100%) !important; }
-  .sidebar.open { transform: translateX(0) !important; }
-  .main { margin-left: 0 !important; }
-
-  /* Bigger tap targets */
-  button, .btn-primary, .btn-secondary, a[role=button] {
-    min-height: 44px;
-  }
-
-  /* Container full padding on mobile */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-
-  /* Card padding on mobile */
-  .card, .panel, .settings-card { padding: 18px 16px !important; }
+.skill-tags-wrap:focus-within { border-color:rgba(99,102,241,.5); box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+.skill-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:99px;
+  background:rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.25);
+  color:var(--primary2); font-size:.78rem; font-weight:600;
 }
+.skill-tag button { background:none; border:none; color:var(--primary2); cursor:pointer; padding:0; font-size:.7rem; line-height:1; opacity:.7; }
+.skill-tag button:hover { opacity:1; }
+.tag-input { border:none; outline:none; background:transparent; color:var(--text); font-size:.85rem; font-family:'DM Sans',sans-serif; min-width:120px; padding:4px 4px; flex:1; }
 
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr !important; }
-  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
-  h1 { font-size: 1.5rem !important; }
+/* ─── RATING SELF ─── */
+.exp-level-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.exp-level-btn {
+  padding:14px 10px; border-radius:14px; text-align:center;
+  border:2px solid var(--border); background:rgba(255,255,255,.02);
+  cursor:pointer; transition:.2s; position:relative; overflow:hidden;
 }
-</style>
-<style id="ss-per-page-responsive">
-/* Expert registration mobile */
-@media (max-width: 768px) {
-  .container { padding-top: 20px !important; }
-  .card { padding: 20px 14px !important; border-radius: 16px; }
-  .form-grid { gap: 14px !important; }
-  h1 { font-size: 1.3rem; }
+.exp-level-btn input[type=radio] { position:absolute; opacity:0; width:0; height:0; }
+.exp-level-btn:hover { border-color:var(--border-h); background:rgba(255,255,255,.04); }
+.exp-level-btn.selected { border-color:var(--primary); background:rgba(99,102,241,.08); }
+.exp-icon { font-size:1.5rem; display:block; margin-bottom:6px; }
+.exp-title { font-size:.82rem; font-weight:700; display:block; margin-bottom:2px; }
+.exp-sub { font-size:.68rem; color:var(--muted); display:block; }
+
+/* ─── AVAILABILITY ─── */
+.day-grid { display:flex; gap:8px; flex-wrap:wrap; }
+.day-btn {
+  width:44px; height:44px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--border); background:rgba(255,255,255,.03);
+  font-size:.72rem; font-weight:700; cursor:pointer; transition:.2s;
+  color:var(--muted2); text-transform:uppercase;
+}
+.day-btn.on { background:rgba(99,102,241,.15); border-color:var(--primary); color:var(--primary2); }
+
+/* ─── AGREEMENT ─── */
+.agreement-box {
+  padding:16px 18px; border-radius:14px;
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  font-size:.82rem; color:var(--muted2); line-height:1.7;
+  position:relative; z-index:1;
+}
+.agreement-box strong { color:var(--text); }
+.check-row { display:flex; align-items:flex-start; gap:12px; margin-top:14px; cursor:pointer; position:relative; z-index:10; }
+.check-row input[type=checkbox] { width:20px; height:20px; min-width:20px; flex-shrink:0; margin-top:2px; accent-color:var(--primary); cursor:pointer; border-radius:5px; position:relative; z-index:11; }
+.check-row span { font-size:.82rem; color:var(--muted2); line-height:1.6; cursor:pointer; }
+.check-row span a { color:var(--primary2); text-decoration:none; }
+.check-row span a:hover { text-decoration:underline; }
+
+/* ─── BUTTONS ─── */
+.btn-row { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-top:24px; }
+.btn-back {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:13px 22px; border-radius:13px;
+  border:1px solid var(--border); background:transparent;
+  color:var(--muted2); font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
+  cursor:pointer; transition:.2s;
+}
+.btn-back:hover { color:var(--text); border-color:var(--border-h); background:rgba(255,255,255,.04); }
+.btn-next, .btn-submit {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 28px; border-radius:13px;
+  border:none; cursor:pointer;
+  font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff; transition:all .3s;
+  box-shadow:0 6px 24px var(--glow);
+  letter-spacing:.01em;
+}
+.btn-next:hover, .btn-submit:hover { transform:translateY(-2px); box-shadow:0 12px 36px var(--glow); }
+.btn-next:disabled, .btn-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+/* ─── SUCCESS STATE ─── */
+.success-view {
+  display:none; text-align:center;
+  padding:60px 20px 80px;
+  max-width:520px; margin:0 auto;
+}
+.success-view.show { display:block; animation:fadeUp .5s ease both; }
+.success-icon {
+  width:72px; height:72px; border-radius:50%;
+  background:linear-gradient(135deg,var(--emerald),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem; margin:0 auto 24px;
+  box-shadow:0 0 40px rgba(16,185,129,.3);
+}
+.success-view h2 { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; margin-bottom:12px; }
+.success-view p { color:var(--muted2); font-size:.95rem; line-height:1.8; margin-bottom:28px; }
+.success-steps {
+  text-align:left;
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:20px 22px; margin-bottom:28px;
+}
+.success-step {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 0; border-bottom:1px solid var(--border);
+  font-size:.85rem;
+}
+.success-step:last-child { border-bottom:none; }
+.success-step-num {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  background:rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.25);
+  color:var(--primary2); font-size:.72rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.btn-home {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 30px; border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff; text-decoration:none; font-family:'Syne',sans-serif;
+  font-weight:700; font-size:.9rem;
+  box-shadow:0 6px 24px var(--glow); transition:all .3s;
+}
+.btn-home:hover { transform:translateY(-2px); box-shadow:0 12px 36px var(--glow); }
+
+/* ─── TOAST ─── */
+.toast-wrap { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:9999; }
+.toast-msg {
+  background:var(--bg2); border:1px solid var(--border-h);
+  border-radius:99px; padding:12px 22px;
+  display:none; align-items:center; gap:9px;
+  font-size:.85rem; font-weight:500;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);
+  white-space:nowrap;
+  animation:fadeUp .3s ease;
+}
+.toast-msg.show { display:flex; }
+.toast-msg.success i { color:var(--emerald); }
+.toast-msg.error i { color:var(--rose); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:768px) {
+  .topnav { padding:0 16px; height:56px; padding-top:var(--sat); }
+  .hero-banner { padding:36px 18px 32px; }
+  .hero-banner h1 { font-size:clamp(1.6rem,7vw,2.2rem); }
+  .hero-banner p { font-size:.92rem; }
+  .hero-perks { gap:8px; }
+  .perk-chip { font-size:.72rem; padding:6px 12px; }
+  .steps-bar { padding:0 12px; gap:0; }
+  .step-label { font-size:.58rem; }
+  .form-outer { padding:0 14px calc(80px + var(--sab)); }
+  .form-card { padding:22px 16px; border-radius:16px; }
+  .form-card-sub { padding-left:0; }
+  .fg { grid-template-columns:1fr; gap:14px; }
+  .fg-3 { grid-template-columns:1fr; }
+  .exp-level-grid { grid-template-columns:1fr; gap:8px; }
+  .exp-level-btn { display:flex; align-items:center; gap:12px; padding:14px 16px; }
+  .exp-icon { margin-bottom:0; font-size:1.3rem; }
+  .exp-title { font-size:.85rem; }
+  .btn-row { flex-direction:column-reverse; }
+  .btn-back, .btn-next, .btn-submit { width:100%; justify-content:center; }
+  body { padding-bottom:calc(70px + var(--sab)); }
+}
+@media (max-width:480px) {
+  .hero-banner { padding:28px 16px 24px; }
+  .hero-eyebrow { font-size:.65rem; }
+  .form-card { padding:18px 14px; }
 }
 </style>
 </head>
-
 <body>
+<div class="bg-layer" aria-hidden="true"></div>
 
+<!-- NAV -->
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark"><i class="fa-solid fa-bolt"></i></div>
+    SkillSwap
+  </a>
+  <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</nav>
 
-<div class="container">
-<div class="card">
-<h1>Apply as Verified Expert</h1>
-
-<div class="form-grid">
-
-<div class="input-group">
-<label>Full Name</label>
-<input id="fullName" required>
+<!-- HERO -->
+<div class="hero-banner" id="heroSection">
+  <div class="hero-eyebrow"><i class="fa-solid fa-star"></i> Expert Program</div>
+  <h1>Share Your Mastery,<br><span>Earn What You Deserve</span></h1>
+  <p>Apply to become a verified SkillSwap Expert. Teach what you've mastered, set your own rates, and build a real reputation in your field.</p>
+  <div class="hero-perks">
+    <span class="perk-chip"><i class="fa-solid fa-indian-rupee-sign" style="color:var(--amber)"></i> Earn ₹300–₹1,000+/hr</span>
+    <span class="perk-chip"><i class="fa-solid fa-shield-check" style="color:var(--emerald)"></i> Verified Badge</span>
+    <span class="perk-chip"><i class="fa-solid fa-calendar-days" style="color:var(--primary2)"></i> Flexible Schedule</span>
+    <span class="perk-chip"><i class="fa-solid fa-users" style="color:var(--accent)"></i> 10,000+ Students</span>
+  </div>
 </div>
 
-<div class="input-group">
-<label>Phone Number</label>
-<input id="phone" required>
+<!-- PROGRESS STEPS -->
+<div class="steps-bar" id="stepsBar">
+  <div class="step active" id="step1">
+    <div class="step-circle">1</div>
+    <span class="step-label">Profile</span>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step" id="step2">
+    <div class="step-circle">2</div>
+    <span class="step-label">Expertise</span>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step" id="step3">
+    <div class="step-circle">3</div>
+    <span class="step-label">Documents</span>
+  </div>
+  <div class="step-line" id="line3"></div>
+  <div class="step" id="step4">
+    <div class="step-circle">4</div>
+    <span class="step-label">Review</span>
+  </div>
 </div>
 
-<div class="input-group">
-<label>Primary Skill</label>
-<input id="skill" required>
+<!-- FORM -->
+<div class="form-outer" id="formOuter">
+
+  <!-- STEP 1: Basic Profile -->
+  <div class="form-step active" id="fstep1">
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(99,102,241,.12);color:var(--primary2)"><i class="fa-solid fa-user"></i></div>
+        Personal Information
+      </div>
+      <p class="form-card-sub">Your public-facing profile details. Students will see this.</p>
+      <div class="fg">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="fullName" placeholder="Rahul Sharma" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Phone Number <span class="req">*</span></label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-phone"></i>
+            <input type="tel" id="phone" placeholder="+91 98765 43210" autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label>College / University</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <input type="text" id="college" placeholder="IIT Delhi, BITS Pilani…">
+          </div>
+        </div>
+        <div class="field">
+          <label>City <span class="req">*</span></label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-location-dot"></i>
+            <input type="text" id="city" placeholder="Mumbai, Delhi, Bangalore…">
+          </div>
+        </div>
+        <div class="field full">
+          <label>Professional Bio <span class="req">*</span></label>
+          <textarea id="bio" placeholder="Tell students about yourself — your background, teaching style, and what makes you the right expert for them…" maxlength="500" oninput="updateCount(this,'bioCount')"></textarea>
+          <div class="field-footer">
+            <span class="field-hint">Write at least 80 characters. This is your first impression.</span>
+            <span class="char-count"><span id="bioCount">0</span>/500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn-next" onclick="goStep(2)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Expertise -->
+  <div class="form-step" id="fstep2">
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(168,85,247,.12);color:var(--accent)"><i class="fa-solid fa-brain"></i></div>
+        Skill & Expertise
+      </div>
+      <p class="form-card-sub">Tell us what you're an expert in. Be specific — it helps us match you with the right students.</p>
+      <div class="fg">
+        <div class="field">
+          <label>Primary Skill <span class="req">*</span></label>
+          <input type="text" id="skill" placeholder="e.g. Python, UI/UX Design, Guitar…">
+        </div>
+        <div class="field">
+          <label>Category <span class="req">*</span></label>
+          <select id="category">
+            <option value="">Select a category</option>
+            <option>Programming & Tech</option>
+            <option>Design & Creative</option>
+            <option>Data Science & AI</option>
+            <option>Business & Finance</option>
+            <option>Marketing & Growth</option>
+            <option>Languages</option>
+            <option>Music & Arts</option>
+            <option>Academic Subjects</option>
+            <option>Fitness & Wellness</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Years of Experience <span class="req">*</span></label>
+          <select id="experience">
+            <option value="">Select experience</option>
+            <option value="1">Less than 1 year</option>
+            <option value="1">1 year</option>
+            <option value="2">2 years</option>
+            <option value="3">3 years</option>
+            <option value="4">4 years</option>
+            <option value="5">5+ years</option>
+            <option value="8">8+ years</option>
+            <option value="10">10+ years</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Hourly Rate (₹) <span class="req">*</span></label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <input type="number" id="rate" placeholder="500" min="100" max="5000">
+          </div>
+          <span class="field-hint">Platform average: ₹400–₹800/hr</span>
+        </div>
+        <div class="field full">
+          <label>Additional Skills <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <div class="skill-tags-wrap" id="skillTagsWrap" onclick="document.getElementById('tagInput').focus()">
+            <input class="tag-input" id="tagInput" placeholder="Type a skill and press Enter…" onkeydown="handleTagInput(event)">
+          </div>
+          <span class="field-hint">Press Enter or comma to add. E.g. React, Figma, JavaScript</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(34,211,238,.1);color:var(--cyan)"><i class="fa-solid fa-chart-bar"></i></div>
+        Self-Assessment
+      </div>
+      <p class="form-card-sub">How would you rate your level in your primary skill?</p>
+      <div class="exp-level-grid">
+        <label class="exp-level-btn" id="lvl-intermediate">
+          <input type="radio" name="level" value="Intermediate" onchange="selectLevel('intermediate')">
+          <span class="exp-icon">🟡</span>
+          <div><span class="exp-title">Intermediate</span><span class="exp-sub">2–4 years experience</span></div>
+        </label>
+        <label class="exp-level-btn" id="lvl-advanced">
+          <input type="radio" name="level" value="Advanced" onchange="selectLevel('advanced')">
+          <span class="exp-icon">🔵</span>
+          <div><span class="exp-title">Advanced</span><span class="exp-sub">4–7 years experience</span></div>
+        </label>
+        <label class="exp-level-btn" id="lvl-expert">
+          <input type="radio" name="level" value="Expert" onchange="selectLevel('expert')">
+          <span class="exp-icon">🟣</span>
+          <div><span class="exp-title">Expert</span><span class="exp-sub">7+ years / professional</span></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--amber)"><i class="fa-solid fa-calendar-days"></i></div>
+        Availability
+      </div>
+      <p class="form-card-sub">Which days are you generally available to teach?</p>
+      <div class="day-grid">
+        <div class="day-btn" id="day-mon" onclick="toggleDay('mon')">Mon</div>
+        <div class="day-btn" id="day-tue" onclick="toggleDay('tue')">Tue</div>
+        <div class="day-btn" id="day-wed" onclick="toggleDay('wed')">Wed</div>
+        <div class="day-btn" id="day-thu" onclick="toggleDay('thu')">Thu</div>
+        <div class="day-btn" id="day-fri" onclick="toggleDay('fri')">Fri</div>
+        <div class="day-btn" id="day-sat" onclick="toggleDay('sat')">Sat</div>
+        <div class="day-btn" id="day-sun" onclick="toggleDay('sun')">Sun</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <button class="btn-next" onclick="goStep(3)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Documents -->
+  <div class="form-step" id="fstep3">
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(16,185,129,.12);color:var(--emerald)"><i class="fa-solid fa-link"></i></div>
+        Online Presence
+      </div>
+      <p class="form-card-sub">Help us verify your expertise. At least one link is recommended.</p>
+      <div class="fg">
+        <div class="field">
+          <label>LinkedIn Profile</label>
+          <div class="input-icon-wrap">
+            <i class="fa-brands fa-linkedin" style="color:#0a66c2"></i>
+            <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourname">
+          </div>
+        </div>
+        <div class="field">
+          <label>Portfolio / Website</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-globe"></i>
+            <input type="url" id="portfolio" placeholder="https://yourportfolio.com">
+          </div>
+        </div>
+        <div class="field">
+          <label>GitHub / Behance / Dribbble</label>
+          <div class="input-icon-wrap">
+            <i class="fa-brands fa-github"></i>
+            <input type="url" id="github" placeholder="https://github.com/yourname">
+          </div>
+        </div>
+        <div class="field">
+          <label>YouTube / Other</label>
+          <div class="input-icon-wrap">
+            <i class="fa-brands fa-youtube" style="color:#ff0000"></i>
+            <input type="url" id="youtube" placeholder="https://youtube.com/@yourchannel">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(244,63,94,.1);color:var(--rose)"><i class="fa-solid fa-file-shield"></i></div>
+        Proof of Expertise <span style="color:var(--rose);font-size:.85rem;font-weight:400">Required</span>
+      </div>
+      <p class="form-card-sub">Upload documents that verify your skills. All documents are reviewed privately by our team.</p>
+
+      <div class="fg">
+        <div class="field full">
+          <label>Certificate / Degree <span class="req">*</span></label>
+          <div class="file-upload" id="certUpload">
+            <input type="file" id="certificate" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'certSelected','certName')">
+            <div class="file-upload-icon"><i class="fa-solid fa-certificate"></i></div>
+            <div class="file-upload-label">Upload Certificate or Degree</div>
+            <div class="file-upload-hint">PDF, JPG or PNG · Max 10MB</div>
+          </div>
+          <div class="file-selected" id="certSelected">
+            <i class="fa-solid fa-file-check"></i>
+            <span id="certName">file.pdf</span>
+            <i class="fa-solid fa-times file-remove" onclick="removeFile('certificate','certSelected')"></i>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Resume / CV <span style="color:var(--muted);font-weight:400">(optional but recommended)</span></label>
+          <div class="file-upload" id="resumeUpload">
+            <input type="file" id="resume" accept=".pdf" onchange="handleFile(this,'resumeSelected','resumeName')">
+            <div class="file-upload-icon"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="file-upload-label">Upload Resume or CV</div>
+            <div class="file-upload-hint">PDF only · Max 5MB</div>
+          </div>
+          <div class="file-selected" id="resumeSelected">
+            <i class="fa-solid fa-file-check"></i>
+            <span id="resumeName">resume.pdf</span>
+            <i class="fa-solid fa-times file-remove" onclick="removeFile('resume','resumeSelected')"></i>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Work Sample / Project Screenshot <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <div class="file-upload" id="sampleUpload">
+            <input type="file" id="workSample" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this,'sampleSelected','sampleName')">
+            <div class="file-upload-icon"><i class="fa-solid fa-image"></i></div>
+            <div class="file-upload-label">Upload Work Sample</div>
+            <div class="file-upload-hint">PDF, JPG or PNG · Max 10MB</div>
+          </div>
+          <div class="file-selected" id="sampleSelected">
+            <i class="fa-solid fa-file-check"></i>
+            <span id="sampleName">sample.jpg</span>
+            <i class="fa-solid fa-times file-remove" onclick="removeFile('workSample','sampleSelected')"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <button class="btn-next" onclick="goStep(4)">Review Application <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Review & Submit -->
+  <div class="form-step" id="fstep4">
+    <div class="form-card" id="reviewCard">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(99,102,241,.12);color:var(--primary2)"><i class="fa-solid fa-list-check"></i></div>
+        Review Your Application
+      </div>
+      <p class="form-card-sub">Please double-check everything before submitting. You can go back to edit.</p>
+      <div id="reviewContent" style="display:grid;gap:10px"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-title">
+        <div class="card-icon" style="background:rgba(244,63,94,.1);color:var(--rose)"><i class="fa-solid fa-handshake"></i></div>
+        Terms & Agreement
+      </div>
+      <div class="agreement-box">
+        By submitting, you confirm that all information and documents provided are <strong>genuine and accurate</strong>. False information will result in permanent ban from the platform.
+        <br><br>
+        SkillSwap reserves the right to verify your documents and approve or reject applications at our discretion. You'll be notified via email within <strong>3–5 business days</strong>.
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="agreeTerms">
+        <label for="agreeTerms" style="font-size:.82rem;color:var(--muted2);line-height:1.6;cursor:pointer">I agree to the <a href="#">Terms of Service</a> and <a href="#">Expert Community Guidelines</a></label>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="agreeAccurate">
+        <label for="agreeAccurate" style="font-size:.82rem;color:var(--muted2);line-height:1.6;cursor:pointer">I confirm all provided information and documents are genuine and accurate</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitApplication()">
+        <i class="fa-solid fa-paper-plane"></i> Submit Application
+      </button>
+    </div>
+  </div>
+
+</div><!-- /form-outer -->
+
+<!-- SUCCESS -->
+<div class="success-view" id="successView">
+  <div class="success-icon">✓</div>
+  <h2>Application Submitted!</h2>
+  <p>Your expert application is now under review. Our team carefully reviews every submission to maintain quality standards.</p>
+  <div class="success-steps">
+    <div class="success-step"><div class="success-step-num">1</div> Application received &amp; queued for review</div>
+    <div class="success-step"><div class="success-step-num">2</div> Document verification by our team (2–3 days)</div>
+    <div class="success-step"><div class="success-step-num">3</div> Interview / skill test may be requested</div>
+    <div class="success-step"><div class="success-step-num">4</div> Approval &amp; Verified Expert badge granted</div>
+  </div>
+  <a href="index.html" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
 </div>
 
-<div class="input-group">
-<label>Category</label>
-<select id="category">
-<option>Programming</option>
-<option>Design</option>
-<option>Marketing</option>
-<option>Business</option>
-<option>Other</option>
-</select>
-</div>
-
-<div class="input-group">
-<label>Years of Experience</label>
-<input id="experience" type="number" required>
-</div>
-
-<div class="input-group">
-<label>Hourly Rate (₹)</label>
-<input id="rate" type="number" required>
-</div>
-
-<div class="input-group full">
-<label>Professional Bio</label>
-<textarea id="bio"></textarea>
-</div>
-
-<div class="input-group">
-<label>LinkedIn URL</label>
-<input id="linkedin">
-</div>
-
-<div class="input-group">
-<label>Portfolio URL</label>
-<input id="portfolio">
-</div>
-
-<div class="input-group full">
-<label>Upload Certificate (PDF/Image)</label>
-<input type="file" id="certificate" accept=".pdf,.jpg,.png" required>
-</div>
-
-<div class="input-group full">
-<label>Upload Resume (Optional)</label>
-<input type="file" id="resume" accept=".pdf">
-</div>
-
-</div>
-
-<button onclick="submitApplication()">Submit Application</button>
-
-</div>
+<!-- TOAST -->
+<div class="toast-wrap">
+  <div class="toast-msg" id="toastMsg">
+    <i class="fa-solid fa-circle-info"></i>
+    <span id="toastText">Message</span>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore,collection,addDoc,serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage,ref,uploadBytes,getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
- const firebaseConfig = {
-            apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-            authDomain: "skillswapp-35e86.firebaseapp.com",
-            projectId: "skillswapp-35e86",
-            storageBucket: "skillswapp-35e86.appspot.com",
-            messagingSenderId: "668466292157",
-            appId: "1:668466292157:web:9be85414fc752b67779ed4"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
+  authDomain: "skillswapp-35e86.firebaseapp.com",
+  projectId: "skillswapp-35e86",
+  storageBucket: "skillswapp-35e86.appspot.com",
+  messagingSenderId: "668466292157",
+  appId: "1:668466292157:web:9be85414fc752b67779ed4"
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
+let currentUser = null;
 
-let currentUser;
-
-onAuthStateChanged(auth,user=>{
-if(!user){
-window.location.href="login.html";
-}else{
-currentUser=user;
-}
+onAuthStateChanged(auth, user => {
+  if (!user) { window.location.href = "login.html"; }
+  else { currentUser = user; }
 });
 
-window.submitApplication = async function(){
+window.submitApplication = async function() {
+  // --- Checkbox validation ---
+  const termsChecked = document.getElementById('agreeTerms').checked;
+  const accurateChecked = document.getElementById('agreeAccurate').checked;
+  if (!termsChecked || !accurateChecked) {
+    showToast('Please tick both agreement checkboxes before submitting', 'error');
+    return; // Button never gets disabled here
+  }
 
-const certFile=document.getElementById("certificate").files[0];
-const resumeFile=document.getElementById("resume").files[0];
+  const certFile = document.getElementById('certificate').files[0];
+  if (!certFile) { showToast('Certificate upload is required', 'error'); return; }
 
-if(!certFile){
-alert("Certificate required");
-return;
-}
+  // --- Lock button ---
+  const btn = document.getElementById('submitBtn');
+  const originalBtnHTML = btn.innerHTML;
+  const resetBtn = () => { btn.disabled = false; btn.innerHTML = originalBtnHTML; };
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting…';
 
-try{
+  try {
+    // --- Convert files to base64 (avoids Firebase Storage CORS issues) ---
+    const toBase64 = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ data: reader.result, name: file.name, type: file.type, size: file.size });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-// Upload certificate
-const certRef=ref(storage,"expertCertificates/"+currentUser.uid+"_"+certFile.name);
-await uploadBytes(certRef,certFile);
-const certURL=await getDownloadURL(certRef);
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing files…';
+    const certData = await toBase64(certFile);
 
-let resumeURL="";
-if(resumeFile){
-const resumeRef=ref(storage,"expertResumes/"+currentUser.uid+"_"+resumeFile.name);
-await uploadBytes(resumeRef,resumeFile);
-resumeURL=await getDownloadURL(resumeRef);
-}
+    let resumeData = null, sampleData = null;
+    const resumeFile = document.getElementById('resume').files[0];
+    if (resumeFile) {
+      if (resumeFile.size > 3 * 1024 * 1024) { showToast('Resume must be under 3MB', 'error'); resetBtn(); return; }
+      resumeData = await toBase64(resumeFile);
+    }
+    const sampleFile = document.getElementById('workSample').files[0];
+    if (sampleFile) {
+      if (sampleFile.size > 3 * 1024 * 1024) { showToast('Work sample must be under 3MB', 'error'); resetBtn(); return; }
+      sampleData = await toBase64(sampleFile);
+    }
 
-await addDoc(collection(db,"expertApplications"),{
-userId:currentUser.uid,
-fullName:fullName.value,
-phone:phone.value,
-skill:skill.value,
-category:category.value,
-experience:Number(experience.value),
-rate:Number(rate.value),
-bio:bio.value,
-linkedin:linkedin.value,
-portfolio:portfolio.value,
-certificateURL:certURL,
-resumeURL:resumeURL,
-status:"pending",
-isVerified:false,
-appliedAt:serverTimestamp()
-});
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to database…';
 
-alert("Application submitted successfully!");
+    const selectedLevel = document.querySelector('input[name="level"]:checked');
+    const activeDays = Array.from(document.querySelectorAll('.day-btn.on')).map(d => d.textContent.trim());
+    const tagEls = document.querySelectorAll('.skill-tag');
+    const extraSkills = Array.from(tagEls).map(t => t.dataset.val);
 
-}catch(error){
-console.error(error);
-alert("Something went wrong.");
-}
+    await addDoc(collection(db, 'expertApplications'), {
+      userId: currentUser.uid,
+      userEmail: currentUser.email,
+      fullName: document.getElementById('fullName').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      college: document.getElementById('college').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      bio: document.getElementById('bio').value.trim(),
+      skill: document.getElementById('skill').value.trim(),
+      category: document.getElementById('category').value,
+      experience: document.getElementById('experience').value,
+      rate: Number(document.getElementById('rate').value),
+      level: selectedLevel ? selectedLevel.value : '',
+      extraSkills,
+      availability: activeDays,
+      linkedin: document.getElementById('linkedin').value.trim(),
+      portfolio: document.getElementById('portfolio').value.trim(),
+      github: document.getElementById('github').value.trim(),
+      youtube: document.getElementById('youtube').value.trim(),
+      // Files stored as metadata + base64 (no Storage CORS needed)
+      certificate: certData,
+      resume: resumeData,
+      workSample: sampleData,
+      // Legacy URL fields for admin compatibility
+      certificateURL: '', resumeURL: '', sampleURL: '',
+      status: 'pending',
+      isVerified: false,
+      adminNote: '',
+      appliedAt: serverTimestamp()
+    });
 
+    // --- Success ---
+    document.getElementById('heroSection').style.display = 'none';
+    document.getElementById('stepsBar').style.display = 'none';
+    document.getElementById('formOuter').style.display = 'none';
+    document.getElementById('successView').classList.add('show');
+
+  } catch(err) {
+    console.error('Submit error:', err);
+    let msg = 'Something went wrong. Please try again.';
+    if (err.code === 'permission-denied') msg = 'Permission denied — please log in again.';
+    if (err.message && err.message.includes('quota')) msg = 'File too large. Please use smaller files.';
+    showToast(msg, 'error');
+    resetBtn();
+  }
 };
+
+window.showToast = function(msg, type='info') {
+  const el = document.getElementById('toastMsg');
+  const icon = el.querySelector('i');
+  document.getElementById('toastText').textContent = msg;
+  el.className = 'toast-msg show ' + type;
+  icon.className = type === 'error' ? 'fa-solid fa-circle-xmark' : type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-info';
+  setTimeout(() => el.classList.remove('show'), 3500);
+};
+</script>
+
+<script>
+let currentStep = 1;
+const tags = [];
+
+function goStep(n) {
+  if (n > currentStep) {
+    if (!validateStep(currentStep)) return;
+  }
+  document.getElementById('fstep' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('fstep' + n).classList.add('active');
+  updateSteps(n);
+  if (n === 4) buildReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSteps(n) {
+  for (let i = 1; i <= 4; i++) {
+    const s = document.getElementById('step' + i);
+    s.classList.remove('active','done');
+    if (i < n) { s.classList.add('done'); s.querySelector('.step-circle').innerHTML = '<i class="fa-solid fa-check"></i>'; }
+    else if (i === n) { s.classList.add('active'); s.querySelector('.step-circle').textContent = i; }
+    else { s.querySelector('.step-circle').textContent = i; }
+  }
+  for (let i = 1; i <= 3; i++) {
+    const l = document.getElementById('line' + i);
+    l.classList.toggle('done', i < n);
+  }
+}
+
+function validateStep(step) {
+  if (step === 1) {
+    const name = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const bio = document.getElementById('bio').value.trim();
+    const city = document.getElementById('city').value.trim();
+    if (!name) { showToastLocal('Please enter your full name', 'error'); highlight('fullName'); return false; }
+    if (!phone) { showToastLocal('Please enter your phone number', 'error'); highlight('phone'); return false; }
+    if (!city) { showToastLocal('Please enter your city', 'error'); highlight('city'); return false; }
+    if (bio.length < 80) { showToastLocal('Bio must be at least 80 characters', 'error'); highlight('bio'); return false; }
+  }
+  if (step === 2) {
+    if (!document.getElementById('skill').value.trim()) { showToastLocal('Please enter your primary skill', 'error'); return false; }
+    if (!document.getElementById('category').value) { showToastLocal('Please select a category', 'error'); return false; }
+    if (!document.getElementById('experience').value) { showToastLocal('Please select your experience level', 'error'); return false; }
+    if (!document.getElementById('rate').value) { showToastLocal('Please enter your hourly rate', 'error'); return false; }
+  }
+  if (step === 3) {
+    if (!document.getElementById('certificate').files[0]) { showToastLocal('Certificate upload is required', 'error'); return false; }
+  }
+  return true;
+}
+
+function highlight(id) {
+  const el = document.getElementById(id);
+  el.classList.add('error');
+  el.focus();
+  setTimeout(() => el.classList.remove('error'), 2000);
+}
+
+function showToastLocal(msg, type) {
+  if (window.showToast) window.showToast(msg, type);
+}
+
+function updateCount(el, countId) {
+  document.getElementById(countId).textContent = el.value.length;
+}
+
+function handleTagInput(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(',','');
+    if (val && !tags.includes(val) && tags.length < 8) {
+      tags.push(val);
+      addTagEl(val);
+      e.target.value = '';
+    }
+  }
+}
+
+function addTagEl(val) {
+  const wrap = document.getElementById('skillTagsWrap');
+  const input = document.getElementById('tagInput');
+  const tag = document.createElement('span');
+  tag.className = 'skill-tag';
+  tag.dataset.val = val;
+  tag.innerHTML = `${val}<button type="button" onclick="removeTag(this,'${val}')"><i class="fa-solid fa-times"></i></button>`;
+  wrap.insertBefore(tag, input);
+}
+
+window.removeTag = function(btn, val) {
+  const idx = tags.indexOf(val);
+  if (idx > -1) tags.splice(idx, 1);
+  btn.closest('.skill-tag').remove();
+};
+
+function selectLevel(id) {
+  document.querySelectorAll('.exp-level-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('lvl-' + id).classList.add('selected');
+}
+
+function toggleDay(day) {
+  const el = document.getElementById('day-' + day);
+  el.classList.toggle('on');
+}
+
+function handleFile(input, selectedId, nameId) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById(nameId).textContent = file.name;
+  document.getElementById(selectedId).style.display = 'flex';
+  input.closest('.file-upload').style.display = 'none';
+}
+
+window.removeFile = function(inputId, selectedId) {
+  document.getElementById(inputId).value = '';
+  document.getElementById(selectedId).style.display = 'none';
+  document.getElementById(selectedId).closest('.field').querySelector('.file-upload').style.display = 'flex';
+};
+
+function buildReview() {
+  const fields = [
+    { label: 'Full Name', val: document.getElementById('fullName').value },
+    { label: 'Phone', val: document.getElementById('phone').value },
+    { label: 'City', val: document.getElementById('city').value },
+    { label: 'College', val: document.getElementById('college').value || '—' },
+    { label: 'Primary Skill', val: document.getElementById('skill').value },
+    { label: 'Category', val: document.getElementById('category').value },
+    { label: 'Experience', val: document.getElementById('experience').value + ' yr(s)' },
+    { label: 'Rate', val: '₹' + document.getElementById('rate').value + '/hr' },
+    { label: 'Level', val: (document.querySelector('input[name="level"]:checked')?.value || '—') },
+    { label: 'Certificate', val: document.getElementById('certificate').files[0]?.name || '—' },
+    { label: 'Resume', val: document.getElementById('resume').files[0]?.name || '—' },
+    { label: 'LinkedIn', val: document.getElementById('linkedin').value || '—' },
+  ];
+  document.getElementById('reviewContent').innerHTML = fields.map(f =>
+    `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem">
+      <span style="color:var(--muted2);font-weight:500">${f.label}</span>
+      <span style="font-weight:600;text-align:right;max-width:65%">${f.val}</span>
+    </div>`
+  ).join('');
+}
+
+// Drag-over effect for file uploads
+document.querySelectorAll('.file-upload').forEach(zone => {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); });
+});
 </script>
 
 </body>

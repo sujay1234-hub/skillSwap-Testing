@@ -1,1324 +1,864 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Settings · SkillSwap</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #070710;
-      --surface: rgba(255,255,255,0.04);
-      --surface-2: rgba(255,255,255,0.07);
-      --border: rgba(255,255,255,0.07);
-      --border-hover: rgba(255,255,255,0.15);
-      --primary: #6366f1;
-      --primary-dim: rgba(99,102,241,0.15);
-      --accent: #a855f7;
-      --gold: #f59e0b;
-      --success: #10b981;
-      --danger: #ef4444;
-      --info: #38bdf8;
-      --text: #f4f4f5;
-      --muted: #71717a;
-      --glow: rgba(99,102,241,0.25);
-    }
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image:
-        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(99,102,241,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 100%, rgba(168,85,247,0.08) 0%, transparent 60%);
-    }
-
-    /* ── SIDEBAR ──────────────────────────────── */
-    .sidebar {
-      width: 240px; flex-shrink: 0;
-      background: rgba(255,255,255,0.02);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      padding: 28px 0;
-      position: fixed; top:0; left:0; bottom:0;
-      z-index: 200;
-      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-    }
-    .sidebar-logo {
-      font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800;
-      padding: 0 24px 28px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      border-bottom: 1px solid var(--border); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .sidebar-logo i { -webkit-text-fill-color: var(--primary); font-size:1.2rem; }
-    .nav-section { padding: 0 12px; margin-bottom: 8px; }
-    .nav-label {
-      font-size: 0.7rem; font-weight: 600; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.1em; padding: 10px 12px 6px;
-    }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 14px; border-radius: 12px;
-      color: var(--muted); font-size: 0.9rem; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
-      text-decoration: none; margin-bottom: 2px;
-    }
-    .nav-item i { width: 18px; text-align: center; font-size: 0.95rem; }
-    .nav-item:hover { background: var(--surface); color: var(--text); }
-    .nav-item.active { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(99,102,241,0.2); }
-    .nav-item.active i { color: var(--primary); }
-    .nav-badge { margin-left: auto; background: var(--danger); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-    .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid var(--border); }
-    .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: var(--surface); cursor: pointer; transition: 0.2s; }
-    .sidebar-user:hover { background: rgba(255,255,255,0.07); }
-    .s-avatar { width:36px; height:36px; background: linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; flex-shrink:0; }
-    .s-user-info { flex:1; min-width:0; }
-    .s-user-name { font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .s-user-role { font-size:0.75rem; color:var(--gold); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199; display:none; }
-    .sidebar-overlay.show { display:block; }
-
-    /* ── MOBILE HEADER ────────────────────────── */
-    .mobile-header {
-      display: none; align-items: center; justify-content: space-between;
-      padding: 16px 20px; position: sticky; top:0;
-      background: rgba(7,7,16,0.9); backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border); z-index: 100;
-    }
-    .mob-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; background:linear-gradient(135deg,var(--primary),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .mob-header-right { display:flex; align-items:center; gap:8px; }
-    .icon-btn { width:42px; height:42px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.2s; }
-    .icon-btn:hover { background:rgba(255,255,255,0.08); color:var(--text); }
-
-    /* ── MAIN ─────────────────────────────────── */
-    .main { margin-left: 240px; padding: 40px 36px 100px; }
-
-    /* ── PAGE HEADER ─────────────────────────── */
-    .page-header { margin-bottom: 36px; }
-    .page-header h1 { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; }
-    .page-header p { color:var(--muted); font-size:0.92rem; margin-top:6px; }
-
-    /* ── SETTINGS LAYOUT ─────────────────────── */
-    .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
-
-    /* ── SETTINGS TABS ───────────────────────── */
-    .settings-tabs { position: sticky; top: 24px; }
-    .tab-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 16px; border-radius: 12px;
-      color: var(--muted); font-size: 0.88rem; font-weight: 500;
-      cursor: pointer; transition: 0.2s; margin-bottom: 4px;
-      border: 1px solid transparent;
-    }
-    .tab-item i { width:18px; text-align:center; font-size:0.9rem; }
-    .tab-item:hover { background: var(--surface); color: var(--text); }
-    .tab-item.active { background: var(--primary-dim); color: var(--primary); border-color: rgba(99,102,241,0.25); }
-    .tab-item.active i { color: var(--primary); }
-    .tab-danger.active { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.2); }
-    .tab-danger:hover { background: rgba(239,68,68,0.07); color: var(--danger); }
-
-    /* ── SETTINGS PANELS ─────────────────────── */
-    .settings-panel { display: none; }
-    .settings-panel.active { display: block; }
-
-    .settings-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 20px;
-    }
-    .settings-card-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      margin-bottom: 6px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .settings-card-title i { font-size: 0.95rem; }
-    .settings-card-desc { font-size: 0.83rem; color: var(--muted); margin-bottom: 24px; }
-    .settings-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-    /* Avatar section */
-    .avatar-section { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
-    .big-avatar {
-      width: 80px; height: 80px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 20px; display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
-      flex-shrink: 0; position: relative; cursor: pointer;
-      transition: 0.2s;
-    }
-    .big-avatar:hover { transform: scale(1.05); }
-    .big-avatar .edit-overlay {
-      position: absolute; inset: 0; border-radius: 20px;
-      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: 0.2s; font-size: 1.2rem;
-    }
-    .big-avatar:hover .edit-overlay { opacity: 1; }
-    .avatar-info h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
-    .avatar-info p { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
-    .avatar-change-btn {
-      margin-top: 10px; padding: 8px 18px;
-      background: var(--primary-dim); border: 1px solid rgba(99,102,241,0.3);
-      border-radius: 10px; color: var(--primary);
-      font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: 0.2s;
-    }
-    .avatar-change-btn:hover { background: rgba(99,102,241,0.25); }
-
-    /* Form grid */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .form-grid.single { grid-template-columns: 1fr; }
-    .input-group { display: flex; flex-direction: column; gap: 8px; }
-    .input-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-    .input-group input,
-    .input-group select,
-    .input-group textarea {
-      padding: 13px 16px;
-      background: rgba(0,0,0,0.25);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem; outline: none; transition: 0.2s;
-      -webkit-appearance: none;
-    }
-    .input-group textarea { resize: vertical; min-height: 90px; }
-    .input-group input:focus,
-    .input-group select:focus,
-    .input-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--glow);
-    }
-    .input-group input::placeholder,
-    .input-group textarea::placeholder { color: var(--muted); }
-    .input-group select option { background: #0f0f1a; }
-    .input-hint { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-
-    /* Skills tags */
-    .skills-input-wrap {
-      display: flex; gap: 10px; margin-bottom: 12px;
-    }
-    .skills-input-wrap input { flex: 1; }
-    .tag-add-btn {
-      padding: 12px 18px; border-radius: 12px;
-      background: var(--primary-dim); border: 1px solid rgba(99,102,241,0.3);
-      color: var(--primary); font-weight: 700; font-size: 0.88rem;
-      cursor: pointer; white-space: nowrap; transition: 0.2s;
-    }
-    .tag-add-btn:hover { background: rgba(99,102,241,0.25); }
-    .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-    .skill-tag {
-      display: flex; align-items: center; gap: 7px;
-      background: var(--primary-dim); border: 1px solid rgba(99,102,241,0.25);
-      border-radius: 20px; padding: 6px 14px;
-      font-size: 0.8rem; font-weight: 600; color: var(--primary);
-    }
-    .skill-tag button {
-      background: none; border: none; color: var(--primary);
-      cursor: pointer; font-size: 0.75rem; padding: 0; opacity: 0.6; transition: 0.2s;
-    }
-    .skill-tag button:hover { opacity: 1; }
-
-    /* Toggle switch */
-    .toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 0; border-bottom: 1px solid var(--border);
-    }
-    .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .toggle-row:first-child { padding-top: 0; }
-    .toggle-info { flex: 1; padding-right: 20px; }
-    .toggle-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
-    .toggle-info p { font-size: 0.78rem; color: var(--muted); }
-    .toggle { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-slider {
-      position: absolute; inset: 0; cursor: pointer;
-      background: rgba(255,255,255,0.1);
-      border-radius: 26px; transition: 0.3s;
-      border: 1px solid var(--border);
-    }
-    .toggle-slider::before {
-      content: ""; position: absolute;
-      height: 18px; width: 18px; left: 4px; top: 3px;
-      background: var(--muted); border-radius: 50%;
-      transition: 0.3s;
-    }
-    .toggle input:checked + .toggle-slider { background: var(--primary); border-color: var(--primary); }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
-
-    /* Security items */
-    .security-item {
-      display: flex; align-items: center; gap: 16px;
-      padding: 16px 0; border-bottom: 1px solid var(--border);
-    }
-    .security-item:last-child { border-bottom: none; }
-    .security-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-    }
-    .security-body { flex: 1; }
-    .security-body h4 { font-size: 0.9rem; font-weight: 600; }
-    .security-body p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .security-status {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.78rem; font-weight: 600;
-      padding: 5px 12px; border-radius: 20px;
-    }
-    .sec-on { background: rgba(16,185,129,0.12); color: var(--success); }
-    .sec-off { background: rgba(245,158,11,0.12); color: var(--gold); }
-    .sec-btn {
-      padding: 9px 18px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text); font-size: 0.82rem; font-weight: 600;
-      cursor: pointer; transition: 0.2s; white-space: nowrap;
-    }
-    .sec-btn:hover { background: var(--surface-2); border-color: var(--border-hover); }
-
-    /* Payment methods */
-    .payment-method {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 0; border-bottom: 1px solid var(--border);
-    }
-    .payment-method:last-child { border-bottom: none; }
-    .pm-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; flex-shrink: 0;
-    }
-    .pm-body { flex: 1; }
-    .pm-body h4 { font-size: 0.9rem; font-weight: 600; }
-    .pm-body p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .pm-actions { display: flex; gap: 8px; }
-    .pm-remove { padding: 7px 14px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); color: var(--danger); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .pm-remove:hover { background: rgba(239,68,68,0.15); }
-
-    /* Theme picker */
-    .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .theme-option {
-      border-radius: 14px; padding: 16px 10px;
-      border: 2px solid var(--border);
-      cursor: pointer; transition: 0.2s;
-      text-align: center;
-    }
-    .theme-option:hover { border-color: var(--border-hover); }
-    .theme-option.selected { border-color: var(--primary); background: var(--primary-dim); }
-    .theme-swatch { width: 100%; height: 36px; border-radius: 8px; margin-bottom: 8px; }
-    .theme-name { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
-    .theme-option.selected .theme-name { color: var(--primary); }
-
-    /* Danger zone */
-    .danger-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px; border-radius: 14px;
-      border: 1px solid rgba(239,68,68,0.2);
-      background: rgba(239,68,68,0.04); margin-bottom: 12px;
-    }
-    .danger-item:last-child { margin-bottom: 0; }
-    .danger-info h4 { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-    .danger-info p { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
-    .danger-btn {
-      padding: 10px 20px; border-radius: 10px;
-      border: 1px solid rgba(239,68,68,0.4);
-      background: transparent; color: var(--danger);
-      font-size: 0.83rem; font-weight: 700; cursor: pointer; transition: 0.2s;
-      white-space: nowrap;
-    }
-    .danger-btn:hover { background: rgba(239,68,68,0.12); }
-
-    /* Buttons */
-    .btn-save {
-      padding: 13px 28px; border-radius: 12px; border: none;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white; font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: 0.25s;
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 24px var(--glow); }
-    .btn-outline {
-      padding: 13px 28px; border-radius: 12px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--muted); font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: 0.2s;
-    }
-    .btn-outline:hover { background: var(--surface); color: var(--text); }
-    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
-
-    /* Linked accounts */
-    .linked-row {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 0; border-bottom: 1px solid var(--border);
-    }
-    .linked-row:last-child { border-bottom: none; }
-    .linked-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .linked-body { flex: 1; }
-    .linked-body h4 { font-size: 0.88rem; font-weight: 600; }
-    .linked-body p { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-    .linked-connect { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .linked-connect:hover { background: var(--surface-2); }
-    .linked-connect.connected { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: var(--success); }
-
-    /* MOBILE NAV */
-    .mobile-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:rgba(7,7,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(20px); padding:10px 0 env(safe-area-inset-bottom,10px); z-index:300; }
-    .mobile-nav-inner { display:flex; justify-content:space-around; }
-    .mob-nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 12px; color:var(--muted); font-size:0.68rem; font-weight:600; cursor:pointer; border-radius:10px; transition:0.2s; }
-    .mob-nav-item i { font-size:1.15rem; }
-    .mob-nav-item.active { color:var(--primary); }
-
-    /* Toast */
-    .toast-container { position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column; gap:10px; z-index:9999; }
-    .toast { background:#1a1a2e; border:1px solid var(--border); border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:12px; min-width:260px; max-width:340px; box-shadow:0 8px 24px rgba(0,0,0,0.4); animation:slideUp 0.4s cubic-bezier(.34,1.56,.64,1); }
-    .toast.removing { animation:slideDown 0.3s ease forwards; }
-    .toast-icon { font-size:1.2rem; flex-shrink:0; }
-    .toast-body { flex:1; }
-    .toast-title { font-size:0.88rem; font-weight:700; }
-    .toast-msg { font-size:0.78rem; color:var(--muted); margin-top:2px; }
-    @keyframes slideUp { from{opacity:0;transform:translateY(20px) scale(0.9)} to{opacity:1;transform:translateY(0) scale(1)} }
-    @keyframes slideDown { to{opacity:0;transform:translateY(10px) scale(0.95)} }
-
-    /* Modal */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .modal-overlay.show { opacity:1; pointer-events:all; }
-    .modal-box { background:#0f0f1a; border:1px solid var(--border); border-radius:24px; padding:36px; width:90%; max-width:420px; transform:scale(0.92) translateY(20px); transition:transform 0.3s cubic-bezier(.34,1.56,.64,1); box-shadow:0 24px 60px rgba(0,0,0,0.5); }
-    .modal-overlay.show .modal-box { transform:scale(1) translateY(0); }
-    .modal-head { text-align:center; margin-bottom:28px; }
-    .modal-icon-wrap { width:60px; height:60px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px; }
-    .modal-head h2 { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
-    .modal-head p { color:var(--muted); font-size:0.88rem; margin-top:6px; }
-    .btn-danger { width:100%; padding:14px; border-radius:12px; border:none; background:var(--danger); color:white; font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:0.2s; }
-    .btn-danger:hover { opacity:0.9; transform:translateY(-1px); }
-    .btn-modal-cancel { width:100%; padding:13px; margin-top:10px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.93rem; font-weight:600; cursor:pointer; transition:0.2s; }
-    .btn-modal-cancel:hover { background:var(--surface); color:var(--text); }
-
-    /* RESPONSIVE */
-    @media (max-width: 1024px) {
-      .settings-layout { grid-template-columns: 180px 1fr; }
-      .theme-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main { margin-left: 0; padding: 0 0 80px; }
-      .mobile-header { display: flex; }
-      .mobile-nav { display: block; }
-      .page-header { padding: 20px 16px 0; }
-      .settings-layout { grid-template-columns: 1fr; padding: 0 16px; }
-      .settings-tabs { position: static; display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-      .settings-tabs::-webkit-scrollbar { display: none; }
-      .tab-item { white-space: nowrap; flex-shrink: 0; }
-      .form-grid { grid-template-columns: 1fr; }
-      .theme-grid { grid-template-columns: repeat(2, 1fr); }
-      .btn-row { flex-direction: column; }
-      .btn-save, .btn-outline { width: 100%; justify-content: center; }
-      .danger-item { flex-direction: column; align-items: flex-start; gap: 12px; }
-    }
-  </style>
-<style id="ss-universal-responsive">
-/* ══════════════════════════════════════════
-   UNIVERSAL RESPONSIVE FIXES — SkillSwap
-   Applied to all pages for consistent UX
-══════════════════════════════════════════ */
-
-/* Safe area support */
-:root {
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sat: env(safe-area-inset-top, 0px);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Settings · SkillSwap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#03030a;--bg2:#080812;
+  --card:rgba(255,255,255,.04);--card-h:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.07);--border-h:rgba(255,255,255,.16);
+  --p:#6157ff;--p2:#8b83ff;--p3:rgba(97,87,255,.15);--a:#ff5c7c;
+  --cyan:#00d4ff;--green:#00e5a0;--amber:#ffb930;--red:#ff5050;
+  --glow:rgba(97,87,255,.35);--txt:#f0f0f8;--muted:#5a5a7a;--muted2:#9090b8;
+  --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px);
 }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--fb);background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+input,textarea,select{font-size:16px!important;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{outline:none}
+.bg-canvas{position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse 80% 60% at 15% 0%,rgba(97,87,255,.13),transparent 60%),radial-gradient(ellipse 60% 50% at 90% 20%,rgba(255,92,124,.09),transparent 60%),var(--bg)}
 
-/* Remove legacy floating back buttons */
-.mobile-back-btn { display: none !important; }
+/* SIDEBAR */
+.sidebar{width:240px;background:rgba(255,255,255,.02);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 0;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar-logo{font-family:var(--fh);font-size:1.2rem;font-weight:800;padding:0 22px 22px;background:linear-gradient(135deg,var(--p2),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sb-lm{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff;-webkit-text-fill-color:#fff;flex-shrink:0}
+.nav-section{padding:0 10px;margin-bottom:6px}
+.nav-label{font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:10px 12px 5px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:11px;color:var(--muted2);font-size:.88rem;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:2px;border:1px solid transparent}
+.nav-item i{width:16px;text-align:center;font-size:.9rem}
+.nav-item:hover{background:var(--card);color:var(--txt)}
+.nav-item.active{background:var(--p3);color:var(--p2);border-color:rgba(97,87,255,.2)}
+.sidebar-bottom{margin-top:auto;padding:14px 10px 0;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:11px;padding:11px;border-radius:11px;background:var(--card);cursor:pointer}
+.sb-user:hover{background:var(--card-h)}
+.sb-av{width:34px;height:34px;background:linear-gradient(135deg,var(--p),var(--a));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.9rem;flex-shrink:0}
+.sb-info{flex:1;min-width:0}
+.sb-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-role{font-size:.72rem;color:var(--amber)}
+.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;display:none;backdrop-filter:blur(4px)}
+.sb-overlay.show{display:block}
 
-/* ── Smooth scrolling & selection ── */
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-* { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* MAIN */
+.main{margin-left:240px;min-height:100vh;padding:36px 40px 60px;max-width:1100px}
+.pg-header{margin-bottom:28px}
+.pg-header h1{font-family:var(--fh);font-size:1.8rem;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:12px}
+.pg-header p{color:var(--muted);font-size:.88rem;margin-top:5px}
 
-/* ── Universal input fixes for mobile ── */
-input, textarea, select {
-  font-size: 16px !important; /* Prevents iOS zoom */
-  -webkit-appearance: none;
-  border-radius: 10px;
+/* DESKTOP TWO-COLUMN LAYOUT */
+.desktop-settings{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:start}
+.ds-menu{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;position:sticky;top:24px}
+.ds-menu-item{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;transition:all .18s;border-bottom:1px solid var(--border);color:var(--muted2);font-size:.86rem;font-weight:500}
+.ds-menu-item:last-child{border-bottom:none}
+.ds-menu-item:hover{background:var(--card-h);color:var(--txt)}
+.ds-menu-item.active{background:var(--p3);color:var(--p2)}
+.ds-menu-item.active .ds-mi-icon{background:rgba(97,87,255,.22);color:var(--p2)}
+.ds-mi-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;transition:.2s}
+.ds-menu-item.danger-item{color:var(--red)}
+.ds-menu-item.danger-item .ds-mi-icon{background:rgba(255,80,80,.1);color:var(--red)}
+.ds-menu-item.danger-item:hover{background:rgba(255,80,80,.06)}
+.ds-panel{display:none}
+.ds-panel.active{display:block}
+
+/* SHARED CARDS */
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:16px}
+.s-card-inner{padding:20px 22px}
+.s-card-title{font-family:var(--fh);font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.s-card-desc{font-size:.77rem;color:var(--muted);margin-bottom:16px}
+
+/* Profile banner */
+.profile-banner{display:flex;align-items:center;gap:16px;padding:20px 22px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(97,87,255,.06),rgba(255,92,124,.04));position:relative;overflow:hidden}
+.profile-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--a))}
+.pb-avatar{width:62px;height:62px;border-radius:16px;flex-shrink:0;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:1.55rem;color:#fff;cursor:pointer;position:relative;overflow:hidden}
+.pb-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:16px}
+.pb-av-ov{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;cursor:pointer;border-radius:16px}
+.pb-avatar:hover .pb-av-ov{opacity:1}
+.pb-info{flex:1}
+.pb-name{font-family:var(--fh);font-size:1rem;font-weight:700}
+.pb-email{font-size:.76rem;color:var(--muted2);margin-top:2px}
+.pb-btn{margin-top:8px;padding:6px 13px;border-radius:8px;background:var(--p3);border:1px solid rgba(97,87,255,.3);color:var(--p2);font-size:.74rem;font-weight:600;cursor:pointer;transition:.2s}
+.pb-btn:hover{background:rgba(97,87,255,.22)}
+
+/* Forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.input-group label{font-size:.73rem;font-weight:600;color:var(--muted2)}
+.input-group input,.input-group select,.input-group textarea{padding:11px 13px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:11px;color:var(--txt);font-family:var(--fb);transition:border-color .2s,box-shadow .2s;width:100%}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:rgba(97,87,255,.5);box-shadow:0 0 0 3px rgba(97,87,255,.1)}
+.input-group input::placeholder,.input-group textarea::placeholder{color:var(--muted)}
+.input-group textarea{resize:vertical;min-height:85px}
+.input-group select option{background:#0d0d1a}
+.input-hint{font-size:.69rem;color:var(--muted)}
+.btn-row{display:flex;gap:11px;padding-top:4px}
+.btn-primary{padding:11px 22px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;font-family:var(--fh);font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px var(--glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--glow)}
+.btn-primary:active{transform:scale(.97)}
+.btn-outline{padding:11px 20px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted2);font-family:var(--fb);font-size:.86rem;font-weight:500;cursor:pointer;transition:.2s}
+.btn-outline:hover{background:var(--card);color:var(--txt)}
+.btn-full{width:100%;justify-content:center}
+
+/* Toggles */
+.toggle-block{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.toggle-block-title{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p2);padding:12px 18px 9px;border-bottom:1px solid var(--border)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info h4{font-size:.85rem;font-weight:600}
+.toggle-info p{font-size:.72rem;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-sl{position:absolute;inset:0;cursor:pointer;background:rgba(255,255,255,.1);border-radius:24px;transition:.3s;border:1px solid var(--border)}
+.toggle-sl::before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.3s}
+.toggle input:checked+.toggle-sl{background:var(--p);border-color:var(--p)}
+.toggle input:checked+.toggle-sl::before{transform:translateX(20px);background:#fff}
+
+/* Security */
+.sec-list{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.sec-row{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.sec-row:last-child{border-bottom:none}
+.sec-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.sec-body{flex:1}.sec-body h4{font-size:.84rem;font-weight:600}.sec-body p{font-size:.71rem;color:var(--muted);margin-top:1px}
+.sec-btn{padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--card-h);color:var(--txt);font-size:.77rem;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+.sec-btn:hover{background:var(--border-h)}
+.sec-status{display:flex;align-items:center;gap:5px;font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.sec-on{background:rgba(0,229,160,.1);color:var(--green)}.sec-off{background:rgba(255,185,48,.1);color:var(--amber)}
+
+/* Theme */
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.theme-opt{border-radius:13px;padding:13px 9px;border:2px solid var(--border);cursor:pointer;transition:.2s;text-align:center}
+.theme-opt:hover{border-color:rgba(97,87,255,.3)}
+.theme-opt.selected{border-color:var(--p);background:var(--p3)}
+.theme-swatch{width:100%;height:28px;border-radius:7px;margin-bottom:6px}
+.theme-name{font-size:.7rem;font-weight:600;color:var(--muted)}
+.theme-opt.selected .theme-name{color:var(--p2)}
+
+/* Linked */
+.linked-list{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.linked-row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.linked-row:last-child{border-bottom:none}
+.linked-ico{width:37px;height:37px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.linked-body{flex:1}.linked-body h4{font-size:.84rem;font-weight:600}.linked-body p{font-size:.71rem;color:var(--muted);margin-top:1px}
+.linked-btn{padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--card-h);color:var(--txt);font-size:.77rem;font-weight:600;cursor:pointer;transition:.2s}
+.linked-btn.connected{background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.3);color:var(--green)}
+
+/* Payments */
+.pm-list{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.pm-row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.pm-row:last-child{border-bottom:none}
+.pm-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+.pm-body{flex:1}.pm-body h4{font-size:.84rem;font-weight:600}.pm-body p{font-size:.71rem;color:var(--muted);margin-top:1px}
+.pm-remove{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,80,80,.3);background:rgba(255,80,80,.07);color:var(--red);font-size:.74rem;font-weight:600;cursor:pointer}
+
+/* Skill tags */
+.skills-input-wrap{display:flex;gap:9px;margin-bottom:10px}
+.skills-input-wrap input{flex:1;padding:10px 13px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:11px;color:var(--txt);font-family:var(--fb);width:100%}
+.skills-input-wrap input:focus{border-color:rgba(97,87,255,.5);box-shadow:0 0 0 3px rgba(97,87,255,.1);outline:none}
+.tag-add-btn{padding:10px 15px;border-radius:10px;background:var(--p3);border:1px solid rgba(97,87,255,.3);color:var(--p2);font-weight:700;font-size:.82rem;cursor:pointer;white-space:nowrap;transition:.2s}
+.tag-add-btn:hover{background:rgba(97,87,255,.22)}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:7px;min-height:8px}
+.s-tag{display:flex;align-items:center;gap:6px;background:var(--p3);border:1px solid rgba(97,87,255,.25);border-radius:20px;padding:5px 11px;font-size:.77rem;font-weight:600;color:var(--p2)}
+.s-tag button{background:none;border:none;color:var(--p2);cursor:pointer;font-size:.7rem;padding:0;opacity:.6}
+.s-tag.learn{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.25);color:var(--cyan)}
+.s-tag.learn button{color:var(--cyan)}
+
+/* Danger */
+.danger-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:13px;border:1px solid rgba(255,80,80,.18);background:rgba(255,80,80,.04);margin-bottom:10px}
+.danger-row:last-child{margin-bottom:0}
+.danger-info h4{font-size:.84rem;font-weight:600}.danger-info p{font-size:.72rem;color:var(--muted);margin-top:2px}
+.danger-btn{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,80,80,.3);background:rgba(255,80,80,.08);color:var(--red);font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.danger-btn:hover{background:rgba(255,80,80,.18)}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);z-index:9999;opacity:0;transition:all .3s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.toast-wrap.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-inner{background:#13131f;border:1px solid var(--border);border-radius:99px;padding:10px 20px;font-size:.83rem;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap}
+.toast-inner.success{border-color:rgba(0,229,160,.3)}.toast-inner.error{border-color:rgba(255,80,80,.3)}.toast-inner.info{border-color:rgba(97,87,255,.3)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{background:#0f0f1c;border:1px solid var(--border);border-radius:24px 24px 0 0;padding:26px 22px;padding-bottom:calc(26px + var(--sab));width:100%;max-width:480px;transform:translateY(40px);transition:transform .32s cubic-bezier(.22,1,.36,1)}
+.modal-overlay.show .modal-box{transform:translateY(0)}
+.modal-head{text-align:center;margin-bottom:20px}
+.modal-icon{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 11px}
+.modal-head h2{font-family:var(--fh);font-size:1.15rem;font-weight:800}
+.modal-head p{color:var(--muted);font-size:.8rem;margin-top:5px}
+.btn-cancel{width:100%;padding:11px;margin-top:9px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted2);font-family:var(--fb);font-size:.88rem;font-weight:500;cursor:pointer}
+.btn-danger-full{width:100%;padding:12px;border-radius:11px;border:none;background:var(--red);color:#fff;font-family:var(--fh);font-size:.9rem;font-weight:700;cursor:pointer}
+
+/* Bottom nav */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(4,4,14,.97);border-top:1px solid var(--border);backdrop-filter:blur(28px);padding:7px 0;padding-bottom:calc(7px + var(--sab));z-index:500}
+.bnav-inner{display:flex;justify-content:space-around;max-width:500px;margin:0 auto}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;color:var(--muted);font-size:.56rem;font-weight:700;text-decoration:none;border-radius:12px;letter-spacing:.04em;text-transform:uppercase;position:relative;min-width:52px;text-align:center}
+.bnav-item i{font-size:1.15rem}
+.bnav-item.active{color:var(--p2)}
+.bnav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:3px;background:linear-gradient(90deg,var(--p),var(--a));border-radius:0 0 4px 4px}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:0 0 90px}
+  .pg-header{display:none}
+  .desktop-settings{display:none!important}
+  .bottom-nav{display:block}
+
+  .mob-header{position:sticky;top:0;z-index:600;display:flex!important;align-items:center;justify-content:space-between;padding:0 16px;padding-top:var(--sat);height:calc(56px + var(--sat));background:rgba(3,3,10,.96);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+  .mob-header-left{display:flex;align-items:center;gap:10px}
+  .mob-back{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;text-decoration:none;transition:.2s}
+  .mob-back:active{background:var(--p3);color:var(--p2)}
+  .mob-title{font-family:var(--fh);font-size:1rem;font-weight:700}
+  .mob-subtitle{font-size:.68rem;color:var(--muted);margin-top:1px}
+
+  .mob-settings-list{display:block!important;padding:14px 14px 0}
+  .mob-profile-card{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border);border-radius:17px;padding:15px;margin-bottom:8px;cursor:pointer;text-decoration:none;color:var(--txt);transition:.2s;position:relative;overflow:hidden}
+  .mob-profile-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--a))}
+  .mob-profile-card:active{background:var(--card-h)}
+  .mpc-av{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:1.3rem;color:#fff;flex-shrink:0;position:relative;overflow:hidden}
+  .mpc-av img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:14px}
+  .mpc-info{flex:1;min-width:0}
+  .mpc-name{font-family:var(--fh);font-size:.92rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mpc-email{font-size:.71rem;color:var(--muted2);margin-top:2px}
+  .mpc-badge{font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,185,48,.1);color:var(--amber);border:1px solid rgba(255,185,48,.2);margin-top:5px;display:inline-block}
+  .mob-group-label{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:14px 4px 7px}
+  .mob-list{background:var(--card);border:1px solid var(--border);border-radius:17px;overflow:hidden;margin-bottom:8px}
+  .mob-row{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;border-bottom:1px solid var(--border);transition:.18s;text-decoration:none;color:var(--txt)}
+  .mob-row:last-child{border-bottom:none}
+  .mob-row:active{background:var(--card-h)}
+  .mr-icon{width:33px;height:33px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+  .mr-body{flex:1;min-width:0}
+  .mr-label{font-size:.86rem;font-weight:600}
+  .mr-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+  .mr-right{display:flex;align-items:center;gap:7px;flex-shrink:0;color:var(--muted);font-size:.63rem}
+  .mr-badge{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--red);color:#fff}
+  .mob-row.danger .mr-label{color:var(--red)}
+  .mob-row.danger .mr-icon{background:rgba(255,80,80,.1)!important;color:var(--red)!important}
+
+  .detail-screen{position:fixed;inset:0;z-index:700;background:var(--bg);transform:translateX(105%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden;display:flex!important;flex-direction:column}
+  .detail-screen.open{transform:translateX(0)}
+  .detail-hdr{position:sticky;top:0;z-index:10;display:flex!important;align-items:center;gap:12px;padding:0 16px;padding-top:var(--sat);height:calc(56px + var(--sat));background:rgba(3,3,10,.96);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);flex-shrink:0}
+  .detail-back{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;flex-shrink:0;transition:.2s}
+  .detail-back:active{background:var(--p3);color:var(--p2)}
+  .detail-hdr-icon{width:33px;height:33px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+  .detail-hdr-title{font-family:var(--fh);font-size:.96rem;font-weight:700;flex:1}
+  .detail-save{padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;border:none;font-family:var(--fh);font-size:.79rem;font-weight:700;cursor:pointer;box-shadow:0 3px 12px var(--glow);white-space:nowrap}
+  .detail-save:active{transform:scale(.95)}
+  .detail-body{padding:16px 14px;padding-bottom:calc(36px + var(--sab))}
+  .toast-wrap{bottom:calc(84px + var(--sab))}
+  .form-grid{grid-template-columns:1fr!important}
+  .theme-grid{grid-template-columns:1fr 1fr!important}
 }
-
-/* ── Focus ring ── */
-input:focus, textarea:focus, select:focus, button:focus-visible {
-  outline: none;
-}
-
-/* ── Prevent horizontal overflow ── */
-body { overflow-x: hidden; }
-img, video { max-width: 100%; }
-
-/* ── Universal Bottom Nav (shown on mobile for app pages) ── */
-.ss-mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(9,9,11,0.97);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 10px 4px;
-  padding-bottom: calc(10px + var(--sab));
-  z-index: 500;
-}
-.ss-mobile-nav-inner {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.ss-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
-  color: #71717a;
-  font-size: 0.62rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: color 0.2s, background 0.2s;
-  text-decoration: none;
-  min-width: 52px;
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-.ss-nav-item i { font-size: 1.2rem; }
-.ss-nav-item.active { color: #6366f1; }
-.ss-nav-item.active i { color: #6366f1; }
-
-/* ── Universal Mobile Header ── */
-.ss-mobile-header {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 400;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  padding-top: calc(14px + var(--sat));
-  background: rgba(9,9,11,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.ss-mob-logo {
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: flex; align-items: center; gap: 8px;
-}
-.ss-mob-btn {
-  width: 40px; height: 40px;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(255,255,255,0.04);
-  color: #a1a1aa;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 1rem;
-  text-decoration: none; transition: background 0.2s;
-}
-.ss-mob-btn:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; }
-
-@media (max-width: 768px) {
-  .ss-mobile-nav { display: block; }
-  .ss-mobile-header { display: flex; }
-
-  /* Extra bottom padding so content not hidden behind nav */
-  body { padding-bottom: calc(70px + var(--sab)) !important; }
-
-  /* Hide desktop sidebars on mobile */
-  .sidebar { transform: translateX(-100%) !important; }
-  .sidebar.open { transform: translateX(0) !important; }
-  .main { margin-left: 0 !important; }
-
-  /* Bigger tap targets */
-  button, .btn-primary, .btn-secondary, a[role=button] {
-    min-height: 44px;
-  }
-
-  /* Container full padding on mobile */
-  .container { padding-left: 16px !important; padding-right: 16px !important; }
-
-  /* Card padding on mobile */
-  .card, .panel, .settings-card { padding: 18px 16px !important; }
-}
-
-@media (max-width: 480px) {
-  .form-grid { grid-template-columns: 1fr !important; }
-  .stats-row, .stat-row { grid-template-columns: 1fr 1fr !important; }
-  h1 { font-size: 1.5rem !important; }
+@media(min-width:769px){
+  .mob-header{display:none}
+  .mob-settings-list{display:none!important}
+  .detail-screen{display:none!important}
+  .bottom-nav{display:none!important}
 }
 </style>
 </head>
 <body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="bg-canvas"></div>
+<div class="toast-wrap" id="toastWrap"><div class="toast-inner" id="toastInner"></div></div>
 
 <!-- SIDEBAR -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><i class="fa-solid fa-bolt"></i> SkillSwap</div>
+  <div class="sidebar-logo">
+    <div class="sb-lm"><i class="fa-solid fa-bolt" style="-webkit-text-fill-color:#fff"></i></div>SkillSwap
+  </div>
   <div class="nav-section">
     <div class="nav-label">Main</div>
-    <a class="nav-item" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a class="nav-item" href="skill-exchange.html"><i class="fa-solid fa-arrows-rotate"></i> Skill Exchange</a>
-    <a class="nav-item" href="trades.html"><i class="fa-solid fa-handshake"></i> My Trades</a>
-    <a class="nav-item" href="#"><i class="fa-solid fa-calendar-days"></i> Sessions</a>
+    <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+    <a class="nav-item" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+    <a class="nav-item" href="skill-exchange.html"><i class="fa-solid fa-arrows-rotate"></i>Skill Exchange</a>
+    <a class="nav-item" href="trades.html"><i class="fa-solid fa-handshake"></i>My Trades</a>
   </div>
   <div class="nav-section">
     <div class="nav-label">Account</div>
-    <a class="nav-item" href="#"><i class="fa-solid fa-bell"></i> Notifications</a>
-    <a class="nav-item" href="#"><i class="fa-solid fa-wallet"></i> Wallet</a>
-    <a class="nav-item active" href="setting.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>My Profile</a>
+    <a class="nav-item active" href="setting.html"><i class="fa-solid fa-gear"></i>Settings</a>
   </div>
   <div class="sidebar-bottom">
-    <div class="sidebar-user">
-      <div class="s-avatar" id="sidebarAvatar">U</div>
-      <div class="s-user-info">
-        <div class="s-user-name" id="sidebarName">Loading…</div>
-        <div class="s-user-role">⭐ <span id="sidebarXP">0</span> XP</div>
-      </div>
-      <i class="fa-solid fa-ellipsis" style="color:var(--muted);font-size:0.85rem;"></i>
+    <div class="sb-user">
+      <div class="sb-av" id="sidebarAvatar">U</div>
+      <div class="sb-info"><div class="sb-name" id="sidebarName">Loading…</div><div class="sb-role">⭐ <span id="sidebarXP">0</span> XP</div></div>
     </div>
   </div>
 </aside>
 
 <!-- MOBILE HEADER -->
-<div class="mobile-header">
-  <div class="mob-logo">⚡ SkillSwap</div>
-  <div class="mob-header-right">
-    <div class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
+<header class="mob-header" style="display:none">
+  <div class="mob-header-left">
+    <a href="index.html" class="mob-back"><i class="fa-solid fa-chevron-left"></i></a>
+    <div><div class="mob-title">Settings</div><div class="mob-subtitle">Account & Preferences</div></div>
   </div>
-</div>
+</header>
 
-<!-- MAIN -->
 <main class="main">
-  <div class="page-header">
-    <h1>⚙️ Settings</h1>
+  <div class="pg-header">
+    <h1><i class="fa-solid fa-gear" style="color:var(--p2);font-size:1.4rem"></i>Settings</h1>
     <p>Manage your account, privacy, and preferences</p>
   </div>
 
-  <div class="settings-layout">
-
-    <!-- TABS -->
-    <div class="settings-tabs">
-      <div class="tab-item active" onclick="switchTab('profile')"><i class="fa-solid fa-user"></i> Profile</div>
-      <div class="tab-item" onclick="switchTab('skills')"><i class="fa-solid fa-code"></i> My Skills</div>
-      <div class="tab-item" onclick="switchTab('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
-      <div class="tab-item" onclick="switchTab('privacy')"><i class="fa-solid fa-shield-halved"></i> Privacy</div>
-      <div class="tab-item" onclick="switchTab('payments')"><i class="fa-solid fa-wallet"></i> Payments</div>
-      <div class="tab-item" onclick="switchTab('appearance')"><i class="fa-solid fa-palette"></i> Appearance</div>
-      <div class="tab-item" onclick="switchTab('linked')"><i class="fa-solid fa-link"></i> Linked</div>
-      <div class="tab-item tab-danger" onclick="switchTab('danger')"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
+  <!-- DESKTOP TWO-COLUMN -->
+  <div class="desktop-settings">
+    <!-- Left menu -->
+    <div class="ds-menu">
+      <div class="ds-menu-item active" onclick="switchTab('profile')" data-tab="profile"><div class="ds-mi-icon" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-user"></i></div>My Profile</div>
+      <div class="ds-menu-item" onclick="switchTab('skills')" data-tab="skills"><div class="ds-mi-icon" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-code"></i></div>My Skills</div>
+      <div class="ds-menu-item" onclick="switchTab('notifications')" data-tab="notifications"><div class="ds-mi-icon" style="background:rgba(255,80,80,.1);color:var(--red)"><i class="fa-solid fa-bell"></i></div>Notifications<span id="notif-dot" style="margin-left:auto;width:8px;height:8px;border-radius:99px;background:var(--red)"></span></div>
+      <div class="ds-menu-item" onclick="switchTab('privacy')" data-tab="privacy"><div class="ds-mi-icon" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-shield-halved"></i></div>Privacy & Security</div>
+      <div class="ds-menu-item" onclick="switchTab('payments')" data-tab="payments"><div class="ds-mi-icon" style="background:rgba(255,185,48,.12);color:var(--amber)"><i class="fa-solid fa-wallet"></i></div>Payments</div>
+      <div class="ds-menu-item" onclick="switchTab('appearance')" data-tab="appearance"><div class="ds-mi-icon" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-palette"></i></div>Appearance</div>
+      <div class="ds-menu-item" onclick="switchTab('linked')" data-tab="linked"><div class="ds-mi-icon" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-link"></i></div>Linked Accounts</div>
+      <div class="ds-menu-item danger-item" onclick="switchTab('danger')" data-tab="danger"><div class="ds-mi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>Danger Zone</div>
     </div>
 
-    <!-- PANELS -->
+    <!-- Right panels -->
     <div>
-
-      <!-- ── PROFILE ── -->
-      <div class="settings-panel active" id="panel-profile">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-user" style="color:var(--primary);"></i> Profile Information</div>
-          <div class="settings-card-desc">Update your name, bio, and public profile details.</div>
-
-          <div class="avatar-section">
-            <div class="big-avatar" id="bigAvatar" onclick="showToast('info','Coming Soon','Photo upload will be available soon.')">
-              U
-              <div class="edit-overlay"><i class="fa-solid fa-camera"></i></div>
-            </div>
-            <div class="avatar-info">
-              <h3 id="profileNameDisplay">User</h3>
-              <p id="profileEmailDisplay"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="85f0f6e0f7c5e0e8e4ece9abe6eae8">[email&#160;protected]</a></p>
-              <button class="avatar-change-btn" onclick="showToast('info','Coming Soon','Photo upload will be available soon.')">
-                <i class="fa-solid fa-upload" style="margin-right:6px;"></i>Change Photo
-              </button>
+      <!-- PROFILE -->
+      <div class="ds-panel active" id="panel-profile">
+        <div class="s-card">
+          <div class="profile-banner">
+            <div class="pb-avatar" id="bigAvatar">U<div class="pb-av-ov" onclick="showToast('info','📷 Coming soon','Photo upload coming soon.')"><i class="fa-solid fa-camera" style="color:#fff;font-size:1rem"></i></div></div>
+            <div class="pb-info">
+              <div class="pb-name" id="profileNameDisplay">User</div>
+              <div class="pb-email" id="profileEmailDisplay">email</div>
+              <button class="pb-btn" onclick="showToast('info','📷 Coming soon','')"><i class="fa-solid fa-camera" style="margin-right:5px"></i>Change Photo</button>
             </div>
           </div>
-          <hr class="settings-divider">
-
-          <div class="form-grid">
-            <div class="input-group">
-              <label>Full Name</label>
-              <input type="text" id="settingName" placeholder="Your full name">
+          <div class="s-card-inner">
+            <div class="s-card-title"><i class="fa-solid fa-pen" style="color:var(--p2);font-size:.8rem"></i>Edit Information</div>
+            <div class="s-card-desc">Update your name, bio, and contact details.</div>
+            <div class="form-grid">
+              <div class="input-group"><label>Full Name</label><input type="text" id="settingName" placeholder="Your full name"></div>
+              <div class="input-group"><label>Username</label><input type="text" id="settingUsername" placeholder="@username"></div>
+              <div class="input-group"><label>Email Address</label><input type="email" id="settingEmail" placeholder="you@email.com"></div>
+              <div class="input-group"><label>Phone Number</label><input type="tel" id="settingPhone" placeholder="+91 00000 00000"></div>
+              <div class="input-group"><label>Location</label><input type="text" id="settingLocation" placeholder="City, Country"></div>
+              <div class="input-group"><label>Website / Portfolio</label><input type="url" id="settingWebsite" placeholder="https://yoursite.com"></div>
             </div>
-            <div class="input-group">
-              <label>Username</label>
-              <input type="text" id="settingUsername" placeholder="@username">
-            </div>
-            <div class="input-group">
-              <label>Email Address</label>
-              <input type="email" id="settingEmail" placeholder="you@email.com">
-            </div>
-            <div class="input-group">
-              <label>Phone Number</label>
-              <input type="tel" id="settingPhone" placeholder="+91 00000 00000">
-            </div>
-            <div class="input-group">
-              <label>Location</label>
-              <input type="text" id="settingLocation" placeholder="City, Country">
-            </div>
-            <div class="input-group">
-              <label>Website / Portfolio</label>
-              <input type="url" id="settingWebsite" placeholder="https://yoursite.com">
-            </div>
-          </div>
-          <div class="input-group" style="margin-top:18px;">
-            <label>Bio</label>
-            <textarea id="settingBio" placeholder="Tell others what you do and what you can teach…"></textarea>
-            <span class="input-hint">Max 200 characters. This appears on your public profile.</span>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn-save" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
-            <button class="btn-outline" onclick="loadProfile()">Discard</button>
+            <div class="input-group" style="margin-bottom:18px"><label>Bio</label><textarea id="settingBio" placeholder="Tell others what you do and what you can teach…"></textarea><span class="input-hint">Max 200 characters. Shown on your public profile.</span></div>
+            <div class="btn-row"><button class="btn-primary" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i>Save Changes</button><button class="btn-outline" onclick="loadProfile()">Discard</button></div>
           </div>
         </div>
       </div>
 
-      <!-- ── SKILLS ── -->
-      <div class="settings-panel" id="panel-skills">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-graduation-cap" style="color:var(--accent);"></i> Skills I Can Teach</div>
-          <div class="settings-card-desc">Add skills you're confident to teach others. These show on your profile.</div>
-          <div class="skills-input-wrap">
-            <input type="text" id="teachSkillInput" placeholder="e.g. Python, Photoshop, Guitar…" onkeydown="if(event.key==='Enter')addTag('teach')">
-            <button class="tag-add-btn" onclick="addTag('teach')"><i class="fa-solid fa-plus"></i> Add</button>
+      <!-- SKILLS -->
+      <div class="ds-panel" id="panel-skills">
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-graduation-cap" style="color:var(--cyan);font-size:.85rem"></i>Skills I Can Teach</div>
+          <div class="s-card-desc">Add skills you're confident to teach others.</div>
+          <div class="skills-input-wrap"><input type="text" id="teachSkillInput" placeholder="e.g. Python, Photoshop, Guitar…" onkeydown="if(event.key==='Enter')addTag('teach')"><button class="tag-add-btn" onclick="addTag('teach')"><i class="fa-solid fa-plus"></i> Add</button></div>
+          <div class="tags-wrap" id="teachTags"></div>
+        </div></div>
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-book-open" style="color:var(--p2);font-size:.85rem"></i>Skills I Want to Learn</div>
+          <div class="s-card-desc">What you'd like to learn from others.</div>
+          <div class="skills-input-wrap"><input type="text" id="learnSkillInput" placeholder="e.g. React, Music Theory…" onkeydown="if(event.key==='Enter')addTag('learn')"><button class="tag-add-btn" style="background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--cyan)" onclick="addTag('learn')"><i class="fa-solid fa-plus"></i> Add</button></div>
+          <div class="tags-wrap" id="learnTags"></div>
+        </div></div>
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-clock" style="color:var(--amber);font-size:.85rem"></i>Availability</div>
+          <div class="s-card-desc">When are you available for sessions?</div>
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="input-group"><label>Timezone</label><select id="settingTimezone"><option>Asia/Kolkata (IST, UTC+5:30)</option><option>Europe/London (GMT)</option><option>America/New_York (EST)</option><option>America/Los_Angeles (PST)</option></select></div>
+            <div class="input-group"><label>Session Preference</label><select id="settingSessionPref"><option>Weekday Evenings</option><option>Weekend Mornings</option><option>Flexible</option></select></div>
           </div>
-          <div class="tags-container" id="teachTags"></div>
-        </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-book-open" style="color:var(--info);"></i> Skills I Want to Learn</div>
-          <div class="settings-card-desc">What would you like to learn? This helps match you with the right partners.</div>
-          <div class="skills-input-wrap">
-            <input type="text" id="learnSkillInput" placeholder="e.g. React, Music Theory, Cooking…" onkeydown="if(event.key==='Enter')addTag('learn')">
-            <button class="tag-add-btn" onclick="addTag('learn')" style="background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.3);color:var(--info);"><i class="fa-solid fa-plus"></i> Add</button>
-          </div>
-          <div class="tags-container" id="learnTags"></div>
-        </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-clock" style="color:var(--gold);"></i> Availability</div>
-          <div class="settings-card-desc">When are you available for skill sessions?</div>
-          <div class="form-grid">
-            <div class="input-group">
-              <label>Timezone</label>
-              <select id="settingTimezone">
-                <option>Asia/Kolkata (IST, UTC+5:30)</option>
-                <option>Asia/Dubai (GST, UTC+4)</option>
-                <option>Europe/London (GMT, UTC+0)</option>
-                <option>America/New_York (EST, UTC-5)</option>
-                <option>America/Los_Angeles (PST, UTC-8)</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label>Session Preference</label>
-              <select id="settingSessionPref">
-                <option>Weekday Evenings</option>
-                <option>Weekend Mornings</option>
-                <option>Weekday Mornings</option>
-                <option>Flexible</option>
-              </select>
-            </div>
-          </div>
-          <div class="btn-row">
-            <button class="btn-save" onclick="saveSkills()"><i class="fa-solid fa-floppy-disk"></i> Save Skills</button>
-          </div>
-        </div>
+          <button class="btn-primary" onclick="saveSkills()"><i class="fa-solid fa-floppy-disk"></i>Save Skills</button>
+        </div></div>
       </div>
 
-      <!-- ── NOTIFICATIONS ── -->
-      <div class="settings-panel" id="panel-notifications">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-bell" style="color:var(--danger);"></i> Push Notifications</div>
-          <div class="settings-card-desc">Choose what you want to be notified about.</div>
-
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>New Trade Requests</h4><p>When someone requests to trade skills with you</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_trade" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Session Reminders</h4><p>Reminder 30 minutes before a scheduled session</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_session" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>New Messages</h4><p>When a trade partner sends you a message</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_msg" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Wallet Updates</h4><p>Withdrawals approved, balance changes</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_wallet" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>XP & Level Up</h4><p>When you earn XP or reach a new level</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_xp" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Platform Announcements</h4><p>New features and SkillSwap news</p></div>
-            <label class="toggle"><input type="checkbox" id="notif_news"><span class="toggle-slider"></span></label>
-          </div>
+      <!-- NOTIFICATIONS -->
+      <div class="ds-panel" id="panel-notifications">
+        <div class="toggle-block"><div class="toggle-block-title">Push Notifications</div>
+          <div class="toggle-row"><div class="toggle-info"><h4>New Trade Requests</h4><p>When someone wants to swap skills</p></div><label class="toggle"><input type="checkbox" id="notif_trade" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Session Reminders</h4><p>30 min before a scheduled session</p></div><label class="toggle"><input type="checkbox" id="notif_session" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>New Messages</h4><p>When a trade partner messages you</p></div><label class="toggle"><input type="checkbox" id="notif_msg" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Wallet Updates</h4><p>Payments received or withdrawn</p></div><label class="toggle"><input type="checkbox" id="notif_wallet" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>XP & Level Up</h4><p>When you earn XP or unlock a level</p></div><label class="toggle"><input type="checkbox" id="notif_xp" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Platform Announcements</h4><p>New features and SkillSwap news</p></div><label class="toggle"><input type="checkbox" id="notif_news"><span class="toggle-sl"></span></label></div>
         </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-envelope" style="color:var(--primary);"></i> Email Notifications</div>
-          <div class="settings-card-desc">Control which emails we send you.</div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Weekly Summary</h4><p>A weekly digest of your trades and earnings</p></div>
-            <label class="toggle"><input type="checkbox" id="email_weekly" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Trade Confirmations</h4><p>Email when a trade is confirmed or completed</p></div>
-            <label class="toggle"><input type="checkbox" id="email_trade" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Marketing Emails</h4><p>Tips, promotions and partner offers</p></div>
-            <label class="toggle"><input type="checkbox" id="email_marketing"><span class="toggle-slider"></span></label>
-          </div>
+        <div class="toggle-block"><div class="toggle-block-title">Email Notifications</div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Weekly Summary</h4><p>Trades and earnings digest</p></div><label class="toggle"><input type="checkbox" id="email_weekly" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Trade Confirmations</h4><p>Email when a trade is confirmed</p></div><label class="toggle"><input type="checkbox" id="email_trade" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Marketing Emails</h4><p>Tips, promotions and partner offers</p></div><label class="toggle"><input type="checkbox" id="email_marketing"><span class="toggle-sl"></span></label></div>
         </div>
-
-        <div class="btn-row" style="padding:0 0 4px;">
-          <button class="btn-save" onclick="saveNotifications()"><i class="fa-solid fa-floppy-disk"></i> Save Preferences</button>
-        </div>
+        <button class="btn-primary" onclick="saveNotifications()"><i class="fa-solid fa-floppy-disk"></i>Save Preferences</button>
       </div>
 
-      <!-- ── PRIVACY ── -->
-      <div class="settings-panel" id="panel-privacy">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-eye" style="color:var(--success);"></i> Profile Visibility</div>
-          <div class="settings-card-desc">Control who can see your profile and activity.</div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Public Profile</h4><p>Allow anyone to view your profile page</p></div>
-            <label class="toggle"><input type="checkbox" id="priv_public" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Show Online Status</h4><p>Let others see when you're active</p></div>
-            <label class="toggle"><input type="checkbox" id="priv_online" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Show Earnings</h4><p>Display your total earnings on your profile</p></div>
-            <label class="toggle"><input type="checkbox" id="priv_earnings"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Show Trade History</h4><p>Allow others to see your past trades</p></div>
-            <label class="toggle"><input type="checkbox" id="priv_trades" checked><span class="toggle-slider"></span></label>
-          </div>
+      <!-- PRIVACY -->
+      <div class="ds-panel" id="panel-privacy">
+        <div class="toggle-block"><div class="toggle-block-title">Profile Visibility</div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Public Profile</h4><p>Anyone can view your profile</p></div><label class="toggle"><input type="checkbox" id="priv_public" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Show Online Status</h4><p>Let others see when you're active</p></div><label class="toggle"><input type="checkbox" id="priv_online" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Show Earnings</h4><p>Display your total earnings publicly</p></div><label class="toggle"><input type="checkbox" id="priv_earnings"><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Show Trade History</h4><p>Allow others to see your past trades</p></div><label class="toggle"><input type="checkbox" id="priv_trades" checked><span class="toggle-sl"></span></label></div>
         </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-lock" style="color:var(--gold);"></i> Security</div>
-          <div class="settings-card-desc">Manage your password and account security.</div>
-
-          <div class="security-item">
-            <div class="security-icon" style="background:rgba(99,102,241,0.12);color:var(--primary);"><i class="fa-solid fa-key"></i></div>
-            <div class="security-body"><h4>Password</h4><p>Last changed 30 days ago</p></div>
-            <button class="sec-btn" onclick="openModal('changePasswordModal')">Change</button>
-          </div>
-          <div class="security-item">
-            <div class="security-icon" style="background:rgba(16,185,129,0.12);color:var(--success);"><i class="fa-solid fa-mobile-screen"></i></div>
-            <div class="security-body"><h4>Two-Factor Authentication</h4><p>Adds a second layer of protection</p></div>
-            <span class="security-status sec-off"><i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> Off</span>
-            <button class="sec-btn" style="margin-left:10px;" onclick="showToast('info','2FA','Two-factor setup coming soon.')">Enable</button>
-          </div>
-          <div class="security-item">
-            <div class="security-icon" style="background:rgba(245,158,11,0.12);color:var(--gold);"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <div class="security-body"><h4>Active Sessions</h4><p>1 active device</p></div>
-            <button class="sec-btn" onclick="showToast('success','Sessions','Other sessions signed out.')">Sign out all</button>
-          </div>
+        <div class="sec-list">
+          <div class="sec-row"><div class="sec-ico" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-key"></i></div><div class="sec-body"><h4>Password</h4><p>Last changed 30 days ago</p></div><button class="sec-btn" onclick="openModal('changePasswordModal')">Change</button></div>
+          <div class="sec-row"><div class="sec-ico" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-mobile-screen"></i></div><div class="sec-body"><h4>Two-Factor Authentication</h4><p>Adds a second layer of protection</p></div><span class="sec-status sec-off">Off</span><button class="sec-btn" style="margin-left:8px" onclick="showToast('info','Coming soon','2FA setup will be available soon.')">Enable</button></div>
+          <div class="sec-row"><div class="sec-ico" style="background:rgba(255,185,48,.1);color:var(--amber)"><i class="fa-solid fa-clock-rotate-left"></i></div><div class="sec-body"><h4>Active Sessions</h4><p>1 active device</p></div><button class="sec-btn" onclick="showToast('success','✅ Done','Other sessions signed out.')">Sign out all</button></div>
         </div>
-
-        <div class="btn-row" style="padding:0 0 4px;">
-          <button class="btn-save" onclick="savePrivacy()"><i class="fa-solid fa-floppy-disk"></i> Save Privacy Settings</button>
-        </div>
+        <button class="btn-primary" onclick="savePrivacy()"><i class="fa-solid fa-floppy-disk"></i>Save Privacy Settings</button>
       </div>
 
-      <!-- ── PAYMENTS ── -->
-      <div class="settings-panel" id="panel-payments">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-wallet" style="color:var(--gold);"></i> Payment Methods</div>
-          <div class="settings-card-desc">Manage UPI IDs and bank accounts for withdrawals.</div>
-
-          <div id="paymentMethodsList">
-            <div class="payment-method">
-              <div class="pm-icon" style="background:rgba(245,158,11,0.12);font-size:1rem;color:var(--gold);">UPI</div>
-              <div class="pm-body"><h4>user@paytm</h4><p>UPI · Default</p></div>
-              <div class="pm-actions">
-                <button class="pm-remove" onclick="showToast('info','Remove','Are you sure? This is your default.')">Remove</button>
-              </div>
-            </div>
+      <!-- PAYMENTS -->
+      <div class="ds-panel" id="panel-payments">
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-wallet" style="color:var(--amber);font-size:.85rem"></i>Payment Methods</div>
+          <div class="s-card-desc">Manage UPI IDs and bank accounts for withdrawals.</div>
+          <div class="pm-list" id="paymentMethodsList">
+            <div class="pm-row"><div class="pm-ico" style="background:rgba(255,185,48,.12);color:var(--amber)">UPI</div><div class="pm-body"><h4>user@paytm</h4><p>UPI · Default</p></div><button class="pm-remove" onclick="showToast('info','Default method','Remove your other methods first.')">Remove</button></div>
           </div>
-          <hr class="settings-divider">
-          <button class="btn-save" style="background:linear-gradient(135deg,var(--gold),#f97316);" onclick="openModal('addPaymentModal')">
-            <i class="fa-solid fa-plus"></i> Add Payment Method
-          </button>
-        </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-file-invoice" style="color:var(--primary);"></i> Withdrawal Settings</div>
-          <div class="settings-card-desc">Set your auto-withdrawal preferences.</div>
-          <div class="form-grid">
-            <div class="input-group">
-              <label>Minimum Withdrawal (₹)</label>
-              <input type="number" id="minWithdraw" placeholder="100" value="100" min="1">
-            </div>
-            <div class="input-group">
-              <label>Auto-Withdraw Threshold</label>
-              <select id="autoWithdraw">
-                <option>Never (Manual only)</option>
-                <option>When balance exceeds ₹500</option>
-                <option>When balance exceeds ₹1000</option>
-                <option>Weekly</option>
-              </select>
-            </div>
+          <button class="btn-primary" style="margin-top:12px;background:linear-gradient(135deg,var(--amber),#f97316)" onclick="openModal('addPaymentModal')"><i class="fa-solid fa-plus"></i>Add Payment Method</button>
+        </div></div>
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-file-invoice" style="color:var(--p2);font-size:.85rem"></i>Withdrawal Settings</div>
+          <div class="s-card-desc">Set your auto-withdrawal preferences.</div>
+          <div class="form-grid" style="margin-bottom:16px">
+            <div class="input-group"><label>Minimum Withdrawal (₹)</label><input type="number" id="minWithdraw" value="100" min="1"></div>
+            <div class="input-group"><label>Auto-Withdraw Threshold</label><select id="autoWithdraw"><option>Never (Manual only)</option><option>When balance ≥ ₹500</option><option>When balance ≥ ₹1000</option><option>Weekly</option></select></div>
           </div>
-          <div class="btn-row">
-            <button class="btn-save" onclick="showToast('success','Saved','Payment settings updated.')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-          </div>
-        </div>
+          <button class="btn-primary" onclick="showToast('success','✅ Saved','Payment settings updated.')"><i class="fa-solid fa-floppy-disk"></i>Save Settings</button>
+        </div></div>
       </div>
 
-      <!-- ── APPEARANCE ── -->
-      <div class="settings-panel" id="panel-appearance">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-palette" style="color:var(--accent);"></i> Theme</div>
-          <div class="settings-card-desc">Choose your dashboard color theme.</div>
+      <!-- APPEARANCE -->
+      <div class="ds-panel" id="panel-appearance">
+        <div class="s-card"><div class="s-card-inner">
+          <div class="s-card-title"><i class="fa-solid fa-palette" style="color:#c084fc;font-size:.85rem"></i>Theme Color</div>
+          <div class="s-card-desc">Choose your dashboard accent color.</div>
           <div class="theme-grid">
-            <div class="theme-option selected" onclick="selectTheme(this,'Indigo')">
-              <div class="theme-swatch" style="background:linear-gradient(135deg,#6366f1,#a855f7);"></div>
-              <div class="theme-name">Indigo ✓</div>
-            </div>
-            <div class="theme-option" onclick="selectTheme(this,'Cyan')">
-              <div class="theme-swatch" style="background:linear-gradient(135deg,#06b6d4,#6366f1);"></div>
-              <div class="theme-name">Cyan</div>
-            </div>
-            <div class="theme-option" onclick="selectTheme(this,'Emerald')">
-              <div class="theme-swatch" style="background:linear-gradient(135deg,#10b981,#06b6d4);"></div>
-              <div class="theme-name">Emerald</div>
-            </div>
-            <div class="theme-option" onclick="selectTheme(this,'Rose')">
-              <div class="theme-swatch" style="background:linear-gradient(135deg,#f43f5e,#a855f7);"></div>
-              <div class="theme-name">Rose</div>
-            </div>
+            <div class="theme-opt selected" onclick="selectTheme(this,'Indigo')"><div class="theme-swatch" style="background:linear-gradient(135deg,#6157ff,#ff5c7c)"></div><div class="theme-name">Indigo ✓</div></div>
+            <div class="theme-opt" onclick="selectTheme(this,'Cyan')"><div class="theme-swatch" style="background:linear-gradient(135deg,#00d4ff,#6157ff)"></div><div class="theme-name">Cyan</div></div>
+            <div class="theme-opt" onclick="selectTheme(this,'Emerald')"><div class="theme-swatch" style="background:linear-gradient(135deg,#00e5a0,#00d4ff)"></div><div class="theme-name">Emerald</div></div>
+            <div class="theme-opt" onclick="selectTheme(this,'Rose')"><div class="theme-swatch" style="background:linear-gradient(135deg,#f43f5e,#a855f7)"></div><div class="theme-name">Rose</div></div>
           </div>
+        </div></div>
+        <div class="toggle-block"><div class="toggle-block-title">Display Preferences</div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Compact Mode</h4><p>Reduce spacing for more content</p></div><label class="toggle"><input type="checkbox" id="compactMode"><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Animations</h4><p>Enable smooth transitions</p></div><label class="toggle"><input type="checkbox" id="animations" checked><span class="toggle-sl"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><h4>Show XP Progress Bar</h4><p>Display XP bar in navigation</p></div><label class="toggle"><input type="checkbox" id="showXP" checked><span class="toggle-sl"></span></label></div>
         </div>
+        <button class="btn-primary" onclick="showToast('success','✅ Saved','Appearance preferences saved.')"><i class="fa-solid fa-floppy-disk"></i>Save Appearance</button>
+      </div>
 
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-text-height" style="color:var(--info);"></i> Display</div>
-          <div class="settings-card-desc">Customize font size and layout density.</div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Compact Mode</h4><p>Reduce spacing for more content on screen</p></div>
-            <label class="toggle"><input type="checkbox" id="compactMode"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Animations</h4><p>Enable smooth transitions and micro-interactions</p></div>
-            <label class="toggle"><input type="checkbox" id="animations" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="toggle-info"><h4>Show XP Progress Bar</h4><p>Display your XP bar in the sidebar</p></div>
-            <label class="toggle"><input type="checkbox" id="showXP" checked><span class="toggle-slider"></span></label>
-          </div>
-        </div>
-
-        <div class="btn-row" style="padding:0 0 4px;">
-          <button class="btn-save" onclick="showToast('success','Saved','Appearance preferences saved.')"><i class="fa-solid fa-floppy-disk"></i> Save Appearance</button>
+      <!-- LINKED -->
+      <div class="ds-panel" id="panel-linked">
+        <div class="linked-list">
+          <div class="linked-row"><div class="linked-ico" style="background:rgba(66,133,244,.12);color:#4285f4"><i class="fa-brands fa-google"></i></div><div class="linked-body"><h4>Google</h4><p id="googleStatus">Not connected</p></div><button class="linked-btn" id="googleBtn" onclick="showToast('info','ℹ️ Google','Linked via Firebase Auth.')">View</button></div>
+          <div class="linked-row"><div class="linked-ico" style="background:rgba(36,41,47,.4);color:#e6edf3"><i class="fa-brands fa-github"></i></div><div class="linked-body"><h4>GitHub</h4><p>Not connected</p></div><button class="linked-btn" onclick="showToast('info','🔗 Coming soon','GitHub OAuth integration coming soon.')">Connect</button></div>
+          <div class="linked-row"><div class="linked-ico" style="background:rgba(10,102,194,.12);color:#0a66c2"><i class="fa-brands fa-linkedin"></i></div><div class="linked-body"><h4>LinkedIn</h4><p>Not connected</p></div><button class="linked-btn" onclick="showToast('info','🔗 Coming soon','LinkedIn integration coming soon.')">Connect</button></div>
+          <div class="linked-row"><div class="linked-ico" style="background:rgba(29,161,242,.12);color:#1da1f2"><i class="fa-brands fa-twitter"></i></div><div class="linked-body"><h4>Twitter / X</h4><p>Not connected</p></div><button class="linked-btn" onclick="showToast('info','🔗 Coming soon','Twitter integration coming soon.')">Connect</button></div>
         </div>
       </div>
 
-      <!-- ── LINKED ACCOUNTS ── -->
-      <div class="settings-panel" id="panel-linked">
-        <div class="settings-card">
-          <div class="settings-card-title"><i class="fa-solid fa-link" style="color:var(--primary);"></i> Linked Accounts</div>
-          <div class="settings-card-desc">Connect social accounts to verify your identity and attract more trade partners.</div>
-
-          <div class="linked-row">
-            <div class="linked-icon" style="background:rgba(29,161,242,0.12);color:#1da1f2;"><i class="fa-brands fa-twitter"></i></div>
-            <div class="linked-body"><h4>Twitter / X</h4><p>Not connected</p></div>
-            <button class="linked-connect" onclick="showToast('info','Twitter','OAuth integration coming soon.')">Connect</button>
-          </div>
-          <div class="linked-row">
-            <div class="linked-icon" style="background:rgba(10,102,194,0.12);color:#0a66c2;"><i class="fa-brands fa-linkedin"></i></div>
-            <div class="linked-body"><h4>LinkedIn</h4><p>Not connected</p></div>
-            <button class="linked-connect" onclick="showToast('info','LinkedIn','OAuth integration coming soon.')">Connect</button>
-          </div>
-          <div class="linked-row">
-            <div class="linked-icon" style="background:rgba(36,41,47,0.4);color:#e6edf3;"><i class="fa-brands fa-github"></i></div>
-            <div class="linked-body"><h4>GitHub</h4><p>Not connected</p></div>
-            <button class="linked-connect" onclick="showToast('info','GitHub','OAuth integration coming soon.')">Connect</button>
-          </div>
-          <div class="linked-row">
-            <div class="linked-icon" style="background:rgba(66,133,244,0.12);color:#4285f4;"><i class="fa-brands fa-google"></i></div>
-            <div class="linked-body"><h4>Google</h4><p id="googleStatus">Not connected</p></div>
-            <button class="linked-connect" id="googleBtn" onclick="showToast('info','Google','Already linked via Firebase Auth.')">View</button>
-          </div>
-        </div>
+      <!-- DANGER -->
+      <div class="ds-panel" id="panel-danger">
+        <p style="font-size:.81rem;color:var(--muted);margin-bottom:16px;line-height:1.6">Irreversible actions. Please read carefully before proceeding.</p>
+        <div class="danger-row"><div class="danger-info"><h4>Pause Account</h4><p>Temporarily hide your profile and pause incoming trade requests.</p></div><button class="danger-btn" onclick="showToast('info','⏸ Paused','Your profile is now hidden from others.')">Pause Account</button></div>
+        <div class="danger-row"><div class="danger-info"><h4>Export My Data</h4><p>Download all your data including trades, sessions and messages.</p></div><button class="danger-btn" onclick="showToast('info','📦 Requested','Your data will be emailed to you.')">Export Data</button></div>
+        <div class="danger-row" style="border-color:rgba(255,80,80,.35);background:rgba(255,80,80,.07)"><div class="danger-info"><h4>Delete Account</h4><p>Permanently delete your account. All data will be lost forever.</p></div><button class="danger-btn" style="background:rgba(255,80,80,.18)" onclick="openModal('deleteAccountModal')">Delete Account</button></div>
       </div>
+    </div>
+  </div><!-- /desktop-settings -->
 
-      <!-- ── DANGER ZONE ── -->
-      <div class="settings-panel" id="panel-danger">
-        <div class="settings-card" style="border-color:rgba(239,68,68,0.2);">
-          <div class="settings-card-title" style="color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
-          <div class="settings-card-desc">Irreversible actions. Please read carefully before proceeding.</div>
-
-          <div class="danger-item">
-            <div class="danger-info">
-              <h4>Pause Account</h4>
-              <p>Temporarily hide your profile and pause incoming trade requests.</p>
-            </div>
-            <button class="danger-btn" onclick="showToast('warning','Account Paused','Your profile is now hidden from others.')">Pause Account</button>
-          </div>
-          <div class="danger-item">
-            <div class="danger-info">
-              <h4>Export My Data</h4>
-              <p>Download a copy of all your data including trades, sessions, and messages.</p>
-            </div>
-            <button class="danger-btn" onclick="showToast('info','Export Requested','Your data export will be emailed to you.')">Export Data</button>
-          </div>
-          <div class="danger-item" style="border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.06);">
-            <div class="danger-info">
-              <h4>Delete Account</h4>
-              <p>Permanently delete your account and all associated data. This cannot be undone.</p>
-            </div>
-            <button class="danger-btn" style="background:rgba(239,68,68,0.12);" onclick="openModal('deleteAccountModal')">Delete Account</button>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- end panels -->
-  </div><!-- end settings-layout -->
+  <!-- MOBILE LIST VIEW -->
+  <div class="mob-settings-list" style="display:none">
+    <a class="mob-profile-card" href="profile.html">
+      <div class="mpc-av" id="mobPcAv">U</div>
+      <div class="mpc-info"><div class="mpc-name" id="mobPcName">Loading…</div><div class="mpc-email" id="mobPcEmail">your@email.com</div><span class="mpc-badge">✦ Edit Profile →</span></div>
+      <i class="fa-solid fa-chevron-right" style="color:var(--muted);font-size:.68rem;flex-shrink:0"></i>
+    </a>
+    <div class="mob-group-label">Account</div>
+    <div class="mob-list">
+      <div class="mob-row" onclick="openDetail('profile')"><div class="mr-icon" style="background:rgba(97,87,255,.14);color:var(--p2)"><i class="fa-solid fa-user"></i></div><div class="mr-body"><div class="mr-label">My Profile</div><div class="mr-sub">Name, bio, photo, contact</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+      <div class="mob-row" onclick="openDetail('skills')"><div class="mr-icon" style="background:rgba(0,212,255,.12);color:var(--cyan)"><i class="fa-solid fa-code"></i></div><div class="mr-body"><div class="mr-label">My Skills</div><div class="mr-sub">Skills to teach & learn</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+      <div class="mob-row" onclick="openDetail('payments')"><div class="mr-icon" style="background:rgba(255,185,48,.12);color:var(--amber)"><i class="fa-solid fa-wallet"></i></div><div class="mr-body"><div class="mr-label">Payments & Wallet</div><div class="mr-sub">UPI, bank, withdrawals</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+    </div>
+    <div class="mob-group-label">Preferences</div>
+    <div class="mob-list">
+      <div class="mob-row" onclick="openDetail('notifications')"><div class="mr-icon" style="background:rgba(255,80,80,.1);color:var(--red)"><i class="fa-solid fa-bell"></i></div><div class="mr-body"><div class="mr-label">Notifications</div><div class="mr-sub">Push, email, alerts</div></div><div class="mr-right"><span class="mr-badge">2</span><i class="fa-solid fa-chevron-right"></i></div></div>
+      <div class="mob-row" onclick="openDetail('privacy')"><div class="mr-icon" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-shield-halved"></i></div><div class="mr-body"><div class="mr-label">Privacy & Security</div><div class="mr-sub">Visibility, password, 2FA</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+      <div class="mob-row" onclick="openDetail('appearance')"><div class="mr-icon" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-palette"></i></div><div class="mr-body"><div class="mr-label">Appearance</div><div class="mr-sub">Theme, display, animations</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+      <div class="mob-row" onclick="openDetail('linked')"><div class="mr-icon" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-link"></i></div><div class="mr-body"><div class="mr-label">Linked Accounts</div><div class="mr-sub">Google, GitHub, LinkedIn</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+    </div>
+    <div class="mob-group-label">More</div>
+    <div class="mob-list">
+      <div class="mob-row" onclick="openDetail('danger')"><div class="mr-icon" style="background:rgba(255,80,80,.1);color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="mr-body"><div class="mr-label" style="color:var(--red)">Danger Zone</div><div class="mr-sub">Pause, export, delete</div></div><div class="mr-right"><i class="fa-solid fa-chevron-right"></i></div></div>
+    </div>
+    <div class="mob-list"><div class="mob-row danger" onclick="logoutUser()"><div class="mr-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div><div class="mr-body"><div class="mr-label">Log Out</div></div></div></div>
+  </div>
 </main>
 
-<!-- MOBILE NAV -->
-<nav class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <div class="mob-nav-item" onclick="location.href='dashboard.html'"><i class="fa-solid fa-gauge-high"></i>Home</div>
-    <div class="mob-nav-item" onclick="location.href='skill-exchange.html'"><i class="fa-solid fa-arrows-rotate"></i>Exchange</div>
-    <div class="mob-nav-item" onclick="location.href='trades.html'"><i class="fa-solid fa-handshake"></i>Trades</div>
-    <div class="mob-nav-item" onclick="location.href='dashboard.html'"><i class="fa-solid fa-bell"></i>Alerts</div>
-    <div class="mob-nav-item active"><i class="fa-solid fa-gear"></i>Settings</div>
+<!-- MOBILE DETAIL SCREENS -->
+<div class="detail-screen" id="detail-profile">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('profile')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(97,87,255,.14);color:var(--p2)"><i class="fa-solid fa-user"></i></div><div class="detail-hdr-title">My Profile</div><button class="detail-save" onclick="saveMobProfile()">Save</button></div>
+  <div class="detail-body">
+    <div style="display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px;margin-bottom:16px">
+      <div style="width:56px;height:56px;border-radius:15px;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:1.45rem;color:#fff;flex-shrink:0" id="mobBigAv">U</div>
+      <div><div style="font-size:.9rem;font-weight:600" id="mobProfileName">User</div><div style="font-size:.72rem;color:var(--muted);margin-top:2px" id="mobProfileEmail">email</div><button onclick="showToast('info','📷 Coming soon','')" style="margin-top:6px;padding:5px 12px;border-radius:8px;background:var(--p3);border:1px solid rgba(97,87,255,.3);color:var(--p2);font-size:.73rem;font-weight:600;cursor:pointer"><i class="fa-solid fa-camera" style="margin-right:4px"></i>Change Photo</button></div>
+    </div>
+    <div class="form-grid">
+      <div class="input-group"><label>Full Name</label><input type="text" id="mobName" placeholder="Your full name"></div>
+      <div class="input-group"><label>Username</label><input type="text" id="mobUsername" placeholder="@username"></div>
+      <div class="input-group"><label>Email</label><input type="email" id="mobEmail" placeholder="you@email.com"></div>
+      <div class="input-group"><label>Phone</label><input type="tel" id="mobPhone" placeholder="+91 00000 00000"></div>
+      <div class="input-group"><label>Location</label><input type="text" id="mobLocation" placeholder="City, Country"></div>
+      <div class="input-group"><label>Website</label><input type="url" id="mobWebsite" placeholder="https://yoursite.com"></div>
+    </div>
+    <div class="input-group"><label>Bio</label><textarea id="mobBio" placeholder="Tell others what you do…"></textarea><span class="input-hint">Max 200 characters.</span></div>
+    <button class="btn-primary btn-full" style="margin-top:10px" onclick="saveMobProfile()"><i class="fa-solid fa-floppy-disk"></i>Save Profile</button>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-skills">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('skills')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(0,212,255,.12);color:var(--cyan)"><i class="fa-solid fa-code"></i></div><div class="detail-hdr-title">My Skills</div><button class="detail-save" onclick="saveSkills()">Save</button></div>
+  <div class="detail-body">
+    <div style="font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p2);margin-bottom:9px">Skills I Can Teach</div>
+    <div class="skills-input-wrap"><input type="text" id="mobTeachInput" placeholder="e.g. Python, Guitar…" onkeydown="if(event.key==='Enter')addMobTag('teach')"><button class="tag-add-btn" onclick="addMobTag('teach')"><i class="fa-solid fa-plus"></i></button></div>
+    <div class="tags-wrap" id="mobTeachTags" style="margin-bottom:20px"></div>
+    <div style="font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:9px">Skills I Want to Learn</div>
+    <div class="skills-input-wrap"><input type="text" id="mobLearnInput" placeholder="e.g. React, Music Theory…" onkeydown="if(event.key==='Enter')addMobTag('learn')"><button class="tag-add-btn" style="background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--cyan)" onclick="addMobTag('learn')"><i class="fa-solid fa-plus"></i></button></div>
+    <div class="tags-wrap" id="mobLearnTags" style="margin-bottom:20px"></div>
+    <div class="input-group"><label>Timezone</label><select id="mobTimezone"><option>Asia/Kolkata (IST)</option><option>Europe/London (GMT)</option><option>America/New_York (EST)</option></select></div>
+    <button class="btn-primary btn-full" style="margin-top:8px" onclick="saveSkills()"><i class="fa-solid fa-floppy-disk"></i>Save Skills</button>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-notifications">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('notifications')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(255,80,80,.1);color:var(--red)"><i class="fa-solid fa-bell"></i></div><div class="detail-hdr-title">Notifications</div><button class="detail-save" onclick="saveNotifications()">Save</button></div>
+  <div class="detail-body">
+    <div class="toggle-block"><div class="toggle-block-title">Push</div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Trade Requests</h4><p>When someone wants to swap</p></div><label class="toggle"><input type="checkbox" id="mn_trade" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Session Reminders</h4><p>30 min before a session</p></div><label class="toggle"><input type="checkbox" id="mn_session" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>New Messages</h4><p>From trade partners</p></div><label class="toggle"><input type="checkbox" id="mn_msg" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Wallet Updates</h4><p>Payments and withdrawals</p></div><label class="toggle"><input type="checkbox" id="mn_wallet" checked><span class="toggle-sl"></span></label></div>
+    </div>
+    <div class="toggle-block" style="margin-top:12px"><div class="toggle-block-title">Email</div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Weekly Summary</h4><p>Trades and earnings digest</p></div><label class="toggle"><input type="checkbox" id="me_weekly" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Trade Confirmations</h4><p>When a trade is confirmed</p></div><label class="toggle"><input type="checkbox" id="me_trade" checked><span class="toggle-sl"></span></label></div>
+    </div>
+    <button class="btn-primary btn-full" style="margin-top:14px" onclick="saveNotifications()"><i class="fa-solid fa-floppy-disk"></i>Save Preferences</button>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-privacy">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('privacy')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-shield-halved"></i></div><div class="detail-hdr-title">Privacy & Security</div><button class="detail-save" onclick="savePrivacy()">Save</button></div>
+  <div class="detail-body">
+    <div class="toggle-block"><div class="toggle-block-title">Visibility</div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Public Profile</h4><p>Anyone can view your profile</p></div><label class="toggle"><input type="checkbox" id="mp_public" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Show Online Status</h4><p>Let others see when active</p></div><label class="toggle"><input type="checkbox" id="mp_online" checked><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Show Earnings</h4><p>Display on your profile</p></div><label class="toggle"><input type="checkbox" id="mp_earn"><span class="toggle-sl"></span></label></div>
+    </div>
+    <div class="sec-list" style="margin-top:12px">
+      <div class="sec-row"><div class="sec-ico" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-key"></i></div><div class="sec-body"><h4>Password</h4><p>Change your password</p></div><button class="sec-btn" onclick="openModal('changePasswordModal')">Change</button></div>
+      <div class="sec-row"><div class="sec-ico" style="background:rgba(0,229,160,.1);color:var(--green)"><i class="fa-solid fa-mobile-screen"></i></div><div class="sec-body"><h4>Two-Factor Auth</h4><p>Extra account protection</p></div><span class="sec-status sec-off">Off</span><button class="sec-btn" style="margin-left:8px" onclick="showToast('info','Coming soon','')">Enable</button></div>
+    </div>
+    <button class="btn-primary btn-full" style="margin-top:14px" onclick="savePrivacy()"><i class="fa-solid fa-floppy-disk"></i>Save Settings</button>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-payments">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('payments')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(255,185,48,.12);color:var(--amber)"><i class="fa-solid fa-wallet"></i></div><div class="detail-hdr-title">Payments</div></div>
+  <div class="detail-body">
+    <div class="pm-list" id="mobPmList"><div class="pm-row"><div class="pm-ico" style="background:rgba(255,185,48,.12);color:var(--amber)">UPI</div><div class="pm-body"><h4>user@paytm</h4><p>Default</p></div><button class="pm-remove" onclick="showToast('info','Default method','')">Remove</button></div></div>
+    <button class="btn-primary btn-full" style="margin-top:12px;background:linear-gradient(135deg,var(--amber),#f97316)" onclick="openModal('addPaymentModal')"><i class="fa-solid fa-plus"></i>Add Method</button>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-appearance">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('appearance')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(168,85,247,.12);color:#c084fc"><i class="fa-solid fa-palette"></i></div><div class="detail-hdr-title">Appearance</div><button class="detail-save" onclick="showToast('success','✅ Saved','')">Save</button></div>
+  <div class="detail-body">
+    <div style="font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p2);margin-bottom:11px">Theme Color</div>
+    <div class="theme-grid" style="margin-bottom:20px">
+      <div class="theme-opt selected" onclick="selectTheme(this,'Indigo')"><div class="theme-swatch" style="background:linear-gradient(135deg,#6157ff,#ff5c7c)"></div><div class="theme-name">Indigo ✓</div></div>
+      <div class="theme-opt" onclick="selectTheme(this,'Cyan')"><div class="theme-swatch" style="background:linear-gradient(135deg,#00d4ff,#6157ff)"></div><div class="theme-name">Cyan</div></div>
+      <div class="theme-opt" onclick="selectTheme(this,'Emerald')"><div class="theme-swatch" style="background:linear-gradient(135deg,#00e5a0,#00d4ff)"></div><div class="theme-name">Emerald</div></div>
+      <div class="theme-opt" onclick="selectTheme(this,'Rose')"><div class="theme-swatch" style="background:linear-gradient(135deg,#f43f5e,#a855f7)"></div><div class="theme-name">Rose</div></div>
+    </div>
+    <div class="toggle-block"><div class="toggle-block-title">Display</div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Compact Mode</h4><p>Reduce spacing</p></div><label class="toggle"><input type="checkbox" id="ma_compact"><span class="toggle-sl"></span></label></div>
+      <div class="toggle-row"><div class="toggle-info"><h4>Animations</h4><p>Enable transitions</p></div><label class="toggle"><input type="checkbox" id="ma_anim" checked><span class="toggle-sl"></span></label></div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-linked">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('linked')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fa-solid fa-link"></i></div><div class="detail-hdr-title">Linked Accounts</div></div>
+  <div class="detail-body">
+    <div class="linked-list">
+      <div class="linked-row"><div class="linked-ico" style="background:rgba(66,133,244,.12);color:#4285f4"><i class="fa-brands fa-google"></i></div><div class="linked-body"><h4>Google</h4><p id="mGoogleStatus">Not connected</p></div><button class="linked-btn" id="mGoogleBtn" onclick="showToast('info','ℹ️ Google','Linked via Firebase Auth.')">View</button></div>
+      <div class="linked-row"><div class="linked-ico" style="background:rgba(36,41,47,.4);color:#e6edf3"><i class="fa-brands fa-github"></i></div><div class="linked-body"><h4>GitHub</h4><p>Not connected</p></div><button class="linked-btn" onclick="showToast('info','Coming soon','')">Connect</button></div>
+      <div class="linked-row"><div class="linked-ico" style="background:rgba(10,102,194,.12);color:#0a66c2"><i class="fa-brands fa-linkedin"></i></div><div class="linked-body"><h4>LinkedIn</h4><p>Not connected</p></div><button class="linked-btn" onclick="showToast('info','Coming soon','')">Connect</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-screen" id="detail-danger">
+  <div class="detail-hdr"><div class="detail-back" onclick="closeDetail('danger')"><i class="fa-solid fa-chevron-left"></i></div><div class="detail-hdr-icon" style="background:rgba(255,80,80,.1);color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="detail-hdr-title">Danger Zone</div></div>
+  <div class="detail-body">
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px;line-height:1.6">These actions are irreversible. Read carefully before proceeding.</p>
+    <div class="danger-row"><div class="danger-info"><h4>Pause Account</h4><p>Temporarily hide your profile.</p></div><button class="danger-btn" onclick="showToast('info','⏸ Paused','Profile hidden.')">Pause</button></div>
+    <div class="danger-row"><div class="danger-info"><h4>Export My Data</h4><p>Download all your account data.</p></div><button class="danger-btn" onclick="showToast('info','📦 Requested','Data will be emailed.')">Export</button></div>
+    <div class="danger-row" style="border-color:rgba(255,80,80,.35);background:rgba(255,80,80,.07)"><div class="danger-info"><h4>Delete Account</h4><p>Permanently delete — cannot be undone.</p></div><button class="danger-btn" style="background:rgba(255,80,80,.18)" onclick="openModal('deleteAccountModal')">Delete</button></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="changePasswordModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-icon" style="background:rgba(97,87,255,.12);color:var(--p2)"><i class="fa-solid fa-key"></i></div><h2>Change Password</h2><p>Choose a strong, unique password</p></div>
+    <div class="input-group" style="margin-bottom:11px"><label>Current Password</label><input type="password" id="currentPass" placeholder="••••••••"></div>
+    <div class="input-group" style="margin-bottom:11px"><label>New Password</label><input type="password" id="newPass" placeholder="Min 8 characters"></div>
+    <div class="input-group" style="margin-bottom:16px"><label>Confirm New Password</label><input type="password" id="confirmPass" placeholder="Repeat new password"></div>
+    <button class="btn-primary btn-full" onclick="changePassword()"><i class="fa-solid fa-lock"></i>Update Password</button>
+    <button class="btn-cancel" onclick="closeModal('changePasswordModal')">Cancel</button>
+  </div>
+</div>
+<div id="addPaymentModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-icon" style="background:rgba(255,185,48,.12);color:var(--amber)"><i class="fa-solid fa-wallet"></i></div><h2>Add Payment Method</h2><p>UPI ID or bank account</p></div>
+    <div class="input-group" style="margin-bottom:11px"><label>Type</label><select id="payType"><option value="upi">UPI ID</option><option value="bank">Bank Account</option></select></div>
+    <div class="input-group" style="margin-bottom:16px"><label>UPI ID / Account Number</label><input type="text" id="payValue" placeholder="yourname@upi"></div>
+    <button class="btn-primary btn-full" style="background:linear-gradient(135deg,var(--amber),#f97316)" onclick="addPayment()"><i class="fa-solid fa-plus"></i>Add Method</button>
+    <button class="btn-cancel" onclick="closeModal('addPaymentModal')">Cancel</button>
+  </div>
+</div>
+<div id="deleteAccountModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head"><div class="modal-icon" style="background:rgba(255,80,80,.12);color:var(--red)"><i class="fa-solid fa-skull"></i></div><h2>Delete Account?</h2><p>This is permanent. All your data, trades and earnings will be lost forever.</p></div>
+    <div class="input-group" style="margin-bottom:16px"><label>Type <strong>DELETE</strong> to confirm</label><input type="text" id="deleteConfirm" placeholder="DELETE"></div>
+    <button class="btn-danger-full" onclick="deleteAccount()"><i class="fa-solid fa-trash" style="margin-right:8px"></i>Delete My Account</button>
+    <button class="btn-cancel" onclick="closeModal('deleteAccountModal')">Cancel, keep my account</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bnav-inner">
+    <a href="index.html" class="bnav-item"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="explore.html" class="bnav-item"><i class="fa-solid fa-compass"></i>Explore</a>
+    <a href="dashboard.html" class="bnav-item"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+    <a href="chat.html" class="bnav-item"><i class="fa-solid fa-message"></i>Messages</a>
+    <a href="setting.html" class="bnav-item active"><i class="fa-solid fa-gear"></i>Settings</a>
   </div>
 </nav>
 
-<!-- Toast -->
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- ── MODALS ── -->
-
-<!-- Change Password -->
-<div id="changePasswordModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-icon-wrap" style="background:rgba(99,102,241,0.12);color:var(--primary);"><i class="fa-solid fa-key"></i></div>
-      <h2>Change Password</h2>
-      <p>Choose a strong, unique password</p>
-    </div>
-    <div class="input-group" style="margin-bottom:16px;">
-      <label>Current Password</label>
-      <input type="password" id="currentPass" placeholder="••••••••">
-    </div>
-    <div class="input-group" style="margin-bottom:16px;">
-      <label>New Password</label>
-      <input type="password" id="newPass" placeholder="Min 8 characters">
-    </div>
-    <div class="input-group" style="margin-bottom:20px;">
-      <label>Confirm New Password</label>
-      <input type="password" id="confirmPass" placeholder="Repeat new password">
-    </div>
-    <button class="btn-save" style="width:100%;justify-content:center;" onclick="changePassword()"><i class="fa-solid fa-lock"></i> Update Password</button>
-    <button class="btn-modal-cancel" onclick="closeModal('changePasswordModal')">Cancel</button>
-  </div>
-</div>
-
-<!-- Add Payment -->
-<div id="addPaymentModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-icon-wrap" style="background:rgba(245,158,11,0.12);color:var(--gold);"><i class="fa-solid fa-wallet"></i></div>
-      <h2>Add Payment Method</h2>
-      <p>Add a UPI ID or bank account</p>
-    </div>
-    <div class="input-group" style="margin-bottom:16px;">
-      <label>Type</label>
-      <select id="payType">
-        <option value="upi">UPI ID</option>
-        <option value="bank">Bank Account</option>
-      </select>
-    </div>
-    <div class="input-group" style="margin-bottom:20px;">
-      <label>UPI ID / Account Number</label>
-      <input type="text" id="payValue" placeholder="yourname@upi">
-    </div>
-    <button class="btn-save" style="width:100%;justify-content:center;background:linear-gradient(135deg,var(--gold),#f97316);" onclick="addPayment()"><i class="fa-solid fa-plus"></i> Add Method</button>
-    <button class="btn-modal-cancel" onclick="closeModal('addPaymentModal')">Cancel</button>
-  </div>
-</div>
-
-<!-- Delete Account -->
-<div id="deleteAccountModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-icon-wrap" style="background:rgba(239,68,68,0.12);color:var(--danger);"><i class="fa-solid fa-skull"></i></div>
-      <h2>Delete Account?</h2>
-      <p>This is permanent and cannot be undone. All your data, trades, and earnings history will be lost forever.</p>
-    </div>
-    <div class="input-group" style="margin-bottom:20px;">
-      <label>Type <strong>DELETE</strong> to confirm</label>
-      <input type="text" id="deleteConfirm" placeholder="DELETE">
-    </div>
-    <button class="btn-danger" onclick="deleteAccount()"><i class="fa-solid fa-trash" style="margin-right:8px;"></i>Delete My Account</button>
-    <button class="btn-modal-cancel" onclick="closeModal('deleteAccountModal')">Cancel, keep my account</button>
-  </div>
-</div>
-
-<!-- Firebase + Settings JS -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",
-  authDomain: "skillswapp-35e86.firebaseapp.com",
-  projectId: "skillswapp-35e86",
-  storageBucket: "skillswapp-35e86.appspot.com",
-  messagingSenderId: "668466292157",
-  appId: "1:668466292157:web:9be85414fc752b67779ed4"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let userData = {};
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "login.html"; return; }
-  currentUser = user;
-
-  const snap = await getDoc(doc(db, "users", user.uid));
-  if (snap.exists()) {
-    userData = snap.data();
-    const name = userData.name || user.displayName || "User";
-    const xp = userData.xp || 0;
-
-    // Sidebar
-    document.getElementById("sidebarName").innerText = name;
-    document.getElementById("sidebarAvatar").innerText = name[0].toUpperCase();
-    document.getElementById("sidebarXP").innerText = xp;
-
-    // Big avatar
-    document.getElementById("bigAvatar").innerText = name[0].toUpperCase();
-    // (overlay re-add after text change)
-    document.getElementById("bigAvatar").innerHTML = name[0].toUpperCase() + `<div class="edit-overlay"><i class="fa-solid fa-camera"></i></div>`;
-
-    // Profile display
-    document.getElementById("profileNameDisplay").innerText = name;
-    document.getElementById("profileEmailDisplay").innerText = user.email || "";
-
-    // Fill form
-    document.getElementById("settingName").value = name;
-    document.getElementById("settingUsername").value = userData.username || "";
-    document.getElementById("settingEmail").value = user.email || "";
-    document.getElementById("settingPhone").value = userData.phone || "";
-    document.getElementById("settingLocation").value = userData.location || "";
-    document.getElementById("settingWebsite").value = userData.website || "";
-    document.getElementById("settingBio").value = userData.bio || "";
-
-    // Skills
-    (userData.teachSkills || []).forEach(s => addTagValue('teach', s));
-    (userData.learnSkills || []).forEach(s => addTagValue('learn', s));
-
-    // Linked Google
-    if (user.providerData.some(p => p.providerId === 'google.com')) {
-      document.getElementById("googleStatus").innerText = "Connected";
-      document.getElementById("googleBtn").classList.add("connected");
-      document.getElementById("googleBtn").innerText = "Connected ✓";
+import { getAuth, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCz52XxqRB2IKCxwqm5duKJsQ2uEMs8ans",authDomain:"skillswapp-35e86.firebaseapp.com",projectId:"skillswapp-35e86",storageBucket:"skillswapp-35e86.appspot.com",messagingSenderId:"668466292157",appId:"1:668466292157:web:9be85414fc752b67779ed4"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+let currentUser=null,userData={};
+onAuthStateChanged(auth,async(user)=>{
+  if(!user){window.location.href="login.html";return;}
+  currentUser=user;
+  const snap=await getDoc(doc(db,"users",user.uid));
+  if(snap.exists()){
+    userData=snap.data();
+    const name=userData.name||user.displayName||"User";
+    const xp=userData.xp||0;
+    const init=name[0].toUpperCase();
+    // sidebar
+    document.getElementById("sidebarAvatar").innerText=init;
+    document.getElementById("sidebarName").innerText=name;
+    document.getElementById("sidebarXP").innerText=xp;
+    // desktop
+    document.getElementById("bigAvatar").innerHTML=init+`<div class="pb-av-ov" onclick="showToast('info','📷 Coming soon','')"><i class="fa-solid fa-camera" style="color:#fff;font-size:1rem"></i></div>`;
+    document.getElementById("profileNameDisplay").innerText=name;
+    document.getElementById("profileEmailDisplay").innerText=user.email||"";
+    document.getElementById("settingName").value=name;
+    document.getElementById("settingUsername").value=userData.username||"";
+    document.getElementById("settingEmail").value=user.email||"";
+    document.getElementById("settingPhone").value=userData.phone||"";
+    document.getElementById("settingLocation").value=userData.location||"";
+    document.getElementById("settingWebsite").value=userData.website||"";
+    document.getElementById("settingBio").value=userData.bio||"";
+    // mobile list
+    document.getElementById("mobPcAv").innerText=init;
+    document.getElementById("mobPcName").innerText=name;
+    document.getElementById("mobPcEmail").innerText=user.email||"";
+    // mobile detail
+    document.getElementById("mobBigAv").innerText=init;
+    document.getElementById("mobProfileName").innerText=name;
+    document.getElementById("mobProfileEmail").innerText=user.email||"";
+    document.getElementById("mobName").value=name;
+    document.getElementById("mobUsername").value=userData.username||"";
+    document.getElementById("mobEmail").value=user.email||"";
+    document.getElementById("mobPhone").value=userData.phone||"";
+    document.getElementById("mobLocation").value=userData.location||"";
+    document.getElementById("mobWebsite").value=userData.website||"";
+    document.getElementById("mobBio").value=userData.bio||"";
+    // skills
+    (userData.teachSkills||[]).forEach(s=>{addTagToContainer("teachTags",s,false);addTagToContainer("mobTeachTags",s,false);});
+    (userData.learnSkills||[]).forEach(s=>{addTagToContainer("learnTags",s,true);addTagToContainer("mobLearnTags",s,true);});
+    // photo
+    if(user.photoURL){
+      ["bigAvatar","mobBigAv","mobPcAv"].forEach(id=>{
+        const el=document.getElementById(id);if(!el)return;
+        const img=document.createElement("img");img.src=user.photoURL;el.appendChild(img);
+      });
+    }
+    // google
+    if(user.providerData.some(p=>p.providerId==="google.com")){
+      ["googleStatus","mGoogleStatus"].forEach(id=>{const el=document.getElementById(id);if(el)el.innerText="Connected";});
+      ["googleBtn","mGoogleBtn"].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.add("connected");el.innerText="Connected ✓";}});
     }
   }
 });
-
-// Save profile
-window.saveProfile = async function() {
-  if (!currentUser) return;
-  const name = document.getElementById("settingName").value.trim();
-  const bio = document.getElementById("settingBio").value.trim();
-  const phone = document.getElementById("settingPhone").value.trim();
-  const location = document.getElementById("settingLocation").value.trim();
-  const website = document.getElementById("settingWebsite").value.trim();
-  const username = document.getElementById("settingUsername").value.trim();
-  if (!name) { showToast("error","Name required","Please enter your full name."); return; }
-  await updateDoc(doc(db, "users", currentUser.uid), { name, bio, phone, location, website, username, updatedAt: serverTimestamp() });
-  document.getElementById("profileNameDisplay").innerText = name;
-  document.getElementById("sidebarName").innerText = name;
-  showToast("success","Profile Saved","Your profile has been updated.");
+function addTagToContainer(containerId,val,isLearn){
+  const c=document.getElementById(containerId);if(!c)return;
+  const t=document.createElement("div");t.className="s-tag"+(isLearn?" learn":"");t.dataset.value=val;
+  t.innerHTML=`${val}<button onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+  c.appendChild(t);
+}
+window.saveProfile=async function(){
+  if(!currentUser)return;
+  const name=document.getElementById("settingName").value.trim();
+  if(!name){showToast("error","❌ Name required","");return;}
+  await updateDoc(doc(db,"users",currentUser.uid),{name,bio:document.getElementById("settingBio").value.trim(),phone:document.getElementById("settingPhone").value.trim(),location:document.getElementById("settingLocation").value.trim(),website:document.getElementById("settingWebsite").value.trim(),username:document.getElementById("settingUsername").value.trim(),updatedAt:serverTimestamp()});
+  document.getElementById("profileNameDisplay").innerText=name;
+  document.getElementById("sidebarName").innerText=name;
+  showToast("success","✅ Profile Saved","Your profile has been updated.");
 };
-
-window.loadProfile = function() {
-  document.getElementById("settingName").value = userData.name || "";
-  document.getElementById("settingBio").value = userData.bio || "";
-  showToast("info","Discarded","Changes have been discarded.");
+window.saveMobProfile=async function(){
+  if(!currentUser)return;
+  const name=document.getElementById("mobName").value.trim();
+  if(!name){showToast("error","❌ Name required","");return;}
+  await updateDoc(doc(db,"users",currentUser.uid),{name,bio:document.getElementById("mobBio").value.trim(),phone:document.getElementById("mobPhone").value.trim(),location:document.getElementById("mobLocation").value.trim(),website:document.getElementById("mobWebsite").value.trim(),username:document.getElementById("mobUsername").value.trim(),updatedAt:serverTimestamp()});
+  document.getElementById("mobProfileName").innerText=name;
+  document.getElementById("mobPcName").innerText=name;
+  document.getElementById("sidebarName").innerText=name;
+  showToast("success","✅ Profile Saved","");
 };
-
-window.saveSkills = async function() {
-  if (!currentUser) return;
-  const teachSkills = Array.from(document.querySelectorAll('#teachTags .skill-tag')).map(el => el.dataset.value);
-  const learnSkills = Array.from(document.querySelectorAll('#learnTags .skill-tag')).map(el => el.dataset.value);
-  await updateDoc(doc(db, "users", currentUser.uid), { teachSkills, learnSkills, updatedAt: serverTimestamp() });
-  showToast("success","Skills Saved","Your skill preferences have been updated.");
+window.loadProfile=function(){window.location.reload();};
+window.saveSkills=async function(){
+  if(!currentUser)return;
+  const teachSkills=[...new Set([...document.querySelectorAll("#teachTags .s-tag, #mobTeachTags .s-tag")].map(el=>el.dataset.value).filter(Boolean))];
+  const learnSkills=[...new Set([...document.querySelectorAll("#learnTags .s-tag, #mobLearnTags .s-tag")].map(el=>el.dataset.value).filter(Boolean))];
+  await updateDoc(doc(db,"users",currentUser.uid),{teachSkills,learnSkills,updatedAt:serverTimestamp()});
+  showToast("success","✅ Skills Saved","");
 };
-
-window.saveNotifications = function() {
-  const prefs = {
-    trade: document.getElementById("notif_trade").checked,
-    session: document.getElementById("notif_session").checked,
-    msg: document.getElementById("notif_msg").checked,
-    wallet: document.getElementById("notif_wallet").checked,
-    xp: document.getElementById("notif_xp").checked,
-    news: document.getElementById("notif_news").checked,
-    emailWeekly: document.getElementById("email_weekly").checked,
-    emailTrade: document.getElementById("email_trade").checked,
-    emailMarketing: document.getElementById("email_marketing").checked,
-  };
-  localStorage.setItem("ss_notif_prefs", JSON.stringify(prefs));
-  showToast("success","Saved","Notification preferences updated.");
+window.saveNotifications=function(){showToast("success","✅ Saved","Notification preferences updated.");};
+window.savePrivacy=async function(){
+  if(!currentUser)return;
+  await updateDoc(doc(db,"users",currentUser.uid),{privacy:{publicProfile:document.getElementById("priv_public").checked,showOnline:document.getElementById("priv_online").checked,showEarnings:document.getElementById("priv_earnings").checked,showTrades:document.getElementById("priv_trades").checked},updatedAt:serverTimestamp()});
+  showToast("success","✅ Privacy Saved","");
 };
-
-window.savePrivacy = async function() {
-  if (!currentUser) return;
-  const privacy = {
-    publicProfile: document.getElementById("priv_public").checked,
-    showOnline: document.getElementById("priv_online").checked,
-    showEarnings: document.getElementById("priv_earnings").checked,
-    showTrades: document.getElementById("priv_trades").checked,
-  };
-  await updateDoc(doc(db, "users", currentUser.uid), { privacy, updatedAt: serverTimestamp() });
-  showToast("success","Privacy Saved","Your privacy settings have been updated.");
-};
-
-window.changePassword = async function() {
-  const current = document.getElementById("currentPass").value;
-  const newP = document.getElementById("newPass").value;
-  const confirm = document.getElementById("confirmPass").value;
-  if (!current || !newP || !confirm) { showToast("error","Missing fields","Please fill all password fields."); return; }
-  if (newP !== confirm) { showToast("error","Mismatch","New passwords don't match."); return; }
-  if (newP.length < 8) { showToast("error","Too short","Password must be at least 8 characters."); return; }
-  try {
-    const cred = EmailAuthProvider.credential(currentUser.email, current);
-    await reauthenticateWithCredential(currentUser, cred);
-    await updatePassword(currentUser, newP);
+window.changePassword=async function(){
+  const cur=document.getElementById("currentPass").value,np=document.getElementById("newPass").value,cp=document.getElementById("confirmPass").value;
+  if(!cur||!np||!cp){showToast("error","❌ Fill all fields","");return;}
+  if(np!==cp){showToast("error","❌ Passwords don't match","");return;}
+  if(np.length<8){showToast("error","❌ Too short","Min 8 characters.");return;}
+  try{
+    await reauthenticateWithCredential(currentUser,EmailAuthProvider.credential(currentUser.email,cur));
+    await updatePassword(currentUser,np);
     closeModal("changePasswordModal");
-    showToast("success","Password Updated","Your password has been changed.");
-    document.getElementById("currentPass").value = "";
-    document.getElementById("newPass").value = "";
-    document.getElementById("confirmPass").value = "";
-  } catch(e) {
-    showToast("error","Error", e.message.includes("wrong-password") ? "Current password is incorrect." : e.message);
-  }
+    showToast("success","✅ Password Updated","");
+  }catch(e){showToast("error","❌ Error",e.message.includes("wrong-password")?"Current password incorrect.":e.message);}
 };
-
-window.deleteAccount = function() {
-  const input = document.getElementById("deleteConfirm").value;
-  if (input !== "DELETE") { showToast("error","Confirmation required","Type DELETE exactly to proceed."); return; }
+window.deleteAccount=function(){
+  if(document.getElementById("deleteConfirm").value!=="DELETE"){showToast("error","❌ Type DELETE to confirm","");return;}
   closeModal("deleteAccountModal");
-  showToast("warning","Account Scheduled","Account deletion has been queued. Contact support to cancel.");
+  showToast("info","⏳ Submitted","Contact support to cancel.");
 };
-
-window.addPayment = function() {
-  const type = document.getElementById("payType").value;
-  const val = document.getElementById("payValue").value.trim();
-  if (!val) { showToast("error","Missing","Please enter a UPI ID or account number."); return; }
-  const list = document.getElementById("paymentMethodsList");
-  const item = document.createElement("div");
-  item.className = "payment-method";
-  item.innerHTML = `<div class="pm-icon" style="background:rgba(245,158,11,0.12);font-size:0.9rem;color:var(--gold);">${type.toUpperCase()}</div><div class="pm-body"><h4>${val}</h4><p>${type === 'upi' ? 'UPI ID' : 'Bank Account'}</p></div><div class="pm-actions"><button class="pm-remove" onclick="this.closest('.payment-method').remove();showToast('info','Removed','Payment method removed.')">Remove</button></div>`;
-  list.appendChild(item);
-  closeModal("addPaymentModal");
-  document.getElementById("payValue").value = "";
-  showToast("success","Added","Payment method added successfully.");
-};
-</script>
-
-<script>
-// ── Tab switching
-function switchTab(name) {
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  // mobile scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ── Skill tags
-let teachTags = [], learnTags = [];
-
-function addTagValue(type, val) {
-  const container = document.getElementById(type + 'Tags');
-  if (!val) return;
-  const tag = document.createElement('div');
-  tag.className = 'skill-tag';
-  tag.dataset.value = val;
-  tag.innerHTML = `${val}<button onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
-  // style learn tags differently
-  if (type === 'learn') {
-    tag.style.background = 'rgba(56,189,248,0.12)';
-    tag.style.borderColor = 'rgba(56,189,248,0.25)';
-    tag.style.color = 'var(--info)';
-    tag.querySelector('button').style.color = 'var(--info)';
-  }
-  container.appendChild(tag);
-}
-
-window.addTag = function(type) {
-  const input = document.getElementById(type + 'SkillInput');
-  const val = input.value.trim();
-  if (!val) return;
-  addTagValue(type, val);
-  input.value = '';
-  input.focus();
-};
-
-// ── Theme selector
-window.selectTheme = function(el, name) {
-  document.querySelectorAll('.theme-option').forEach(t => {
-    t.classList.remove('selected');
-    t.querySelector('.theme-name').textContent = t.querySelector('.theme-name').textContent.replace(' ✓','');
+window.addPayment=function(){
+  const type=document.getElementById("payType").value,val=document.getElementById("payValue").value.trim();
+  if(!val){showToast("error","❌ Enter a value","");return;}
+  ["paymentMethodsList","mobPmList"].forEach(id=>{
+    const list=document.getElementById(id);if(!list)return;
+    const item=document.createElement("div");item.className="pm-row";
+    item.innerHTML=`<div class="pm-ico" style="background:rgba(255,185,48,.12);color:var(--amber)">${type.toUpperCase()}</div><div class="pm-body"><h4>${val}</h4><p>${type==="upi"?"UPI ID":"Bank Account"}</p></div><button class="pm-remove" onclick="this.closest('.pm-row').remove()">Remove</button>`;
+    list.appendChild(item);
   });
-  el.classList.add('selected');
-  el.querySelector('.theme-name').textContent = name + ' ✓';
-  showToast('success','Theme Changed', name + ' theme applied.');
+  closeModal("addPaymentModal");document.getElementById("payValue").value="";
+  showToast("success","✅ Added","Payment method added.");
+};
+window.logoutUser=async()=>{await signOut(auth);window.location.href="login.html";};
+</script>
+<script>
+// Desktop tab switching
+function switchTab(name){
+  document.querySelectorAll(".ds-menu-item").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".ds-panel").forEach(el=>el.classList.remove("active"));
+  const mi=document.querySelector(`.ds-menu-item[data-tab="${name}"]`);
+  if(mi)mi.classList.add("active");
+  const p=document.getElementById("panel-"+name);
+  if(p)p.classList.add("active");
+}
+window.switchTab=switchTab;
+
+// Mobile detail screens
+function openDetail(n){const el=document.getElementById("detail-"+n);if(el){el.classList.add("open");document.body.style.overflow="hidden";}history.pushState(null,"",location.href);}
+function closeDetail(n){const el=document.getElementById("detail-"+n);if(el){el.classList.remove("open");document.body.style.overflow="";}}
+window.openDetail=openDetail;window.closeDetail=closeDetail;
+
+// Swipe back
+let tx=0;
+document.querySelectorAll(".detail-screen").forEach(s=>{
+  s.addEventListener("touchstart",e=>{tx=e.changedTouches[0].screenX},{passive:true});
+  s.addEventListener("touchend",e=>{if(e.changedTouches[0].screenX-tx>80&&s.classList.contains("open"))closeDetail(s.id.replace("detail-",""))},{passive:true});
+});
+window.addEventListener("popstate",()=>{
+  const o=document.querySelector(".detail-screen.open");
+  if(o){closeDetail(o.id.replace("detail-",""));}
+});
+
+// Toast
+let tt;
+function showToast(type,title,msg){
+  clearTimeout(tt);
+  const w=document.getElementById("toastWrap"),i=document.getElementById("toastInner");
+  i.className="toast-inner "+type;
+  i.innerHTML=`<span>${title}</span>${msg?`<span style="color:var(--muted);font-size:.75rem">${msg}</span>`:""}`;
+  w.classList.add("show");
+  tt=setTimeout(()=>w.classList.remove("show"),3000);
+}
+window.showToast=showToast;
+
+// Tags — desktop
+window.addTag=function(type){
+  const input=document.getElementById(type+"SkillInput");
+  if(!input)return;
+  const val=input.value.trim();if(!val)return;
+  addTagToContainer(type+"Tags",val,type==="learn");
+  input.value="";input.focus();
+};
+// Tags — mobile
+window.addMobTag=function(type){
+  const input=document.getElementById("mob"+type.charAt(0).toUpperCase()+type.slice(1)+"Input");
+  if(!input)return;
+  const val=input.value.trim();if(!val)return;
+  addTagToContainer("mob"+type.charAt(0).toUpperCase()+type.slice(1)+"Tags",val,type==="learn");
+  input.value="";input.focus();
+};
+function addTagToContainer(cid,val,isLearn){
+  const c=document.getElementById(cid);if(!c)return;
+  const t=document.createElement("div");t.className="s-tag"+(isLearn?" learn":"");t.dataset.value=val;
+  t.innerHTML=`${val}<button onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+  c.appendChild(t);
+}
+
+// Theme
+window.selectTheme=function(el,name){
+  document.querySelectorAll(".theme-opt").forEach(t=>{t.classList.remove("selected");t.querySelector(".theme-name").textContent=t.querySelector(".theme-name").textContent.replace(" ✓","");});
+  el.classList.add("selected");el.querySelector(".theme-name").textContent=name+" ✓";
+  showToast("success","🎨 Theme Changed",name+" applied.");
 };
 
-// ── Modal helpers
-window.openModal = function(id) { document.getElementById(id).classList.add('show'); };
-window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
-document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('show'); }));
+// Modals
+window.openModal=id=>document.getElementById(id).classList.add("show");
+window.closeModal=id=>document.getElementById(id).classList.remove("show");
+document.querySelectorAll(".modal-overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("show");}));
 
-// ── Toast
-window.showToast = function(type, title, msg) {
-  const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
-  const colors = { success:'var(--success)', error:'var(--danger)', info:'var(--info)', warning:'var(--gold)' };
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.style.borderLeftWidth = '3px';
-  toast.style.borderLeftColor = colors[type] || 'var(--primary)';
-  toast.innerHTML = `<div class="toast-icon">${icons[type]||'💬'}</div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
-  container.appendChild(toast);
-  setTimeout(() => { toast.classList.add('removing'); setTimeout(()=>toast.remove(),300); }, 4000);
-};
-
-// ── Sidebar mobile
-window.toggleSidebar = function() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classLis}
+// Sidebar
+window.closeSidebar=function(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sbOverlay").classList.remove("show");};
+</script>
+</body>
+</html>
